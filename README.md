@@ -1,73 +1,243 @@
-# React + TypeScript + Vite
+# LandSight Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Веб-приложение для анализа земельных участков, позволяющее пользователям выбирать полигоны на карте, задавать им имя, отправлять на анализ и отслеживать статус.
 
-Currently, two official plugins are available:
+## Технологии
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 19** с функциональными компонентами и хуками.
+- **TypeScript** для статической типизации.
+- **Vite** как сборщик и dev-сервер с проксированием API.
+- **Redux Toolkit** для управления состоянием (полигон, анализы).
+- **React Router** для навигации между страницами.
+- **Material-UI (MUI)** как UI-библиотека (компоненты, иконки, стилизация).
+- **Leaflet** + **react-leaflet** для отображения карт и рисования полигонов.
+- **TanStack Query (React Query)** для управления асинхронными запросами.
+- **SASS/SCSS** с модулями и методологией BEM для стилей.
 
-## React Compiler
+## Архитектура
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Проект построен по принципам **микро-фронтендов** (Micro-Frontends) с разделением на независимые функциональные модули (features), страницы (pages) и общие утилиты (shared).
 
-## Expanding the ESLint configuration
+### Структура проекта
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── app/                    # Ядро приложения
+│   ├── store/             # Управление состоянием (Redux Toolkit)
+│   │   ├── slices/        # Слайсы состояния (polygon, analysis)
+│   │   ├── hooks.ts       # Типизированные хуки useAppDispatch/useAppSelector
+│   │   └── index.ts       # Конфигурация store
+│   ├── routes/            # Маршрутизация (React Router)
+│   └── App.tsx            # Корневой компонент
+├── features/              # Функциональные модули
+│   ├── map/               # Работа с картой
+│   │   ├── components/    # MapView, LayerSwitcher
+│   │   └── hooks/         # useDrawing (логика рисования полигонов)
+│   ├── analysis/          # Анализ участков
+│   │   ├── components/    # AnalysisForm (форма запуска анализа)
+│   │   └── services/      # API-запросы к бэкенду
+│   └── ui/                # Общие UI-компоненты (Menu)
+├── pages/                 # Страницы приложения
+│   ├── MapPage/           # Главная страница с картой
+│   ├── AnalysesPage/      # Список запущенных анализов
+│   └── AnalysisDetailsPage/ # Детали анализа
+├── shared/                # Общие ресурсы
+│   └── api/               # HTTP-клиент (axios)
+└── index.sass             # Глобальные стили
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Ключевые архитектурные решения
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. **Микро-фронтенды** – каждая функциональная область выделена в отдельный модуль (`features/`), что позволяет разрабатывать и тестировать их независимо.
+2. **Управление состоянием** – Redux Toolkit с двумя основными слайсами: polygon (текущий выбранный полигон) и analyses (список запущенных анализов).
+3. **Работа с картой** – основана на `react-leaflet`, рисование полигонов через плагин `leaflet-draw` в кастомном хуке `useDrawing`.
+4. **Взаимодействие с бэкендом** – HTTP-клиент `axios` с базовым URL `/api`, проксирование через Vite в development, в production – nginx.
+5. **Стилизация** – SASS с модулями, BEM-именование, глобальные стили в `index.sass` и `global.sass`.
+6. **Маршрутизация** – три основные страницы: `/map` (карта), `/analyses` (список анализов), `/analyses/:id` (детали анализа).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Установка и запуск
+
+### Предварительные требования
+
+- Node.js 18+ (рекомендуется LTS)
+- pnpm (или npm, yarn)
+
+### Установка зависимостей
+
+```bash
+pnpm install
 ```
+
+### Запуск в режиме разработки
+
+```bash
+pnpm run dev
+```
+
+Приложение будет доступно по адресу [http://localhost:5173](http://localhost:5173). Бэкенд должен быть доступен на `http://localhost:3000` (проксируется через Vite).
+
+### Сборка для production
+
+```bash
+pnpm run build
+```
+
+Собранные статические файлы появятся в папке `dist/`. Их можно обслуживать любым HTTP-сервером (nginx, Apache, CDN).
+
+### Просмотр собранной версии локально
+
+```bash
+pnpm run preview
+```
+
+## Скрипты
+
+В проекте определены следующие npm-скрипты (доступны через `pnpm run <script>`):
+
+| Скрипт         | Назначение                                            |
+| -------------- | ----------------------------------------------------- |
+| `dev`          | Запуск dev-сервера Vite                               |
+| `build`        | Сборка проекта (TypeScript компиляция + Vite build)   |
+| `preview`      | Локальный просмотр собранного приложения              |
+| `lint`         | Проверка кода ESLint                                  |
+| `lint:fix`     | Автоисправление ESLint проблем                        |
+| `format`       | Форматирование кода Prettier                          |
+| `format:check` | Проверка форматирования без изменений                 |
+| `type-check`   | Проверка типов TypeScript                             |
+| `check`        | Комплексная проверка: типы + линтинг + форматирование |
+
+## Тестирование
+
+На данный момент unit-тесты не настроены. Планируется добавить Jest + React Testing Library.
+
+## Линтинг и форматирование
+
+Проект использует ESLint и Prettier с предустановленными конфигурациями. Перед коммитом автоматически запускается `lint-staged` через Husky.
+
+### Ручной запуск линтинга
+
+```bash
+pnpm run lint
+```
+
+### Автоисправление
+
+```bash
+pnpm run lint:fix
+```
+
+### Форматирование
+
+```bash
+pnpm run format
+```
+
+## Git Workflow
+
+### Ветки
+
+Используется упрощённая модель Git Flow:
+
+- `main` – стабильная ветка, соответствует production.
+- `develop` – ветка для интеграции новых функций (опционально).
+- `feature/*` – ветки для разработки новых возможностей.
+- `bugfix/*` – ветки для исправления багов.
+- `hotfix/*` – срочные исправления в production.
+
+### Правила коммитов
+
+Сообщения коммитов должны следовать [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <subject>
+```
+
+Допустимые типы:
+
+- `feat` – новая функциональность.
+- `fix` – исправление бага.
+- `docs` – изменения в документации.
+- `style` – изменения, не влияющие на логику (форматирование, пробелы).
+- `refactor` – рефакторинг кода без изменения поведения.
+- `test` – добавление или исправление тестов.
+- `chore` – вспомогательные изменения (обновление зависимостей, настройки).
+
+Пример:
+
+```
+feat(map): добавить переключение слоёв карты
+fix(analysis): исправить отправку формы при пустом имени
+```
+
+### Pre-commit хуки
+
+Установлен Husky, который перед коммитом автоматически запускает линтинг и форматирование для изменённых файлов. Это гарантирует соответствие кода стандартам проекта.
+
+#### Настройка Husky
+
+Husky уже настроен в проекте. При установке зависимостей (`pnpm install`) автоматически выполняется скрипт `prepare`, который активирует хуки в папке `.husky/`. Если хуки не срабатывают, убедитесь, что:
+
+1. Хуки включены в Git: `git config core.hooksPath .husky` (выполняется автоматически при `pnpm install`).
+2. Файлы в `.husky/` исполняемые (права `+x`). При клонировании репозитория может потребоваться выполнить `chmod +x .husky/*`.
+
+#### Что делают хуки
+
+- **pre-commit**: запускает `lint-staged`, который выполняет `eslint --fix` и `prettier --write` для изменённых файлов (TypeScript/TSX, SCSS/CSS, JSON/MD). Если линтинг или форматирование завершаются с ошибкой, коммит прерывается.
+
+Чтобы пропустить хуки (например, для экстренного коммита), используйте флаг `--no-verify`:
+
+```bash
+git commit -m "..." --no-verify
+```
+
+Но делать это следует только в исключительных случаях.
+
+## Деплой
+
+### Development
+
+Разработка ведётся на локальной машине с использованием Vite dev-сервера. Бэкенд должен быть запущен на `localhost:3000` (или настроен прокси в `vite.config.ts`).
+
+### Production
+
+1. Собрать проект: `pnpm run build`.
+2. Скопировать содержимое `dist/` на сервер.
+3. Настроить веб-сервер (например, nginx) для обслуживания статики и проксирования API-запросов.
+
+Пример конфигурации nginx:
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    root /path/to/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://backend:3000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+## Дальнейшее развитие
+
+- Добавить аутентификацию и авторизацию.
+- Реализовать реальное WebSocket-оповещение о завершении анализа.
+- Улучшить UX: drag-and-drop редактирование полигона, предпросмотр метрик.
+- Интеграция с дополнительными картографическими сервисами (Yandex Maps, Google Maps).
+- Оптимизация производительности: lazy loading страниц, мемоизация компонентов.
+
+## Заключение
+
+Данная архитектура обеспечивает модульность, масштабируемость и поддерживаемость кода. Она соответствует современным best practices фронтенд-разработки и позволяет легко добавлять новые функции без переписывания существующего кода.
+
+## Лицензия
+
+Проприетарное ПО.
