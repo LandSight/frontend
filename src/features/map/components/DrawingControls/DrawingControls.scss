@@ -1,0 +1,42 @@
+.DrawingControls {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-s;
+  background-color: white;
+  padding: $spacing-xs;
+  border-radius: $border-radius-l;
+  box-shadow: $box-shadow;
+
+  &__Button {
+    border-radius: 0 !important;
+    min-width: $icon-size;
+    min-height: $icon-size;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: $color-text-secondary;
+    transition: all $transition-fast;
+
+    &:hover {
+      background-color: $color-text-muted-hover;
+      transform: scale(1.05);
+    }
+
+    &:active {
+      background-color: $color-text-muted;
+      transform: scale(0.95);
+    }
+
+    // &--active {
+    //   background-color: $color-bg-dark-light !important;
+    //   color: $color-text-white !important;
+
+    //   &:hover {
+    //     background-color: $color-bg-dark-light !important;
+    //   }
+    // }
+  }
+}

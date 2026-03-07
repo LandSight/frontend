@@ -1,0 +1,44 @@
+// Colors
+$color-bg-dark: #161b1d;
+$color-bg-dark-light: #232b2f;
+$color-bg-dark-lighter: #2a3439;
+$color-text-light: #fafafa;
+$color-text-muted: #c5c5c5;
+$color-text-muted-hover: #e0e0e0;
+$color-text-active: #d9dbdb;
+$color-text-white: #ffffff;
+$color-text-secondary: #888;
+
+// Spacing (s, m, l, xl)
+$spacing-xs: 4px;
+$spacing-s: 8px;
+$spacing-m: 16px;
+$spacing-l: 24px;
+$spacing-xl: 32px;
+
+// Component sizes
+$sidebar-width: 250px;
+$logo-size: 64px;
+
+// Typography
+$font-family-base: system-ui, Avenir, Helvetica, Arial, sans-serif;
+$font-size-s: 0.875rem;
+$font-size-m: 1rem;
+$font-size-l: 1.5rem;
+$font-weight-bold: 700;
+
+// Borders
+$border-radius-s: 4px;
+$border-radius-m: 5px;
+$border-radius-l: 8px;
+
+// Shadows
+$box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+// Transitions
+$transition-fast: 0.2s ease;
+
+// Additional spacing
+$spacing-gap: 15px;
+$icon-size: 40px;
+$letter-spacing-title: 0.5px;

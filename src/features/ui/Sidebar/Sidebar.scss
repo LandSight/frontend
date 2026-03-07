@@ -1,0 +1,15 @@
+.Sidebar {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: $sidebar-width;
+  height: 100vh;
+  background-color: $color-bg-dark;
+  color: $color-text-light;
+  padding: $spacing-m;
+  gap: $spacing-s;
+
+  &__Divider {
+    background-color: $color-text-light;
+  }
+}
