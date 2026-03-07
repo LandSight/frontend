@@ -1,0 +1,29 @@
+.ZoomControls {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: $border-radius-l;
+  box-shadow: $box-shadow;
+  overflow: hidden;
+
+  &__Button {
+    border-radius: 0 !important;
+    min-width: $icon-size;
+    min-height: $icon-size;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    color: $color-text-secondary;
+    transition: background-color $transition-fast;
+
+    &:hover {
+      background-color: $color-text-muted-hover;
+    }
+
+    &:active {
+      background-color: $color-text-muted;
+    }
+  }
+}

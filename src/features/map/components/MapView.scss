@@ -1,0 +1,10 @@
+.MapView {
+  height: 100%;
+  width: 100%;
+  position: 'relative';
+
+  &__MapContainer {
+    height: 100%;
+    width: 100%;
+  }
+}
