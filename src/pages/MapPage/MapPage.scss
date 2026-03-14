@@ -1,5 +1,29 @@
-.map-page {
-  height: 100%;
+.MapPage {
+  display: flex;
+  height: 100vh;
   width: 100%;
-  position: relative;
+  overflow: hidden;
+
+  &__MapContainer {
+    flex: 1;
+    position: relative;
+  }
+
+  &__RightSidebar {
+    width: $sidebar-width;
+    background-color: $color-bg-dark;
+    color: $color-text-light;
+    padding: $spacing-m;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-m;
+    overflow: hidden;
+  }
+
+  &__RightSidebarTitle {
+    margin: 0;
+    text-align: center;
+    font-size: $font-size-l;
+    font-weight: $font-weight-bold;
+  }
 }
