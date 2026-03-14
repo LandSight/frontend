@@ -22,7 +22,7 @@ import { useAction } from '@reatom/react';
 
 import { cn } from '#/shared/lib/bem';
 
-import { deleteAnalysis, exportMetrics } from '../../models/analysis';
+import { deleteAnalysis, exportMetrics } from '../../models/analyses';
 
 import { analysisStatusMap, analysisTypeMap, formatDate } from './helpers';
 import type { AnalysesTableProps } from './types';

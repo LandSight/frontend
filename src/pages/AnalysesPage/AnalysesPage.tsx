@@ -2,13 +2,13 @@ import React, { useEffect } from 'react';
 import { Box, Container, Paper, Skeleton, Typography } from '@mui/material';
 import { useAtom } from '@reatom/react';
 
-import { AnalysesFilters } from '#/features/analysis/components/AnalysesFilters';
-import { AnalysesTable } from '#/features/analysis/components/AnalysesTable';
+import { AnalysesFilters } from '#/features/analyses/components/AnalysesFilters';
+import { AnalysesTable } from '#/features/analyses/components/AnalysesTable';
 import {
   fetchAnalyses,
   filteredAnalysesAtom,
   isLoadingAtom,
-} from '#/features/analysis/models/analysis';
+} from '#/features/analyses/models/analyses';
 import { cn } from '#/shared/lib/bem';
 
 import './AnalysesPage.scss';

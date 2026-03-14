@@ -21,10 +21,10 @@ import {
   sortByFields,
   type SortOrder,
   sortOrderValues,
-} from '#/features/analysis/types';
+} from '#/features/analyses/types';
 import { cn } from '#/shared/lib/bem';
 
-import { filtersAtom, setFilters } from '../../models/analysis';
+import { filtersAtom, setFilters } from '../../models/analyses';
 
 import './AnalysesFilters.scss';
 

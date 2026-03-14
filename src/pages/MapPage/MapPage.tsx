@@ -2,14 +2,14 @@ import React from 'react';
 import { Button } from '@mui/material';
 import { useAction, useAtom } from '@reatom/react';
 
-import type { CreateAnalysisRequest } from '#/features/analysis/api/analysisApi';
-import { AnalysisDialog } from '#/features/analysis/components/AnalysisDialog';
+import type { CreateAnalysisRequest } from '#/features/analyses/api/analysesApi';
+import { AnalysisDialog } from '#/features/analyses/components/AnalysisDialog';
 import {
   analysisTypeAtom,
   createAnalysis,
   isFormOpenAtom,
   isLoadingAtom as analysisLoadingAtom,
-} from '#/features/analysis/models';
+} from '#/features/analyses/models';
 import { MapView } from '#/features/map/components/MapView';
 import { clearDrawingState, drawingPolygonAtom } from '#/features/map/models';
 import type { CreateParcelRequest } from '#/features/parcels/api/parcelsApi';

@@ -1,4 +1,4 @@
-import type { AnalysisStatus, AnalysisType } from '#/features/analysis/types';
+import type { AnalysisStatus, AnalysisType } from '#/features/analyses/types';
 
 export const analysisTypeMap: Record<AnalysisType, string> = {
   infrastructure: 'Infrastructure',

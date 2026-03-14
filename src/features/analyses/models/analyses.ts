@@ -2,8 +2,8 @@ import { action, atom, computed } from '@reatom/core';
 
 import { addNotification } from '#/shared/ui/notification';
 
-import type { CreateAnalysisRequest, FetchAnalysesParams } from '../api/analysisApi';
-import { analysisApi } from '../api/analysisApi';
+import type { CreateAnalysisRequest, FetchAnalysesParams } from '../api/analysesApi';
+import { analysesApi } from '../api/analysesApi';
 import { mockAnalyses } from '../mocks/analyses';
 import type { Analysis, AnalysisStatus, AnalysisType, SortBy, SortOrder } from '../types';
 
@@ -89,7 +89,7 @@ export const fetchAnalyses = action(async (params?: FetchAnalysesParams) => {
   errorAtom.set(null);
 
   try {
-    const analyses = await analysisApi.fetchAll(params);
+    const analyses = await analysesApi.fetchAll(params);
     const byId: Record<string, Analysis> = {};
     analyses.forEach((analysis) => {
       byId[analysis.id] = analysis;
@@ -119,7 +119,7 @@ export const createAnalysis = action(async (data: CreateAnalysisRequest) => {
   errorAtom.set(null);
 
   try {
-    const newAnalysis = await analysisApi.create(data);
+    const newAnalysis = await analysesApi.create(data);
     analysesAtom.set((prev) => ({ ...prev, [newAnalysis.id]: newAnalysis as Analysis }));
     addNotification('Analysis started successfully', 'success');
     return newAnalysis;
@@ -137,7 +137,7 @@ export const deleteAnalysis = action(async (id: string) => {
   errorAtom.set(null);
 
   try {
-    await analysisApi.delete(id);
+    await analysesApi.delete(id);
     analysesAtom.set((prev) => {
       const { [id]: _, ...rest } = prev;
       return rest;
@@ -154,7 +154,7 @@ export const deleteAnalysis = action(async (id: string) => {
 
 export const exportMetrics = action(async (id: string, format: 'json' | 'csv' = 'json') => {
   try {
-    const blob = await analysisApi.exportMetrics(id, format);
+    const blob = await analysesApi.exportMetrics(id, format);
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
