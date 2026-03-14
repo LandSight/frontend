@@ -1,0 +1,76 @@
+.AnalysesTable {
+  height: 100%;
+  overflow: scroll;
+  border-radius: 16px !important;
+
+  .MuiTableContainer-root {
+    height: 100%;
+    border-radius: 16px;
+  }
+
+  .MuiTableHead-root {
+    background-color: $color-bg-dark-lighter;
+
+    .MuiTableCell-head {
+      color: white;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-bottom: none;
+    }
+  }
+
+  .MuiTableBody-root {
+    .MuiTableRow-root {
+      &:nth-of-type(even) {
+        background-color: #f8f9fa;
+      }
+
+      &:hover {
+        background-color: #e3f2fd;
+      }
+
+      .MuiTableCell-body {
+        padding: 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid #e0e0e0;
+      }
+    }
+  }
+
+  &__Status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__StatusBadge {
+    font-weight: 500;
+    border-radius: 12px;
+    min-width: 80px;
+    justify-content: center;
+
+    &--pending {
+      color: black !important;
+    }
+    &--processing {
+      background-color: #4ba6ef !important;
+      color: white !important;
+    }
+    &--completed {
+      background-color: #9bff9f !important;
+      color: black !important;
+    }
+    &--failed {
+      background-color: #e0584e !important;
+      color: white !important;
+    }
+  }
+
+  &__ScoreChip {
+    color: white;
+    font-weight: 600;
+    border-radius: 12px;
+    min-width: 50px;
+    justify-content: center;
+  }
+}
