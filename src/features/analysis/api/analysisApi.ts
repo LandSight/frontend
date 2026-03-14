@@ -1,17 +1,15 @@
+import type { AnalysisType } from '#/features/analysis/types';
 import apiClient from '#/shared/api/client';
-import type { AnalysisType } from '#/shared/types/analysis';
-import type { Point } from '#/shared/types/geometry';
 
-export interface CreateAnalysisRequest {
-  name: string;
+export type CreateAnalysisRequest = {
   type: AnalysisType;
-  polygon: Point[];
-}
+  parcel_id: string;
+};
 
-export interface CreateAnalysisResponse {
+export type CreateAnalysisResponse = {
   id: string;
   status: string;
-}
+};
 
 export const analysisApi = {
   create: async (data: CreateAnalysisRequest): Promise<CreateAnalysisResponse> => {

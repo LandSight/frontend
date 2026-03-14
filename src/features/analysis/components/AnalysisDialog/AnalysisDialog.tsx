@@ -5,18 +5,22 @@ import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 
 import { cn } from '#/shared/lib/bem';
 
-import AnalysisForm from '../AnalysisForm/AnalysisForm';
+import { AnalysisForm } from './AnalysisForm';
+import type { AnalysisDialogProps } from './types';
 
 import './AnalysisDialog.scss';
 
 const cnAnalysisDialog = cn('AnalysisDialog');
 
-interface AnalysisDialogProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-export const AnalysisDialog: React.FC<AnalysisDialogProps> = ({ open, onClose }) => {
+export const AnalysisDialog: React.FC<AnalysisDialogProps> = ({
+  open,
+  onClose,
+  selectedParcel,
+  analysisType,
+  onAnalysisTypeChange,
+  onRunAnalysis,
+  isLoading,
+}) => {
   return (
     <Dialog
       open={open}
@@ -30,14 +34,20 @@ export const AnalysisDialog: React.FC<AnalysisDialogProps> = ({ open, onClose })
       <DialogTitle className={cnAnalysisDialog('Title')}>
         <span className={cnAnalysisDialog('TitleContent')}>
           <AssessmentIcon className={cnAnalysisDialog('TitleIcon')} sx={{ fontSize: '32px' }} />
-          Анализ участка
+          Parcel analysis
         </span>
         <IconButton onClick={onClose} size="small">
           <CloseIcon />
         </IconButton>
       </DialogTitle>
       <DialogContent className={cnAnalysisDialog('Content')}>
-        <AnalysisForm />
+        <AnalysisForm
+          selectedParcel={selectedParcel}
+          analysisType={analysisType}
+          onAnalysisTypeChange={onAnalysisTypeChange}
+          onRunAnalysis={onRunAnalysis}
+          isLoading={isLoading}
+        />
       </DialogContent>
     </Dialog>
   );
