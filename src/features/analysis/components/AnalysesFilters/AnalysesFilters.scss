@@ -1,0 +1,59 @@
+.AnalysesFilters {
+  &__Row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px;
+    align-items: flex-end;
+  }
+
+  &__Search {
+    min-width: 200px;
+    flex: 1;
+
+    .MuiOutlinedInput-root {
+      border-radius: 12px;
+    }
+  }
+
+  &__Select {
+    min-width: 150px;
+    width: 150px;
+    flex: none;
+
+    .MuiOutlinedInput-root {
+      border-radius: 12px;
+    }
+  }
+
+  &__SelectMultiple {
+    min-width: 150px;
+    width: 300px;
+    flex: none;
+
+    .MuiOutlinedInput-root {
+      border-radius: 12px;
+    }
+  }
+
+  &__Sort {
+    .MuiOutlinedInput-root {
+      border-radius: 12px;
+    }
+  }
+
+  &__Chip {
+    border-radius: 8px;
+  }
+
+  &__ChipContainer {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    overflow: scroll;
+    scrollbar-width: none;
+  }
+
+  &__MenuItem {
+    padding: 0 !important;
+  }
+}
