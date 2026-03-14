@@ -35,8 +35,9 @@
       }
     }
 
-    &--active {
-      background-color: $color-bg-dark-light;
+    &--selected {
+      border-left: $border-radius-s solid $color-selected !important;
+      background-color: $color-control-selected !important;
       color: $color-text-active;
 
       .NavigationMenu__ItemIcon {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '../../../shared/lib/bem';
+import { cn } from '#/shared/lib/bem';
 
 import './Header.scss';
 

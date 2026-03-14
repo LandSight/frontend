@@ -1,10 +1,11 @@
 import React from 'react';
 import { Divider } from '@mui/material';
 
-import { cn } from '../../../shared/lib/bem';
-import { Footer } from '../Footer/Footer';
-import { Header } from '../Header/Header';
-import { NavigationMenu } from '../NavigationMenu/NavigationMenu';
+import { cn } from '#/shared/lib/bem';
+
+import { Footer } from './Footer';
+import { Header } from './Header';
+import { NavigationMenu } from './NavigationMenu';
 
 import './Sidebar.scss';
 

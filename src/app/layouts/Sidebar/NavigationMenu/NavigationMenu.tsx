@@ -1,23 +1,19 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import MapIcon from '@mui/icons-material/Map';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 
-import { cn } from '../../../shared/lib/bem';
+import { cn } from '#/shared/lib/bem';
+
+import { getMenuItems } from './helpers';
 
 import './NavigationMenu.scss';
-
-const menuItems = [
-  { text: 'Карта', icon: <MapIcon />, path: '/map' },
-  { text: 'Анализы', icon: <AssessmentIcon />, path: '/analyses' },
-];
 
 const cnNavMenu = cn('NavigationMenu');
 
 export const NavigationMenu: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const menuItems = getMenuItems();
 
   return (
     <List className={cnNavMenu()}>
@@ -28,7 +24,7 @@ export const NavigationMenu: React.FC = () => {
             <ListItemButton
               selected={isActive}
               onClick={() => navigate(item.path)}
-              className={cnNavMenu('Item', { active: isActive })}
+              className={cnNavMenu('Item', { selected: isActive })}
             >
               <ListItemIcon className={cnNavMenu('ItemIcon')}>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} className={cnNavMenu('ItemText')} />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography } from '@mui/material';
 
-import { cn } from '../../../shared/lib/bem';
+import { cn } from '#/shared/lib/bem';
 
 import './Footer.scss';
 
