@@ -1,36 +1,45 @@
-import React, { useState } from 'react';
-import { Polygon, TileLayer } from 'react-leaflet';
+import React, { useEffect } from 'react';
+import { Polygon, TileLayer, useMap } from 'react-leaflet';
+import { useAtom } from '@reatom/react';
 import L from 'leaflet';
 
-import { useAppDispatch, useAppSelector } from '#/app/store/hooks';
-import { setIsDrawing, setPolygon } from '#/app/store/slices/polygon';
+import { layerConfigs } from '#/features/map/constants';
+import { drawingPolygonAtom, isDrawingAtom, layerAtom } from '#/features/map/models';
+import {
+  isCreateParcelDialogOpenAtom,
+  parcelsListAtom,
+  selectedParcelAtom,
+  selectedParcelIdAtom,
+} from '#/features/parcels/models/parcels';
 import { cn } from '#/shared/lib/bem';
 import { fromLeafletArray, toLeafletArray } from '#/shared/types/geometry';
 
-import { useDrawing } from '../../hooks/useDrawing';
-import { AnalysisButton } from '../AnalysisButton/AnalysisButton';
-import { DrawingControls } from '../DrawingControls/DrawingControls';
-import { LayerSwitcher } from '../LayerSwitcher/LayerSwitcher';
-import { ZoomControls } from '../ZoomControls/ZoomControls';
+import { DrawingControls } from '../DrawingControls';
+import { LayerSwitcher } from '../LayerSwitcher';
+import { ZoomControls } from '../ZoomControls';
+
+import { useDrawing } from './hooks/useDrawing';
+import { computeCentroid, getParcelStyle } from './helpers';
 
 import './MapContent.scss';
 
 const cnMapContent = cn('MapContent');
 
-interface MapContentProps {
-  onOpenAnalysisDialog?: () => void;
-}
-
-export const MapContent: React.FC<MapContentProps> = ({ onOpenAnalysisDialog }) => {
-  const dispatch = useAppDispatch();
-  const isDrawing = useAppSelector((state) => state.polygon.isDrawing);
-  const polygonCoordinates = useAppSelector((state) => state.polygon.coordinates);
-  const [layer, setLayer] = useState<'osm' | 'satellite'>('osm');
+export const MapContent: React.FC = () => {
+  const [isDrawing, setIsDrawing] = useAtom(isDrawingAtom);
+  const [polygonCoordinates, setPolygonCoordinates] = useAtom(drawingPolygonAtom);
+  const [parcels] = useAtom(parcelsListAtom);
+  const [selectedId, setSelectedId] = useAtom(selectedParcelIdAtom);
+  const [selectedParcel] = useAtom(selectedParcelAtom);
+  const [, setIsCreateParcelDialogOpen] = useAtom(isCreateParcelDialogOpenAtom);
+  const [layer, setLayer] = useAtom(layerAtom);
+  const map = useMap();
 
   const handlePolygonCreated = (latlngs: L.LatLng[]) => {
     const points = fromLeafletArray(latlngs);
-    dispatch(setPolygon(points));
-    dispatch(setIsDrawing(false));
+    setPolygonCoordinates(points);
+    setIsDrawing(false);
+    setIsCreateParcelDialogOpen(true);
   };
 
   const { undoLastPoint, clearDrawing, finishDrawing } = useDrawing({
@@ -38,16 +47,28 @@ export const MapContent: React.FC<MapContentProps> = ({ onOpenAnalysisDialog }) 
     onPolygonCreated: handlePolygonCreated,
   });
 
+  const handleParcelClick = (id: string) => {
+    if (!isDrawing) {
+      if (selectedId === id) {
+        setSelectedId(null);
+      } else {
+        setSelectedId(id);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (selectedParcel !== null) {
+      const center = computeCentroid(selectedParcel.polygon);
+      map.panTo(center, { animate: true, duration: 0.5 });
+    }
+  }, [selectedParcel, map]);
+
+  const layerConfig = layerConfigs[layer];
+
   return (
     <div className={cnMapContent()}>
-      <TileLayer
-        url={
-          layer === 'osm'
-            ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-            : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-        }
-        attribution={layer === 'osm' ? '&copy; OpenStreetMap contributors' : 'Tiles &copy; Esri'}
-      />
+      <TileLayer url={layerConfig.url} attribution={layerConfig.attribution} />
 
       <div className={cnMapContent('RightControls')}>
         <LayerSwitcher layer={layer} onLayerChange={setLayer} />
@@ -60,8 +81,18 @@ export const MapContent: React.FC<MapContentProps> = ({ onOpenAnalysisDialog }) 
           clearDrawing={clearDrawing}
           finishDrawing={finishDrawing}
         />
-        {onOpenAnalysisDialog && <AnalysisButton onClick={onOpenAnalysisDialog} />}
       </div>
+
+      {parcels.map((parcel) => (
+        <Polygon
+          key={parcel.id}
+          positions={toLeafletArray(parcel.polygon)}
+          pathOptions={getParcelStyle(parcel.id, selectedId, isDrawing)}
+          eventHandlers={{
+            click: () => handleParcelClick(parcel.id),
+          }}
+        />
+      ))}
 
       {polygonCoordinates && polygonCoordinates.length > 0 && (
         <Polygon

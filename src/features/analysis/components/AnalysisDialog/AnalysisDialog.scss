@@ -18,11 +18,4 @@
     gap: $spacing-s;
     font-size: $font-size-l;
   }
-
-  &__Content {
-    .MuiFormLabel-asterisk,
-    .MuiInputLabel-asterisk {
-      color: red;
-    }
-  }
 }

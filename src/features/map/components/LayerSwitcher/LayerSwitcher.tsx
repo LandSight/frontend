@@ -2,18 +2,15 @@ import React, { useState } from 'react';
 import LayersIcon from '@mui/icons-material/Layers';
 import { IconButton, Tooltip } from '@mui/material';
 
+import type { LayerType } from '#/features/map/types';
 import { cn } from '#/shared/lib/bem';
 
-import LayerSwitcherMenu from './LayerSwitcherMenu/LayerSwitcherMenu';
+import { LayerSwitcherMenu } from './LayerSwitcherMenu';
+import type { LayerSwitcherProps } from './types';
 
 import './LayerSwitcher.scss';
 
 const cnLayerSwitcher = cn('LayerSwitcher');
-
-interface LayerSwitcherProps {
-  layer: 'osm' | 'satellite';
-  onLayerChange: (newLayer: 'osm' | 'satellite') => void;
-}
 
 export const LayerSwitcher: React.FC<LayerSwitcherProps> = ({ layer, onLayerChange }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -27,14 +24,14 @@ export const LayerSwitcher: React.FC<LayerSwitcherProps> = ({ layer, onLayerChan
     setAnchorEl(null);
   };
 
-  const handleSelect = (newLayer: 'osm' | 'satellite') => {
+  const handleSelect = (newLayer: LayerType) => {
     onLayerChange(newLayer);
     handleClose();
   };
 
   return (
     <div className={cnLayerSwitcher()}>
-      <Tooltip title="Слои карты" placement="left">
+      <Tooltip title="Map layers" placement="left">
         <IconButton size="medium" onClick={handleClick} className={cnLayerSwitcher('Button')}>
           <LayersIcon />
         </IconButton>

@@ -1,9 +1,9 @@
 import L from 'leaflet';
 
-export interface Point {
+export type Point = {
   lat: number;
   lng: number;
-}
+};
 
 export const toLeaflet = (point: Point): L.LatLng => {
   return L.latLng(point.lat, point.lng);

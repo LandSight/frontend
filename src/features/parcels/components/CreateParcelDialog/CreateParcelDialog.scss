@@ -1,0 +1,21 @@
+.CreateParcelDialog {
+  &__Paper {
+    border-radius: $border-radius-l;
+    padding: $spacing-s;
+  }
+
+  &__Title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: $font-size-l;
+    font-weight: $font-weight-bold;
+  }
+
+  &__TitleContent {
+    display: flex;
+    align-items: center;
+    gap: $spacing-s;
+    font-size: $font-size-l;
+  }
+}

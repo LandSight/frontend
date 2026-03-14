@@ -1,44 +1,34 @@
 import React from 'react';
 import CheckIcon from '@mui/icons-material/Check';
-import ClearAllIcon from '@mui/icons-material/ClearAll';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import UndoIcon from '@mui/icons-material/Undo';
 import { IconButton, Tooltip } from '@mui/material';
+import { useAtom } from '@reatom/react';
 
-import { useAppDispatch, useAppSelector } from '#/app/store/hooks';
-import { setIsDrawing } from '#/app/store/slices/polygon';
+import { isDrawingAtom } from '#/features/map/models';
 import { cn } from '#/shared/lib/bem';
+
+import type { DrawingControlsProps } from './types';
 
 import './DrawingControls.scss';
 
 const cnDrawingControls = cn('DrawingControls');
-
-interface DrawingControlsProps {
-  undoLastPoint: () => void;
-  clearDrawing: () => void;
-  finishDrawing: () => void;
-}
 
 export const DrawingControls: React.FC<DrawingControlsProps> = ({
   undoLastPoint,
   clearDrawing,
   finishDrawing,
 }) => {
-  const dispatch = useAppDispatch();
-  const isDrawing = useAppSelector((state) => state.polygon.isDrawing);
+  const [isDrawing, setIsDrawing] = useAtom(isDrawingAtom);
 
   const handleToggleDrawing = () => {
     clearDrawing();
-    dispatch(setIsDrawing(!isDrawing));
+    setIsDrawing(!isDrawing);
   };
 
   const handleUndoLastPoint = () => {
     undoLastPoint();
-  };
-
-  const handleClearAll = () => {
-    clearDrawing();
   };
 
   const handleFinishDrawing = () => {
@@ -47,7 +37,7 @@ export const DrawingControls: React.FC<DrawingControlsProps> = ({
 
   return (
     <div className={cnDrawingControls()}>
-      <Tooltip title={isDrawing ? 'Завершить рисование' : 'Начать рисование'} placement="right">
+      <Tooltip title={isDrawing ? 'Decline new polygon' : 'Start new polygon'} placement="right">
         <IconButton
           size="medium"
           onClick={handleToggleDrawing}
@@ -57,7 +47,7 @@ export const DrawingControls: React.FC<DrawingControlsProps> = ({
         </IconButton>
       </Tooltip>
 
-      <Tooltip title="Отменить последнюю точку" placement="right">
+      <Tooltip title="Decline last pint" placement="right">
         <IconButton
           size="medium"
           onClick={handleUndoLastPoint}
@@ -67,13 +57,7 @@ export const DrawingControls: React.FC<DrawingControlsProps> = ({
         </IconButton>
       </Tooltip>
 
-      <Tooltip title="Очистить всё" placement="right">
-        <IconButton size="medium" onClick={handleClearAll} className={cnDrawingControls('Button')}>
-          <ClearAllIcon />
-        </IconButton>
-      </Tooltip>
-
-      <Tooltip title="Завершить рисование" placement="right">
+      <Tooltip title="Create new parcel" placement="right">
         <IconButton
           size="medium"
           onClick={handleFinishDrawing}
