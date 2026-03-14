@@ -1,2 +1,2 @@
-export * from './analysis';
+export * from './analyses';
 export * from './analysisForm';

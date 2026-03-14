@@ -1,9 +1,7 @@
-import type { AnalysisType } from '#/features/analysis/types';
+import type { AnalysisType } from '#/features/analyses/types';
 import type { Parcel } from '#/shared/types/parcel';
 
-export type AnalysisDialogProps = {
-  open: boolean;
-  onClose: () => void;
+export type AnalysisFormProps = {
   selectedParcel: Parcel | null;
   analysisType: AnalysisType;
   onAnalysisTypeChange: (type: AnalysisType) => void;

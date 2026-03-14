@@ -12,7 +12,7 @@ import {
   TextField,
 } from '@mui/material';
 
-import type { AnalysisType } from '#/features/analysis/types';
+import type { AnalysisType } from '#/features/analyses/types';
 import { cn } from '#/shared/lib/bem';
 
 import type { AnalysisFormProps } from './types';
