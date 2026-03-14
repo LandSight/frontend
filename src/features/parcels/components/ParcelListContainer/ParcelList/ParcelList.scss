@@ -1,0 +1,40 @@
+.ParcelList {
+  flex: 1;
+  overflow-y: auto;
+  // padding: $spacing-s 0px !important;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-s;
+
+  &__Icon {
+    color: $color-text-light;
+    opacity: 0.7;
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &__Item {
+    cursor: pointer;
+    background-color: transparent;
+    border-radius: $border-radius-s;
+    margin-bottom: $spacing-xs;
+    transition: background-color $transition-fast;
+    color: $color-text-light !important;
+
+    &:hover {
+      background-color: $color-control-hovered;
+    }
+
+    &--selected {
+      border-left: $border-radius-s solid $color-selected;
+      background-color: $color-control-selected;
+    }
+  }
+
+  &__Empty {
+    padding: $spacing-l;
+    text-align: center;
+    color: $color-text-secondary;
+  }
+}
