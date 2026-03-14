@@ -2,6 +2,7 @@ import React from 'react';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import MapIcon from '@mui/icons-material/Map';
 
+import { AnalysesPage } from '#/pages/AnalysesPage';
 import { MapPage } from '#/pages/MapPage';
 
 export type RouteConfig = {
@@ -26,7 +27,7 @@ export const routes: RouteConfig[] = [
   },
   {
     path: '/analyses',
-    component: MapPage,
+    component: AnalysesPage,
     name: 'Analysis',
     text: 'Analysis',
     icon: <AssessmentIcon />,
