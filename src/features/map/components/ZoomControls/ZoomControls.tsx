@@ -23,12 +23,12 @@ export const ZoomControls: React.FC = () => {
 
   return (
     <div className={cnZoomControls()}>
-      <Tooltip title="Увеличить" placement="left">
+      <Tooltip title="Zoom in" placement="left">
         <IconButton size="medium" onClick={handleZoomIn} className={cnZoomControls('Button')}>
           <AddIcon />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Уменьшить" placement="left">
+      <Tooltip title="Zoom out" placement="left">
         <IconButton size="medium" onClick={handleZoomOut} className={cnZoomControls('Button')}>
           <RemoveIcon />
         </IconButton>

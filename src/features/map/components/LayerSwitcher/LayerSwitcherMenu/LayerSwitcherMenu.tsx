@@ -1,21 +1,16 @@
 import React from 'react';
-import MapIcon from '@mui/icons-material/Map';
-import SatelliteIcon from '@mui/icons-material/Satellite';
 import { ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 
+import { layerConfigs } from '#/features/map/constants.ts';
+import { layerTypes } from '#/features/map/types';
 import { cn } from '#/shared/lib/bem';
+
+import { layerIcons } from './constants.tsx';
+import type { LayerSwitcherMenuProps } from './types';
 
 const cnLayerSwitcherMenu = cn('LayerSwitcherMenu');
 
-interface LayerSwitcherMenuProps {
-  anchorEl: HTMLElement | null;
-  open: boolean;
-  onClose: () => void;
-  layer: 'osm' | 'satellite';
-  onSelect: (newLayer: 'osm' | 'satellite') => void;
-}
-
-const LayerSwitcherMenu: React.FC<LayerSwitcherMenuProps> = ({
+export const LayerSwitcherMenu: React.FC<LayerSwitcherMenuProps> = ({
   anchorEl,
   open,
   onClose,
@@ -37,20 +32,16 @@ const LayerSwitcherMenu: React.FC<LayerSwitcherMenuProps> = ({
       }}
       className={cnLayerSwitcherMenu()}
     >
-      <MenuItem selected={layer === 'osm'} onClick={() => onSelect('osm')}>
-        <ListItemIcon>
-          <MapIcon fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Схема</ListItemText>
-      </MenuItem>
-      <MenuItem selected={layer === 'satellite'} onClick={() => onSelect('satellite')}>
-        <ListItemIcon>
-          <SatelliteIcon fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Спутник</ListItemText>
-      </MenuItem>
+      {layerTypes.map((layerType) => (
+        <MenuItem
+          key={layerType}
+          selected={layer === layerType}
+          onClick={() => onSelect(layerType)}
+        >
+          <ListItemIcon>{layerIcons[layerType]}</ListItemIcon>
+          <ListItemText>{layerConfigs[layerType].label}</ListItemText>
+        </MenuItem>
+      ))}
     </Menu>
   );
 };
-
-export default LayerSwitcherMenu;

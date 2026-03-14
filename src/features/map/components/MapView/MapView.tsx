@@ -6,7 +6,7 @@ import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 import { cn } from '#/shared/lib/bem';
 
-import { MapContent } from './MapContent/MapContent';
+import { MapContent } from '../MapContent';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -19,11 +19,7 @@ L.Marker.prototype.options.icon = L.icon({
 
 const cnMapView = cn('MapView');
 
-interface MapViewProps {
-  onOpenAnalysisDialog?: () => void;
-}
-
-export const MapView: React.FC<MapViewProps> = ({ onOpenAnalysisDialog }) => {
+export const MapView: React.FC = () => {
   return (
     <div className={cnMapView()}>
       <MapContainer
@@ -34,7 +30,7 @@ export const MapView: React.FC<MapViewProps> = ({ onOpenAnalysisDialog }) => {
         attributionControl={false}
         className={cnMapView('MapContainer')}
       >
-        <MapContent onOpenAnalysisDialog={onOpenAnalysisDialog} />
+        <MapContent />
       </MapContainer>
     </div>
   );
