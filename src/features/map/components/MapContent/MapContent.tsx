@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Polygon, TileLayer, useMap } from 'react-leaflet';
-import { useAtom } from '@reatom/react';
+import { useAction, useAtom } from '@reatom/react';
 import L from 'leaflet';
 
 import { layerConfigs } from '#/features/map/constants';
@@ -31,15 +31,15 @@ export const MapContent: React.FC = () => {
   const [parcels] = useAtom(parcelsListAtom);
   const [selectedId, setSelectedId] = useAtom(selectedParcelIdAtom);
   const [selectedParcel] = useAtom(selectedParcelAtom);
-  const [, setIsCreateParcelDialogOpen] = useAtom(isCreateParcelDialogOpenAtom);
   const [layer, setLayer] = useAtom(layerAtom);
   const map = useMap();
+  const handleCreateParcelDialogOpen = useAction(isCreateParcelDialogOpenAtom.open);
 
   const handlePolygonCreated = (latlngs: L.LatLng[]) => {
     const points = fromLeafletArray(latlngs);
     setPolygonCoordinates(points);
     setIsDrawing(false);
-    setIsCreateParcelDialogOpen(true);
+    handleCreateParcelDialogOpen();
   };
 
   const { undoLastPoint, clearDrawing, finishDrawing } = useDrawing({

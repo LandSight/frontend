@@ -16,8 +16,8 @@ export const AnalysisDialog: React.FC<AnalysisDialogProps> = ({
   open,
   onClose,
   selectedParcel,
-  analysisType,
-  onAnalysisTypeChange,
+  analysisName,
+  onAnalysisNameChange,
   onRunAnalysis,
   isLoading,
 }) => {
@@ -43,8 +43,8 @@ export const AnalysisDialog: React.FC<AnalysisDialogProps> = ({
       <DialogContent className={cnAnalysisDialog('Content')}>
         <AnalysisForm
           selectedParcel={selectedParcel}
-          analysisType={analysisType}
-          onAnalysisTypeChange={onAnalysisTypeChange}
+          analysisName={analysisName}
+          onAnalysisNameChange={onAnalysisNameChange}
           onRunAnalysis={onRunAnalysis}
           isLoading={isLoading}
         />

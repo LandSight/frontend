@@ -1,8 +1,8 @@
-import type { Analysis, AnalysisType } from '#/features/analyses/types';
+import type { Analysis } from '#/features/analyses/types';
 import apiClient from '#/shared/api/client';
 
 export type CreateAnalysisRequest = {
-  type: AnalysisType;
+  name: string;
   parcel_id: string;
 };
 
@@ -15,13 +15,13 @@ export type FetchAnalysesParams = {
   limit?: number;
   offset?: number;
   search?: string;
-  type?: AnalysisType;
+  name?: string;
   sortBy?: string;
   order?: 'asc' | 'desc';
 };
 
 export const analysesApi = {
-  create: async (data: CreateAnalysisRequest): Promise<CreateAnalysisResponse> => {
+  start: async (data: CreateAnalysisRequest): Promise<CreateAnalysisResponse> => {
     const response = await apiClient.post('/analyses', data);
     return response.data;
   },

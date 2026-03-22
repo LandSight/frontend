@@ -1,16 +1,20 @@
+// Local variables for Header component
+$header-logo-size: 64px;
+$header-letter-spacing-title: 0.5px;
+
 .Header {
   display: flex;
   flex-direction: row;
   align-items: center;
   width: 100%;
-  gap: $spacing-gap;
+  gap: $spacing-m;
   margin-bottom: $spacing-s;
 
   &__Logo {
     display: flex;
     justify-content: center;
-    width: $logo-size;
-    height: $logo-size;
+    width: $header-logo-size;
+    height: $header-logo-size;
 
     &__Image {
       width: 100%;
@@ -21,7 +25,7 @@
   &__Title {
     font-size: $font-size-l;
     font-weight: $font-weight-bold;
-    letter-spacing: $letter-spacing-title;
+    letter-spacing: $header-letter-spacing-title;
     color: $color-text-light;
   }
 }

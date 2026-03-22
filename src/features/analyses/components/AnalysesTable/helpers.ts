@@ -1,10 +1,4 @@
-import type { AnalysisStatus, AnalysisType } from '#/features/analyses/types';
-
-export const analysisTypeMap: Record<AnalysisType, string> = {
-  infrastructure: 'Infrastructure',
-  ihb: 'IHB',
-  agricultural: 'Agricultural',
-};
+import type { AnalysisStatus } from '#/features/analyses/types';
 
 export const analysisStatusMap: Record<AnalysisStatus, string> = {
   pending: 'Pending',

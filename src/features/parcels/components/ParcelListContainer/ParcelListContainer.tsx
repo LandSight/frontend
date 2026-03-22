@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
-import { Typography } from '@mui/material';
+import { LinearProgress, Typography } from '@mui/material';
 import { useAction, useAtom } from '@reatom/react';
 
 import {
   deleteParcel,
   fetchParcels,
-  isFetchingAtom,
   parcelsListAtom,
   selectedParcelIdAtom,
 } from '#/features/parcels/models';
@@ -19,7 +18,7 @@ const cnParcelListContainer = cn('ParcelListContainer');
 
 export const ParcelListContainer: React.FC = () => {
   const [parcels] = useAtom(parcelsListAtom);
-  const [isFetching] = useAtom(isFetchingAtom);
+  const [isFetched] = useAtom(fetchParcels.ready);
   const [selectedId, setSelectedId] = useAtom(selectedParcelIdAtom);
 
   const handleFetch = useAction(fetchParcels);
@@ -29,8 +28,8 @@ export const ParcelListContainer: React.FC = () => {
     handleFetch();
   }, []);
 
-  if (isFetching && parcels.length === 0) {
-    return <Typography className={cnParcelListContainer()}>Loading...</Typography>;
+  if (!isFetched && parcels.length === 0) {
+    return <LinearProgress />;
   }
 
   if (parcels.length === 0) {

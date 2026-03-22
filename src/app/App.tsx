@@ -1,14 +1,27 @@
 import { ThemeProvider } from '@mui/material/styles';
+import { urlAtom } from '@reatom/core';
+import { reatomComponent } from '@reatom/react';
 
-import AppRouter from './routes/AppRouter';
+import { MainLayout } from './layouts/MainLayout';
+import { mapRoute } from './routes/routes';
+import { routesConfig } from './routes/routesConfig';
 import { theme } from './theme';
 
-function App() {
+export const App = reatomComponent(() => {
+  const { pathname } = urlAtom();
+
+  if (pathname === '/') {
+    mapRoute.go();
+  }
+
   return (
     <ThemeProvider theme={theme}>
-      <AppRouter />
+      <MainLayout>
+        {Object.values(routesConfig).map(({ route, component: Page, exact }) => {
+          const active = exact ? route.exact() : route();
+          return active ? <Page key={route.name} /> : null;
+        })}
+      </MainLayout>
     </ThemeProvider>
   );
-}
-
-export default App;
+});
