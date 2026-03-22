@@ -1,5 +1,4 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
 
 import { cn } from '#/shared/lib/bem';
 import { NotificationStack } from '#/shared/ui/notification';
@@ -9,16 +8,17 @@ import { Sidebar } from '../Sidebar';
 import './MainLayout.scss';
 
 const cnMainLayout = cn('MainLayout');
-const MainLayout: React.FC = () => {
+
+export interface MainLayoutProps {
+  children?: React.ReactNode;
+}
+
+export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <div className={cnMainLayout()}>
       <Sidebar />
-      <div className={cnMainLayout('Content')}>
-        <Outlet />
-      </div>
+      <div className={cnMainLayout('Content')}>{children}</div>
       <NotificationStack />
     </div>
   );
 };
-
-export default MainLayout;
