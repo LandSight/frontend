@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-s;
-  background-color: white;
+  background-color: $color-bg-light;
   padding: $spacing-xs;
   border-radius: $border-radius-l;
   box-shadow: $box-shadow;
@@ -21,12 +21,12 @@
     transition: all $transition-fast;
 
     &:hover {
-      background-color: $color-text-muted-hover;
+      background-color: $color-text-light-muted-hover;
       transform: scale(1.05);
     }
 
     &:active {
-      background-color: $color-text-muted;
+      background-color: $color-text-light-muted;
       transform: scale(0.95);
     }
   }

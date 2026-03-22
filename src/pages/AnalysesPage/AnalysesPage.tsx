@@ -4,11 +4,7 @@ import { useAtom } from '@reatom/react';
 
 import { AnalysesFilters } from '#/features/analyses/components/AnalysesFilters';
 import { AnalysesTable } from '#/features/analyses/components/AnalysesTable';
-import {
-  fetchAnalyses,
-  filteredAnalysesAtom,
-  isLoadingAtom,
-} from '#/features/analyses/models/analyses';
+import { fetchAnalyses, filteredAnalysesAtom } from '#/features/analyses/models/analyses';
 import { cn } from '#/shared/lib/bem';
 
 import './AnalysesPage.scss';
@@ -17,7 +13,7 @@ const cnAnalysesPage = cn('AnalysesPage');
 
 export const AnalysesPage: React.FC = () => {
   const [analyses] = useAtom(filteredAnalysesAtom);
-  const [loading] = useAtom(isLoadingAtom);
+  const [isAnalysesLoaded] = useAtom(fetchAnalyses.ready);
 
   useEffect(() => {
     fetchAnalyses();
@@ -30,7 +26,7 @@ export const AnalysesPage: React.FC = () => {
       </Paper>
 
       <div className={cnAnalysesPage('TableContainer')}>
-        {loading && analyses.length === 0 ? (
+        {!isAnalysesLoaded && analyses.length === 0 ? (
           <Box className={cnAnalysesPage('Skeleton')}>
             <Skeleton variant="rectangular" height={200} />
           </Box>

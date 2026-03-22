@@ -16,28 +16,63 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   Tooltip,
 } from '@mui/material';
-import { useAction } from '@reatom/react';
+import { useAction, useAtom } from '@reatom/react';
 
 import { cn } from '#/shared/lib/bem';
 
-import { deleteAnalysis, exportMetrics } from '../../models/analyses';
+import { deleteAnalysis, exportMetrics, filtersAtom } from '../../models/analyses';
+import type { SortBy } from '../../types';
 
-import { analysisStatusMap, analysisTypeMap, formatDate } from './helpers';
+import { analysisStatusMap, formatDate } from './helpers';
 import type { AnalysesTableProps } from './types';
 
 import './AnalysesTable.scss';
 
 const cnAnalysesTable = cn('AnalysesTable');
 
+type SortableColumn = SortBy;
+
+const columnConfig: { field: SortableColumn; label: string; align: 'center'; className: string }[] =
+  [
+    { field: 'name', label: 'Name', align: 'center', className: cnAnalysesTable('col-name') },
+    {
+      field: 'parcel_name',
+      label: 'Parcel',
+      align: 'center',
+      className: cnAnalysesTable('col-parcel'),
+    },
+    { field: 'status', label: 'Status', align: 'center', className: cnAnalysesTable('col-status') },
+    {
+      field: 'created_at',
+      label: 'Created',
+      align: 'center',
+      className: cnAnalysesTable('col-created'),
+    },
+    { field: 'score', label: 'Score', align: 'center', className: cnAnalysesTable('col-score') },
+  ];
+
 export const AnalysesTable: React.FC<AnalysesTableProps> = ({ analyses }) => {
+  const [filters] = useAtom(filtersAtom);
   const handleDelete = useAction(deleteAnalysis);
   const handleExport = useAction(exportMetrics);
+  const setSortBy = useAction(filtersAtom.setSortBy);
+  const setSortOrder = useAction(filtersAtom.setSortOrder);
 
   const handleViewReport = (analysisId: string) => {
     // TODO: navigate to report page
     window.open(`/reports/${analysisId}`, '_blank');
+  };
+
+  const handleSort = (field: SortBy) => {
+    if (filters.sortBy === field) {
+      setSortOrder(filters.sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder('desc');
+    }
   };
 
   return (
@@ -45,26 +80,32 @@ export const AnalysesTable: React.FC<AnalysesTableProps> = ({ analyses }) => {
       <Table size="medium">
         <TableHead>
           <TableRow>
-            <TableCell align="center">Parcel</TableCell>
-            <TableCell align="center">Type</TableCell>
-            <TableCell align="center">Status</TableCell>
-            <TableCell align="center">Created</TableCell>
-            <TableCell align="center">Score</TableCell>
-            <TableCell align="center">Actions</TableCell>
+            {columnConfig.map(({ field, label, align, className }) => (
+              <TableCell key={field} align={align} className={className}>
+                <TableSortLabel
+                  active={filters.sortBy === field}
+                  direction={filters.sortOrder}
+                  onClick={() => handleSort(field)}
+                >
+                  {label}
+                </TableSortLabel>
+              </TableCell>
+            ))}
+            <TableCell align="center" className={cnAnalysesTable('col-actions')}>
+              Actions
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {analyses.map((analysis) => (
             <TableRow key={analysis.id} hover>
-              <TableCell align="center">{analysis.parcel_name || 'Unknown'}</TableCell>
-              <TableCell align="center">
-                <Chip
-                  label={analysisTypeMap[analysis.type] || analysis.type}
-                  size="small"
-                  variant="outlined"
-                />
+              <TableCell align="center" className={cnAnalysesTable('col-name')}>
+                {analysis.name || '—'}
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" className={cnAnalysesTable('col-parcel')}>
+                {analysis.parcel_name || 'Unknown'}
+              </TableCell>
+              <TableCell align="center" className={cnAnalysesTable('col-status')}>
                 <Box className={cnAnalysesTable('Status')}>
                   <Chip
                     label={analysisStatusMap[analysis.status] || analysis.status}
@@ -76,8 +117,10 @@ export const AnalysesTable: React.FC<AnalysesTableProps> = ({ analyses }) => {
                   />
                 </Box>
               </TableCell>
-              <TableCell align="center">{formatDate(analysis.created_at)}</TableCell>
-              <TableCell align="center">
+              <TableCell align="center" className={cnAnalysesTable('col-created')}>
+                {formatDate(analysis.created_at)}
+              </TableCell>
+              <TableCell align="center" className={cnAnalysesTable('col-score')}>
                 {analysis.status === 'completed' && analysis.score !== undefined ? (
                   <Chip
                     label={analysis.score.toFixed(1)}
@@ -93,7 +136,7 @@ export const AnalysesTable: React.FC<AnalysesTableProps> = ({ analyses }) => {
                   '—'
                 )}
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" className={cnAnalysesTable('col-actions')}>
                 <Tooltip title="View report">
                   <IconButton
                     size="small"

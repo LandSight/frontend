@@ -1,12 +1,11 @@
-import type { AnalysisType } from '#/features/analyses/types';
 import type { Parcel } from '#/shared/types/parcel';
 
 export type AnalysisDialogProps = {
   open: boolean;
   onClose: () => void;
   selectedParcel: Parcel | null;
-  analysisType: AnalysisType;
-  onAnalysisTypeChange: (type: AnalysisType) => void;
-  onRunAnalysis: (data: { type: AnalysisType; parcel_id: string }) => Promise<void>;
+  analysisName: string;
+  onAnalysisNameChange: (name: string) => void;
+  onRunAnalysis: (data: { name: string; parcel_id: string }) => Promise<void>;
   isLoading: boolean;
 };

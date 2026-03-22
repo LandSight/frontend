@@ -1,37 +1,51 @@
-import { action, atom, computed } from '@reatom/core';
+import { action, atom, computed, withActions, withAsyncData } from '@reatom/core';
 
 import { addNotification } from '#/shared/ui/notification';
 
 import type { CreateAnalysisRequest, FetchAnalysesParams } from '../api/analysesApi';
 import { analysesApi } from '../api/analysesApi';
 import { mockAnalyses } from '../mocks/analyses';
-import type { Analysis, AnalysisStatus, AnalysisType, SortBy, SortOrder } from '../types';
+import type { AnalysesFilters, Analysis, AnalysisStatus, SortBy, SortOrder } from '../types';
 
-export const analysesAtom = atom<Record<string, Analysis>>({});
+// === Atoms ===
+export const analysesAtom = atom<Record<string, Analysis>>({}, 'analysesAtom');
+export const newAnalysisNameAtom = atom('', 'newAnalysisNameAtom').extend(
+  withActions((target) => ({
+    reset: () => target.set(''),
+  }))
+);
+export const isAnalysisDialogOpenAtom = atom(false, 'isAnalysisDialogOpenAtom').extend(
+  withActions((target) => ({
+    open: () => target.set(true),
+    close: () => target.set(false),
+  }))
+);
+export const filtersAtom = atom<AnalysesFilters>(
+  {
+    search: '',
+    statuses: [],
+    sortBy: 'created_at',
+    sortOrder: 'desc',
+  },
+  'filtersAtom'
+).extend(
+  withActions((target) => ({
+    setSearch: (search: string) => target.set((prev) => ({ ...prev, search })),
+    setStatuses: (statuses: AnalysisStatus[]) => target.set((prev) => ({ ...prev, statuses })),
+    setSortBy: (sortBy: SortBy) => target.set((prev) => ({ ...prev, sortBy })),
+    setSortOrder: (sortOrder: SortOrder) => target.set((prev) => ({ ...prev, sortOrder })),
+    setPartial: (partial: Partial<AnalysesFilters>) =>
+      target.set((prev) => ({ ...prev, ...partial })),
+  }))
+);
 
+// === Computed atoms ===
 export const analysesListAtom = computed(() => {
   const analyses = analysesAtom();
   return Object.values(analyses).sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
-});
-
-export type Filters = {
-  search: string;
-  types: AnalysisType[];
-  statuses: AnalysisStatus[];
-  sortBy: SortBy;
-  sortOrder: SortOrder;
-};
-
-export const filtersAtom = atom<Filters>({
-  search: '',
-  types: [],
-  statuses: [],
-  sortBy: 'created_at',
-  sortOrder: 'desc',
-});
-
+}, 'analysesListAtom');
 export const filteredAnalysesAtom = computed(() => {
   const list = analysesListAtom();
   const filters = filtersAtom();
@@ -40,13 +54,11 @@ export const filteredAnalysesAtom = computed(() => {
 
   if (filters.search) {
     const searchLower = filters.search.toLowerCase();
-    filtered = filtered.filter((analysis) =>
-      analysis.parcel_name?.toLowerCase().includes(searchLower)
+    filtered = filtered.filter(
+      (analysis) =>
+        analysis.parcel_name?.toLowerCase().includes(searchLower) ||
+        analysis.name?.toLowerCase().includes(searchLower)
     );
-  }
-
-  if (filters.types.length > 0) {
-    filtered = filtered.filter((analysis) => filters.types.includes(analysis.type));
   }
 
   if (filters.statuses.length > 0) {
@@ -63,6 +75,15 @@ export const filteredAnalysesAtom = computed(() => {
     } else if (filters.sortBy === 'score') {
       aValue = a.score ?? -Infinity;
       bValue = b.score ?? -Infinity;
+    } else if (filters.sortBy === 'parcel_name') {
+      aValue = a.parcel_name?.toLowerCase() ?? '';
+      bValue = b.parcel_name?.toLowerCase() ?? '';
+    } else if (filters.sortBy === 'name') {
+      aValue = a.name?.toLowerCase() ?? '';
+      bValue = b.name?.toLowerCase() ?? '';
+    } else if (filters.sortBy === 'status') {
+      aValue = a.status;
+      bValue = b.status;
     }
 
     if (filters.sortOrder === 'asc') {
@@ -73,104 +94,97 @@ export const filteredAnalysesAtom = computed(() => {
   });
 
   return filtered;
-});
+}, 'filteredAnalysesAtom');
 
-export const isLoadingAtom = atom(false);
-export const errorAtom = atom<string | null>(null);
-
-errorAtom.subscribe((error) => {
-  if (error) {
-    addNotification(error, 'error');
-  }
-});
-
+// === Actions ===
 export const fetchAnalyses = action(async (params?: FetchAnalysesParams) => {
-  isLoadingAtom.set(true);
-  errorAtom.set(null);
+  const analyses = await analysesApi.fetchAll(params);
+  const map: Record<string, Analysis> = {};
+  analyses.forEach((analysis) => {
+    map[analysis.id] = analysis;
+  });
+  analysesAtom.set(map);
+}, 'fetchAnalyses').extend(
+  withAsyncData({
+    parseError: (error) => {
+      if (import.meta.env.DEV) {
+        const map: Record<string, Analysis> = {};
+        mockAnalyses.forEach((analysis) => {
+          map[analysis.id] = analysis;
+        });
+        analysesAtom.set(map);
+        addNotification('Using demo data (API unavailable)', 'info');
+      } else {
+        const msg =
+          error instanceof Error
+            ? `Failed to fetch all analyses': ${error.message}`
+            : 'Failed to fetch all analyses';
+        addNotification(msg, 'error');
+        return new Error(msg);
+      }
+    },
+  })
+);
 
-  try {
-    const analyses = await analysesApi.fetchAll(params);
-    const byId: Record<string, Analysis> = {};
-    analyses.forEach((analysis) => {
-      byId[analysis.id] = analysis;
-    });
-    analysesAtom.set(byId);
-  } catch (err) {
-    // In development, fallback to mock data
-    if (import.meta.env.DEV) {
-      const byId: Record<string, Analysis> = {};
-      mockAnalyses.forEach((analysis) => {
-        byId[analysis.id] = analysis;
-      });
-      analysesAtom.set(byId);
-      addNotification('Using demo data (API unavailable)', 'info');
-    } else {
-      const msg = err instanceof Error ? err.message : 'Failed to fetch analyses';
-      errorAtom.set(msg);
-      throw err;
-    }
-  } finally {
-    isLoadingAtom.set(false);
-  }
-});
-
-export const createAnalysis = action(async (data: CreateAnalysisRequest) => {
-  isLoadingAtom.set(true);
-  errorAtom.set(null);
-
-  try {
-    const newAnalysis = await analysesApi.create(data);
-    analysesAtom.set((prev) => ({ ...prev, [newAnalysis.id]: newAnalysis as Analysis }));
-    addNotification('Analysis started successfully', 'success');
-    return newAnalysis;
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Failed to create analysis';
-    errorAtom.set(msg);
-    throw err;
-  } finally {
-    isLoadingAtom.set(false);
-  }
-});
+export const startAnalysis = action(async (data: CreateAnalysisRequest) => {
+  const newAnalysis = await analysesApi.start(data);
+  analysesAtom.set((prev) => ({ ...prev, [newAnalysis.id]: newAnalysis as Analysis }));
+  newAnalysisNameAtom.reset();
+  addNotification('Analysis started successfully', 'success');
+  return newAnalysis;
+}, 'startAnalysis').extend(
+  withAsyncData({
+    parseError: (error) => {
+      const msg =
+        error instanceof Error
+          ? `Failed to start analysis: ${error.message}`
+          : 'Failed to start analysis';
+      addNotification(msg, 'error');
+      return new Error(msg);
+    },
+  })
+);
 
 export const deleteAnalysis = action(async (id: string) => {
-  isLoadingAtom.set(true);
-  errorAtom.set(null);
-
-  try {
-    await analysesApi.delete(id);
-    analysesAtom.set((prev) => {
-      const { [id]: _, ...rest } = prev;
-      return rest;
-    });
-    addNotification('Analysis deleted successfully', 'success');
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Failed to delete analysis';
-    errorAtom.set(msg);
-    throw err;
-  } finally {
-    isLoadingAtom.set(false);
-  }
-});
+  await analysesApi.delete(id);
+  analysesAtom.set((prev) => {
+    const { [id]: _, ...rest } = prev;
+    return rest;
+  });
+  addNotification('Analysis deleted successfully', 'success');
+}, 'deleteAnalysis').extend(
+  withAsyncData({
+    parseError: (error) => {
+      const msg =
+        error instanceof Error
+          ? `Failed to delete analysis: ${error.message}`
+          : 'Failed to delete analysis';
+      addNotification(msg, 'error');
+      return new Error(msg);
+    },
+  })
+);
 
 export const exportMetrics = action(async (id: string, format: 'json' | 'csv' = 'json') => {
-  try {
-    const blob = await analysesApi.exportMetrics(id, format);
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `analysis_${id}_metrics.${format}`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-    addNotification('Metrics exported successfully', 'success');
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Failed to export metrics';
-    addNotification(msg, 'error');
-    throw err;
-  }
-});
-
-export const setFilters = action((filters: Partial<Filters>) => {
-  filtersAtom.set((prev) => ({ ...prev, ...filters }));
-});
+  const blob = await analysesApi.exportMetrics(id, format);
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `analysis_${id}_metrics.${format}`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+  addNotification('Metrics exported successfully', 'success');
+}, 'exportMetrics').extend(
+  withAsyncData({
+    parseError: (error) => {
+      const msg =
+        error instanceof Error
+          ? `Failed to export metrics: ${error.message}`
+          : 'Failed to export metrics';
+      addNotification(msg, 'error');
+      return new Error(msg);
+    },
+  })
+);

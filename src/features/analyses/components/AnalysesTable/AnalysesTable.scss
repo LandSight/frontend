@@ -1,38 +1,77 @@
 .AnalysesTable {
+  // Local color variables
+  $table-row-even: #f8f9fa;
+  $table-row-hover: #e3f2fd;
+  $status-processing: #4ba6ef;
+  $status-completed: #9bff9f;
+  $status-failed: #e0584e;
+  $table-border: #e0e0e0;
+
   height: 100%;
   overflow: scroll;
-  border-radius: 16px !important;
+  border-radius: $border-radius-xxl !important;
+
+  // Column width classes
+  &__col-name {
+    width: 20%;
+  }
+  &__col-parcel {
+    width: 20%;
+  }
+  &__col-status {
+    width: 15%;
+  }
+  &__col-created {
+    width: 20%;
+  }
+  &__col-score {
+    width: 10%;
+  }
+  &__col-actions {
+    width: 15%;
+  }
 
   .MuiTableContainer-root {
     height: 100%;
-    border-radius: 16px;
+    border-radius: $border-radius-xxl;
   }
 
   .MuiTableHead-root {
-    background-color: $color-bg-dark-lighter;
+    background-color: $color-bg-dark-light;
 
     .MuiTableCell-head {
-      color: white;
+      color: $color-text-white;
       font-weight: 600;
       font-size: 0.875rem;
       border-bottom: none;
+      white-space: nowrap;
+
+      .MuiTableSortLabel-root {
+        color: $color-text-white;
+        &:hover {
+          color: rgba($color-text-white, 0.8);
+        }
+        .MuiTableSortLabel-icon {
+          color: $color-text-white !important;
+        }
+      }
     }
   }
 
   .MuiTableBody-root {
     .MuiTableRow-root {
       &:nth-of-type(even) {
-        background-color: #f8f9fa;
+        background-color: $table-row-even;
       }
 
       &:hover {
-        background-color: #e3f2fd;
+        background-color: $table-row-hover;
       }
 
       .MuiTableCell-body {
-        padding: 16px;
+        padding: $spacing-m;
         vertical-align: middle;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid $table-border;
       }
     }
   }
@@ -45,7 +84,7 @@
 
   &__StatusBadge {
     font-weight: 500;
-    border-radius: 12px;
+    border-radius: $border-radius-xl;
     min-width: 80px;
     justify-content: center;
 
@@ -53,23 +92,27 @@
       color: black !important;
     }
     &--processing {
-      background-color: #4ba6ef !important;
-      color: white !important;
+      background-color: $status-processing !important;
+      color: $color-text-white !important;
+
+      .MuiCircularProgress-root {
+        color: $color-text-white !important;
+      }
     }
     &--completed {
-      background-color: #9bff9f !important;
+      background-color: $status-completed !important;
       color: black !important;
     }
     &--failed {
-      background-color: #e0584e !important;
-      color: white !important;
+      background-color: $status-failed !important;
+      color: $color-text-white !important;
     }
   }
 
   &__ScoreChip {
-    color: white;
+    color: $color-text-white;
     font-weight: 600;
-    border-radius: 12px;
+    border-radius: $border-radius-xl;
     min-width: 50px;
     justify-content: center;
   }

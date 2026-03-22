@@ -1,8 +1,10 @@
 .AnalysesFilters {
+  padding: 0px !important;
+
   &__Row {
     display: flex;
     flex-wrap: nowrap;
-    gap: 20px;
+    gap: $spacing-m;
     align-items: flex-end;
   }
 
@@ -11,7 +13,7 @@
     flex: 1;
 
     .MuiOutlinedInput-root {
-      border-radius: 12px;
+      border-radius: $border-radius-xl;
     }
   }
 
@@ -21,7 +23,7 @@
     flex: none;
 
     .MuiOutlinedInput-root {
-      border-radius: 12px;
+      border-radius: $border-radius-xl;
     }
   }
 
@@ -31,24 +33,24 @@
     flex: none;
 
     .MuiOutlinedInput-root {
-      border-radius: 12px;
+      border-radius: $border-radius-xl;
     }
   }
 
   &__Sort {
     .MuiOutlinedInput-root {
-      border-radius: 12px;
+      border-radius: $border-radius-xl;
     }
   }
 
   &__Chip {
-    border-radius: 8px;
+    border-radius: $border-radius-l;
   }
 
   &__ChipContainer {
     display: flex;
     flex-wrap: nowrap;
-    gap: 4px;
+    gap: $spacing-xs;
     overflow: scroll;
     scrollbar-width: none;
   }

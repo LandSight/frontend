@@ -4,15 +4,11 @@ import {
   Button,
   CircularProgress,
   FormControl,
-  FormControlLabel,
   FormLabel,
   Paper,
-  Radio,
-  RadioGroup,
   TextField,
 } from '@mui/material';
 
-import type { AnalysisType } from '#/features/analyses/types';
 import { cn } from '#/shared/lib/bem';
 
 import type { AnalysisFormProps } from './types';
@@ -23,22 +19,16 @@ const cnAnalysisForm = cn('AnalysisForm');
 
 export const AnalysisForm: React.FC<AnalysisFormProps> = ({
   selectedParcel,
-  analysisType,
-  onAnalysisTypeChange,
+  analysisName,
+  onAnalysisNameChange,
   onRunAnalysis,
   isLoading,
 }) => {
-  const analysisTypesMap: Record<AnalysisType, string> = {
-    infrastructure: 'Infrastructure',
-    ihb: 'IHB',
-    agricultural: 'Agricultural',
-  };
-
   const handleRunAnalysis = async () => {
     if (!selectedParcel) return;
     try {
       await onRunAnalysis({
-        type: analysisType,
+        name: analysisName,
         parcel_id: selectedParcel.id,
       });
     } catch (error) {
@@ -60,29 +50,23 @@ export const AnalysisForm: React.FC<AnalysisFormProps> = ({
           value={selectedParcel?.name || ''}
           disabled
         />
-        <FormControl component="fieldset" margin="normal" required>
-          <FormLabel component="legend">Analysis type</FormLabel>
-          <RadioGroup
-            value={analysisType}
-            onChange={(e) => onAnalysisTypeChange(e.target.value as AnalysisType)}
-          >
-            {Object.entries(analysisTypesMap).map(([value, label]) => (
-              <FormControlLabel
-                key={value}
-                value={value}
-                control={<Radio />}
-                label={label}
-                disabled={!hasSelected}
-              />
-            ))}
-          </RadioGroup>
+        <FormControl component="fieldset" margin="normal" required fullWidth>
+          <FormLabel component="legend">Analysis name</FormLabel>
+          <TextField
+            placeholder="Enter analysis name"
+            variant="outlined"
+            value={analysisName}
+            onChange={(e) => onAnalysisNameChange(e.target.value)}
+            disabled={!hasSelected}
+            fullWidth
+          />
         </FormControl>
         <Box className={cnAnalysisForm('ButtonContainer')}>
           <Button
             variant="contained"
             color="primary"
             onClick={handleRunAnalysis}
-            disabled={!hasSelected || !analysisType || isLoading}
+            disabled={!hasSelected || !analysisName || isLoading}
             startIcon={isLoading ? <CircularProgress size={20} /> : null}
             size="large"
           >
