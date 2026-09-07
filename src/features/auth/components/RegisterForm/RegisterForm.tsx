@@ -152,7 +152,7 @@ export const RegisterForm: React.FC = () => {
       </Button>
 
       <Typography variant="body2" align="center" className={cnRegister('Footer')}>
-        Already have an account?{' '}
+        {'Already have an account? '}
         <Typography
           component="a"
           href="#"

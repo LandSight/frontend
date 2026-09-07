@@ -114,7 +114,7 @@ export const LoginForm: React.FC = () => {
       </Button>
 
       <Typography variant="body2" align="center" className={cnLogin('Footer')}>
-        {"Don't have an account?"}
+        {"Don't have an account? "}
         <Typography
           component="a"
           href="#"
