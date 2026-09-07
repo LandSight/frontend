@@ -1,0 +1,9 @@
+.AuthLayout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(16, 20, 24, 0.95) 0%, rgba(27, 35, 43, 0.95) 100%),
+    url('/login_background.jpg') center/cover no-repeat;
+}
