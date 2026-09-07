@@ -1,0 +1,30 @@
+.LoginForm {
+  &__Title {
+    margin-bottom: $spacing-s;
+  }
+
+  &__Subtitle {
+    margin-bottom: $spacing-m;
+  }
+
+  &__RememberRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: $spacing-xs;
+    margin-left: $spacing-xs;
+  }
+
+  &__Submit {
+    margin-top: $spacing-xl !important;
+  }
+
+  &__Footer {
+    margin-top: $spacing-l !important;
+  }
+
+  &__Link {
+    cursor: pointer !important;
+    font-weight: $font-weight-bold !important;
+  }
+}

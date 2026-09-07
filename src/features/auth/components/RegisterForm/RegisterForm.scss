@@ -1,0 +1,22 @@
+.RegisterForm {
+  &__Title {
+    margin-bottom: $spacing-s;
+  }
+
+  &__Subtitle {
+    margin-bottom: $spacing-m;
+  }
+
+  &__Submit {
+    margin-top: $spacing-xl !important;
+  }
+
+  &__Footer {
+    margin-top: $spacing-l !important;
+  }
+
+  &__Link {
+    cursor: pointer !important;
+    font-weight: $font-weight-bold !important;
+  }
+}
