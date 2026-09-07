@@ -1,8 +1,27 @@
 .Footer {
   text-align: center;
   font-size: $font-size-s;
+  padding: 12px 16px;
 
   &__Text {
     color: $color-text-secondary;
+  }
+
+  &__User {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  &__Username {
+    color: $color-text-light;
+    font-weight: 600;
+    max-width: 100%;
+  }
+
+  &__Logout {
+    text-transform: none;
   }
 }
