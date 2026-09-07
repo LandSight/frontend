@@ -1,5 +1,6 @@
 import { action, atom, computed, withActions, withAsyncData } from '@reatom/core';
 
+import { getApiErrorMessage } from '#/shared/api/errors';
 import type { Parcel } from '#/shared/types/parcel';
 import { addNotification } from '#/shared/ui/notification';
 
@@ -45,10 +46,7 @@ export const fetchParcels = action(async () => {
 }, 'fetchParcels').extend(
   withAsyncData({
     parseError: (error) => {
-      const msg =
-        error instanceof Error
-          ? `Failed to fetch all parcels: ${error.message}`
-          : 'Failed to fetch all parcels';
+      const msg = getApiErrorMessage(error, 'Failed to fetch all parcels');
       addNotification(msg, 'error');
       return new Error(msg);
     },
@@ -67,10 +65,7 @@ export const createParcel = action(async (data: CreateParcelRequest) => {
 }, 'createParcel').extend(
   withAsyncData({
     parseError: (error) => {
-      const msg =
-        error instanceof Error
-          ? `Failed to create parcel: ${error.message}`
-          : 'Failed to create parcel';
+      const msg = getApiErrorMessage(error, 'Failed to create parcel');
       addNotification(msg, 'error');
       return new Error(msg);
     },
@@ -90,10 +85,7 @@ export const deleteParcel = action(async (id: string) => {
 }, 'deleteParcel').extend(
   withAsyncData({
     parseError: (error) => {
-      const msg =
-        error instanceof Error
-          ? `Failed to delete parcel: ${error.message}`
-          : 'Failed to delete parcel';
+      const msg = getApiErrorMessage(error, 'Failed to delete parcel');
       addNotification(msg, 'error');
       return new Error(msg);
     },

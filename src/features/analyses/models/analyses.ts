@@ -1,5 +1,6 @@
 import { action, atom, computed, withActions, withAsyncData } from '@reatom/core';
 
+import { getApiErrorMessage } from '#/shared/api/errors';
 import { addNotification } from '#/shared/ui/notification';
 
 import type { CreateAnalysisRequest, FetchAnalysesParams } from '../api/analysesApi';
@@ -115,10 +116,7 @@ export const fetchAnalyses = action(async (params?: FetchAnalysesParams) => {
         analysesAtom.set(map);
         addNotification('Using demo data (API unavailable)', 'info');
       } else {
-        const msg =
-          error instanceof Error
-            ? `Failed to fetch all analyses': ${error.message}`
-            : 'Failed to fetch all analyses';
+        const msg = getApiErrorMessage(error, 'Failed to fetch all analyses');
         addNotification(msg, 'error');
         return new Error(msg);
       }
@@ -135,10 +133,7 @@ export const startAnalysis = action(async (data: CreateAnalysisRequest) => {
 }, 'startAnalysis').extend(
   withAsyncData({
     parseError: (error) => {
-      const msg =
-        error instanceof Error
-          ? `Failed to start analysis: ${error.message}`
-          : 'Failed to start analysis';
+      const msg = getApiErrorMessage(error, 'Failed to start analysis');
       addNotification(msg, 'error');
       return new Error(msg);
     },
@@ -155,10 +150,7 @@ export const deleteAnalysis = action(async (id: string) => {
 }, 'deleteAnalysis').extend(
   withAsyncData({
     parseError: (error) => {
-      const msg =
-        error instanceof Error
-          ? `Failed to delete analysis: ${error.message}`
-          : 'Failed to delete analysis';
+      const msg = getApiErrorMessage(error, 'Failed to delete analysis');
       addNotification(msg, 'error');
       return new Error(msg);
     },
@@ -179,10 +171,7 @@ export const exportMetrics = action(async (id: string, format: 'json' | 'csv' = 
 }, 'exportMetrics').extend(
   withAsyncData({
     parseError: (error) => {
-      const msg =
-        error instanceof Error
-          ? `Failed to export metrics: ${error.message}`
-          : 'Failed to export metrics';
+      const msg = getApiErrorMessage(error, 'Failed to export metrics');
       addNotification(msg, 'error');
       return new Error(msg);
     },
