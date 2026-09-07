@@ -9,7 +9,7 @@ import { LoginPage } from '#/pages/LoginPage';
 import { RegisterPage } from '#/pages/RegisterPage';
 
 import { MainLayout } from './layouts/MainLayout';
-import { loginRoute, mapRoute } from './routes/routes';
+import { loginRoute, mapRoute, registerRoute } from './routes/routes';
 import { routesConfig } from './routes/routesConfig';
 import { theme } from './theme';
 
@@ -22,14 +22,14 @@ export const App = reatomComponent(() => {
     handleRestoreSession();
   }, []);
 
-  const isLoginPath = pathname === '/login';
-  const isRegisterPath = pathname === '/register';
+  const isLogging = loginRoute.exact();
+  const isRegistering = registerRoute.exact();
 
   // Auth pages are always accessible and rendered without the main layout.
-  if (isLoginPath || isRegisterPath) {
+  if (isLogging || isRegistering) {
     return (
       <ThemeProvider theme={theme}>
-        <AuthLayout>{isRegisterPath ? <RegisterPage /> : <LoginPage />}</AuthLayout>
+        <AuthLayout>{isRegistering ? <RegisterPage /> : <LoginPage />}</AuthLayout>
       </ThemeProvider>
     );
   }
