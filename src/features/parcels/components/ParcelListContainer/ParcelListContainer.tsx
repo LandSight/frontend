@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
 import { LinearProgress, Typography } from '@mui/material';
-import { useAction, useAtom } from '@reatom/react';
+import { reatomFactoryComponent } from '@reatom/react';
 
 import {
   deleteParcel,
@@ -16,50 +15,46 @@ import './ParcelListContainer.scss';
 
 const cnParcelListContainer = cn('ParcelListContainer');
 
-export const ParcelListContainer: React.FC = () => {
-  const [parcels] = useAtom(parcelsListAtom);
-  const [isFetched] = useAtom(fetchParcels.ready);
-  const [selectedId, setSelectedId] = useAtom(selectedParcelIdAtom);
+export const ParcelListContainer = reatomFactoryComponent(() => {
+  fetchParcels();
 
-  const handleFetch = useAction(fetchParcels);
-  const handleDelete = useAction(deleteParcel);
+  return () => {
+    const parcels = parcelsListAtom();
 
-  useEffect(() => {
-    handleFetch();
-  }, []);
+    // Если ещё не загружено и нет данных – показываем лоадер
+    if (!fetchParcels.ready && parcels.length === 0) {
+      return <LinearProgress />;
+    }
 
-  if (!isFetched && parcels.length === 0) {
-    return <LinearProgress />;
-  }
+    if (parcels.length === 0) {
+      return (
+        <Typography className={cnParcelListContainer()}>
+          You don&apos;t have any parcels yet. Create a new one!
+        </Typography>
+      );
+    }
 
-  if (parcels.length === 0) {
+    const handleDeleteParcel = async (id: string) => {
+      if (window.confirm('Delete parcel?')) {
+        await deleteParcel(id);
+      }
+    };
+
+    const handleParcelClick = (id: string) => {
+      if (selectedParcelIdAtom() === id) {
+        selectedParcelIdAtom.set(null);
+      } else {
+        selectedParcelIdAtom.set(id);
+      }
+    };
+
     return (
-      <Typography className={cnParcelListContainer()}>
-        You don&apos;t have any parcels yet. Create a new one!
-      </Typography>
+      <ParcelList
+        parcels={parcels}
+        selectedParcelId={selectedParcelIdAtom()}
+        onClick={handleParcelClick}
+        onDelete={handleDeleteParcel}
+      />
     );
-  }
-
-  const handleDeleteParcel = async (id: string) => {
-    if (window.confirm('Delete parcel?')) {
-      await handleDelete(id);
-    }
   };
-
-  const handleParcelClick = (id: string) => {
-    if (selectedId === id) {
-      setSelectedId(null);
-    } else {
-      setSelectedId(id);
-    }
-  };
-
-  return (
-    <ParcelList
-      parcels={parcels}
-      selectedParcelId={selectedId}
-      onClick={handleParcelClick}
-      onDelete={handleDeleteParcel}
-    />
-  );
-};
+}, 'ParcelListContainer');
