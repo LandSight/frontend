@@ -1,13 +1,25 @@
 const ACCESS_TOKEN_KEY = 'landsight_access_token';
+const REMEMBER_ME_KEY = 'landsight_remember_me';
+
+export const getRememberMe = (): boolean => {
+  return localStorage.getItem(REMEMBER_ME_KEY) === 'true';
+};
+
+export const setRememberMe = (remember: boolean): void => {
+  localStorage.setItem(REMEMBER_ME_KEY, String(remember));
+};
 
 export const getAccessToken = (): string | null => {
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
+  const storage = getRememberMe() ? localStorage : sessionStorage;
+  return storage.getItem(ACCESS_TOKEN_KEY);
 };
 
 export const setAccessToken = (token: string): void => {
-  localStorage.setItem(ACCESS_TOKEN_KEY, token);
+  const storage = getRememberMe() ? localStorage : sessionStorage;
+  storage.setItem(ACCESS_TOKEN_KEY, token);
 };
 
 export const clearAccessToken = (): void => {
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  const storage = getRememberMe() ? localStorage : sessionStorage;
+  storage.removeItem(ACCESS_TOKEN_KEY);
 };

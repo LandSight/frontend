@@ -1,6 +1,7 @@
 import type { SyntheticEvent } from 'react';
 import { action, atom, computed, withActions } from '@reatom/core';
 
+import { getRememberMe, setRememberMe } from '#/shared/api/token';
 import { addNotification } from '#/shared/ui/notification';
 
 import { login, register } from './auth';
@@ -9,9 +10,14 @@ import { login, register } from './auth';
 export const usernameAtom = atom('', 'usernameAtom');
 export const passwordAtom = atom('', 'passwordAtom');
 export const confirmPasswordAtom = atom('', 'confirmPasswordAtom');
-export const rememberMeAtom = atom(false, 'rememberMeAtom').extend(
+
+export const rememberMeAtom = atom(getRememberMe(), 'rememberMeAtom').extend(
   withActions((target) => ({
-    toggle: () => target.set((prev) => !prev),
+    toggle: () => {
+      const next = !target();
+      target.set(next);
+      setRememberMe(next);
+    },
   }))
 );
 

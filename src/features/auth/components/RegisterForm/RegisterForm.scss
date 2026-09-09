@@ -7,6 +7,14 @@
     margin-bottom: $spacing-m;
   }
 
+  &__RememberRow {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: $spacing-xs;
+    margin-left: $spacing-xs;
+  }
+
   &__Submit {
     margin-top: $spacing-xl !important;
   }

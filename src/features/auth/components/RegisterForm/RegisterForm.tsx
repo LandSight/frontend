@@ -3,7 +3,9 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
   Box,
   Button,
+  Checkbox,
   CircularProgress,
+  FormControlLabel,
   IconButton,
   InputAdornment,
   TextField,
@@ -20,6 +22,7 @@ import {
   passwordAtom,
   register,
   registerAction,
+  rememberMeAtom,
   usernameAtom,
 } from '#/features/auth/';
 import { cn } from '#/shared/lib/bem';
@@ -42,6 +45,9 @@ export const RegisterForm: React.FC = () => {
 
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+
+  const [rememberMe] = useAtom(rememberMeAtom);
+  const handleRememberMeToggle = useAction(rememberMeAtom.toggle);
 
   const handleRegister = useAction(registerAction);
   const handleUsernameChange = useAction(usernameAtom.set);
@@ -137,6 +143,20 @@ export const RegisterForm: React.FC = () => {
           ),
         }}
       />
+
+      <Box className={cnRegister('RememberRow')}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={rememberMe}
+              onChange={handleRememberMeToggle}
+              disabled={isPending}
+              size="small"
+            />
+          }
+          label="Remember me"
+        />
+      </Box>
 
       <Button
         type="submit"

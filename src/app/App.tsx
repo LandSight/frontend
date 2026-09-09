@@ -1,9 +1,9 @@
 import { ThemeProvider } from '@mui/material/styles';
-import { effect, peek, urlAtom } from '@reatom/core';
+import { computed, effect, peek, urlAtom } from '@reatom/core';
 import { reatomFactoryComponent } from '@reatom/react';
 
 import { AuthLayout } from '#/app/layouts/AuthLayout';
-import { isAuthenticatedAtom, restoreSession } from '#/features/auth';
+import { accessTokenAtom, restoreSession } from '#/features/auth';
 import { LoginPage } from '#/pages/LoginPage';
 import { RegisterPage } from '#/pages/RegisterPage';
 
@@ -14,6 +14,8 @@ import { theme } from './theme';
 
 export const App = reatomFactoryComponent(() => {
   restoreSession();
+
+  const isAuthenticatedAtom = computed(() => accessTokenAtom() !== null, 'isAuthenticatedAtom');
 
   effect(() => {
     const { pathname } = urlAtom();
@@ -30,7 +32,7 @@ export const App = reatomFactoryComponent(() => {
         </ThemeProvider>
       );
     }
-    if (isAuthenticatedAtom()) {
+    if (peek(isAuthenticatedAtom)) {
       return (
         <ThemeProvider theme={theme}>
           <MainLayout>

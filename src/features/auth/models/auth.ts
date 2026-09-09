@@ -12,19 +12,14 @@ import type { LoginCredentials, RegisterCredentials, User } from '../types';
 export const accessTokenAtom = atom<string | null>(getAccessToken(), 'accessTokenAtom');
 export const userAtom = atom<User | null>(null, 'userAtom');
 
-export const isAuthenticatedAtom = computed(
-  () => accessTokenAtom() !== null,
-  'isAuthenticatedAtom'
-);
 export const currentUsernameAtom = computed(
   () => userAtom()?.username ?? '',
   'currentUsernameAtom'
 );
 
-// === Actions ===
 export const applyTokens = action((accessToken: string) => {
-  setAccessToken(accessToken);
   accessTokenAtom.set(accessToken);
+  setAccessToken(accessToken);
 }, 'applyTokens');
 
 export const login = action(async (credentials: LoginCredentials) => {

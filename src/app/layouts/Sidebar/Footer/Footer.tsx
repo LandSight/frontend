@@ -1,7 +1,6 @@
-import React from 'react';
 import { Logout as LogoutIcon } from '@mui/icons-material';
 import { Button, Typography } from '@mui/material';
-import { useAction, useAtom } from '@reatom/react';
+import { reatomComponent } from '@reatom/react';
 
 import { currentUsernameAtom, logout } from '#/features/auth';
 import { cn } from '#/shared/lib/bem';
@@ -10,9 +9,8 @@ import './Footer.scss';
 
 const cnFooter = cn('Footer');
 
-export const Footer: React.FC = () => {
-  const [username] = useAtom(currentUsernameAtom);
-  const handleLogout = useAction(logout);
+export const Footer = reatomComponent(() => {
+  const username = currentUsernameAtom();
 
   return (
     <footer className={cnFooter()}>
@@ -25,7 +23,7 @@ export const Footer: React.FC = () => {
           size="small"
           color="inherit"
           startIcon={<LogoutIcon />}
-          onClick={handleLogout}
+          onClick={logout}
           className={cnFooter('Logout')}
         >
           Logout
@@ -36,4 +34,4 @@ export const Footer: React.FC = () => {
       </Typography>
     </footer>
   );
-};
+});
