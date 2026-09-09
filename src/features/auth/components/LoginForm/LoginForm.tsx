@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { wrap } from '@reatom/core';
 import { reatomComponent } from '@reatom/react';
 
 import {
@@ -58,7 +59,7 @@ export const LoginForm = reatomComponent(() => {
         fullWidth
         margin="normal"
         value={username}
-        onChange={(e) => usernameAtom.set(e.target.value)}
+        onChange={(e) => wrap(usernameAtom.set(e.target.value))}
         disabled={isLogginingIn}
         autoComplete="username"
         autoFocus
@@ -72,7 +73,7 @@ export const LoginForm = reatomComponent(() => {
         fullWidth
         margin="normal"
         value={password}
-        onChange={(e) => passwordAtom.set(e.target.value)}
+        onChange={(e) => wrap(passwordAtom.set(e.target.value))}
         disabled={isLogginingIn}
         autoComplete="current-password"
         required
@@ -83,7 +84,7 @@ export const LoginForm = reatomComponent(() => {
           control={
             <Checkbox
               checked={rememberMe}
-              onChange={rememberMeAtom.toggle}
+              onChange={() => wrap(rememberMeAtom.toggle())}
               disabled={isLogginingIn}
               size="small"
             />
@@ -99,7 +100,7 @@ export const LoginForm = reatomComponent(() => {
         fullWidth
         size="large"
         disabled={!isFormValid || isLogginingIn}
-        onClick={loginAction}
+        onClick={() => wrap(loginAction())}
         className={cnLogin('Submit')}
       >
         {isLogginingIn ? <CircularProgress size={22} color="inherit" /> : 'Sign in'}
@@ -112,7 +113,7 @@ export const LoginForm = reatomComponent(() => {
           href="#"
           variant="body2"
           className={cnLogin('Link')}
-          onClick={goToRegisterPageAction}
+          onClick={() => wrap(goToRegisterPageAction())}
         >
           Sign up
         </Typography>

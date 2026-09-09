@@ -10,6 +10,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { wrap } from '@reatom/core';
 import { reatomComponent } from '@reatom/react';
 
 import {
@@ -73,7 +74,7 @@ export const RegisterForm = reatomComponent(() => {
         fullWidth
         margin="normal"
         value={username}
-        onChange={(e) => usernameAtom.set(e.target.value)}
+        onChange={(e) => wrap(usernameAtom.set(e.target.value))}
         disabled={isLoading}
         autoComplete="username"
         autoFocus
@@ -89,14 +90,14 @@ export const RegisterForm = reatomComponent(() => {
         fullWidth
         margin="normal"
         value={password}
-        onChange={(e) => passwordAtom.set(e.target.value)}
+        onChange={(e) => wrap(passwordAtom.set(e.target.value))}
         disabled={isLoading}
         autoComplete="new-password"
         required
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton onClick={() => showPasswordAtom.set(!showPassword)} edge="end">
+              <IconButton onClick={() => wrap(showPasswordAtom.set(!showPassword))} edge="end">
                 {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
@@ -113,7 +114,7 @@ export const RegisterForm = reatomComponent(() => {
         fullWidth
         margin="normal"
         value={confirmPassword}
-        onChange={(e) => confirmPasswordAtom.set(e.target.value)}
+        onChange={(e) => wrap(confirmPasswordAtom.set(e.target.value))}
         disabled={isLoading}
         autoComplete="new-password"
         required
@@ -129,7 +130,7 @@ export const RegisterForm = reatomComponent(() => {
           endAdornment: (
             <InputAdornment position="end">
               <IconButton
-                onClick={() => showConfirmPasswordAtom.set(!showConfirmPassword)}
+                onClick={() => wrap(showConfirmPasswordAtom.set(!showConfirmPassword))}
                 edge="end"
               >
                 {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
@@ -144,7 +145,7 @@ export const RegisterForm = reatomComponent(() => {
           control={
             <Checkbox
               checked={rememberMe}
-              onChange={rememberMeAtom.toggle}
+              onChange={() => wrap(rememberMeAtom.toggle())}
               disabled={isLoading}
               size="small"
             />
@@ -160,7 +161,7 @@ export const RegisterForm = reatomComponent(() => {
         fullWidth
         size="large"
         disabled={!isFormValid || isLoading}
-        onClick={registerAction}
+        onClick={() => wrap(registerAction())}
         className={cnRegister('Submit')}
       >
         {isLoading ? <CircularProgress size={22} color="inherit" /> : 'Sign up'}
@@ -173,7 +174,7 @@ export const RegisterForm = reatomComponent(() => {
           href="#"
           variant="body2"
           className={cnRegister('Link')}
-          onClick={goToLoginPageAction}
+          onClick={() => wrap(goToLoginPageAction())}
         >
           Sign in
         </Typography>

@@ -1,4 +1,4 @@
-import { action, atom, computed, withAsyncData } from '@reatom/core';
+import { action, atom, computed, withAbort, withAsyncData } from '@reatom/core';
 
 import { loginRoute, mapRoute } from '#/app/routes/routes';
 import { getApiErrorMessage } from '#/shared/api/errors';
@@ -77,4 +77,4 @@ export const restoreSession = action(async () => {
       userAtom.set(null);
     }
   }
-}, 'restoreSession');
+}, 'restoreSession').extend(withAbort());
