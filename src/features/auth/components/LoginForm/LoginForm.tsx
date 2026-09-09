@@ -84,7 +84,7 @@ export const LoginForm = reatomComponent(() => {
           control={
             <Checkbox
               checked={rememberMe}
-              onChange={() => wrap(rememberMeAtom.toggle())}
+              onChange={wrap(rememberMeAtom.toggle)}
               disabled={isLogginingIn}
               size="small"
             />
@@ -100,7 +100,7 @@ export const LoginForm = reatomComponent(() => {
         fullWidth
         size="large"
         disabled={!isFormValid || isLogginingIn}
-        onClick={() => wrap(loginAction())}
+        onClick={wrap(loginAction)}
         className={cnLogin('Submit')}
       >
         {isLogginingIn ? <CircularProgress size={22} color="inherit" /> : 'Sign in'}
@@ -113,7 +113,7 @@ export const LoginForm = reatomComponent(() => {
           href="#"
           variant="body2"
           className={cnLogin('Link')}
-          onClick={() => wrap(goToRegisterPageAction())}
+          onClick={wrap(goToRegisterPageAction)}
         >
           Sign up
         </Typography>
