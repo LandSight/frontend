@@ -1,7 +1,6 @@
-import React from 'react';
 import { Cancel, CheckCircle } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
-import { useAtom } from '@reatom/react';
+import { reatomComponent } from '@reatom/react';
 
 import {
   isPasswordHasLowerCaseAtom,
@@ -16,12 +15,12 @@ import './PasswordStrengthIndicator.scss';
 
 const cnPasswordStrength = cn('PasswordStrengthIndicator');
 
-export const PasswordStrengthIndicator: React.FC = () => {
-  const [isMinLength] = useAtom(isPasswordMinLengthAtom);
-  const [hasUpper] = useAtom(isPasswordHasUpperCaseAtom);
-  const [hasLower] = useAtom(isPasswordHasLowerCaseAtom);
-  const [hasNumber] = useAtom(isPasswordHasNumberAtom);
-  const [hasSpecial] = useAtom(isPasswordHasSpecialCharAtom);
+export const PasswordStrengthIndicator = reatomComponent(() => {
+  const isMinLength = isPasswordMinLengthAtom();
+  const hasUpper = isPasswordHasUpperCaseAtom();
+  const hasLower = isPasswordHasLowerCaseAtom();
+  const hasNumber = isPasswordHasNumberAtom();
+  const hasSpecial = isPasswordHasSpecialCharAtom();
 
   const requirements = [
     { label: 'At least 8 characters', isValid: isMinLength },
@@ -51,4 +50,4 @@ export const PasswordStrengthIndicator: React.FC = () => {
       ))}
     </Box>
   );
-};
+}, 'PasswordStrengthIndicator');

@@ -1,7 +1,6 @@
-import React from 'react';
 import { Cancel, CheckCircle } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
-import { useAtom } from '@reatom/react';
+import { reatomComponent } from '@reatom/react';
 
 import {
   isUsernameMaxLengthAtom,
@@ -14,10 +13,10 @@ import './UsernameIndicator.scss';
 
 const cnUsername = cn('UsernameIndicator');
 
-export const UsernameIndicator: React.FC = () => {
-  const [minLength] = useAtom(isUsernameMinLengthAtom);
-  const [maxLength] = useAtom(isUsernameMaxLengthAtom);
-  const [validChars] = useAtom(isUsernameValidCharsAtom);
+export const UsernameIndicator = reatomComponent(() => {
+  const minLength = isUsernameMinLengthAtom();
+  const maxLength = isUsernameMaxLengthAtom();
+  const validChars = isUsernameValidCharsAtom();
 
   const requirements = [
     {
@@ -52,4 +51,4 @@ export const UsernameIndicator: React.FC = () => {
       ))}
     </Box>
   );
-};
+}, 'UsernameIndicator');
