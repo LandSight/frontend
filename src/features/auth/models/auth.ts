@@ -17,11 +17,11 @@ export const currentUsernameAtom = computed(
   'currentUsernameAtom'
 );
 
+// === Actions ===
 export const applyTokens = action((accessToken: string) => {
   accessTokenAtom.set(accessToken);
   setAccessToken(accessToken);
 }, 'applyTokens');
-
 export const login = action(async (credentials: LoginCredentials) => {
   const tokens = await authApi.login(credentials);
   applyTokens(tokens.access_token);
@@ -38,7 +38,6 @@ export const login = action(async (credentials: LoginCredentials) => {
     },
   })
 );
-
 export const register = action(async (credentials: RegisterCredentials) => {
   await authApi.register(credentials);
   addNotification(`User "${credentials.username}" registered. Signing in...`, 'success');
@@ -52,14 +51,12 @@ export const register = action(async (credentials: RegisterCredentials) => {
     },
   })
 );
-
 export const logout = action(() => {
   clearAccessToken();
   accessTokenAtom.set(null);
   userAtom.set(null);
   loginRoute.go();
 }, 'logout');
-
 export const restoreSession = action(async () => {
   if (!accessTokenAtom()) {
     return;

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Box,
   Button,
@@ -8,13 +7,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { wrap } from '@reatom/core';
-import { useAction, useAtom } from '@reatom/react';
+import { reatomComponent } from '@reatom/react';
 
-import { registerRoute } from '#/app/routes/routes';
 import {
+  goToRegisterPageAction,
   isLoginFormValidAtom,
-  login,
   loginAction,
   passwordAtom,
   rememberMeAtom,
@@ -26,18 +23,13 @@ import './LoginForm.scss';
 
 const cnLogin = cn('LoginForm');
 
-export const LoginForm: React.FC = () => {
-  const [username] = useAtom(usernameAtom);
-  const [password] = useAtom(passwordAtom);
-  const [rememberMe] = useAtom(rememberMeAtom);
-  const [isFormValid] = useAtom(isLoginFormValidAtom);
-  const [pending] = useAtom(login.pending);
-  const isPending = pending > 0;
+export const LoginForm = reatomComponent(() => {
+  const username = usernameAtom();
+  const password = passwordAtom();
+  const rememberMe = rememberMeAtom();
 
-  const handleLogin = useAction(loginAction);
-  const handleUsernameChange = useAction(usernameAtom.set);
-  const handlePasswordChange = useAction(passwordAtom.set);
-  const handleRememberMeToggle = useAction(rememberMeAtom.toggle);
+  const isFormValid = isLoginFormValidAtom();
+  const isLogginingIn = loginAction.status().isPending;
 
   return (
     <Box component="form" className={cnLogin()}>
@@ -66,8 +58,8 @@ export const LoginForm: React.FC = () => {
         fullWidth
         margin="normal"
         value={username}
-        onChange={(e) => handleUsernameChange(e.target.value)}
-        disabled={isPending}
+        onChange={(e) => usernameAtom.set(e.target.value)}
+        disabled={isLogginingIn}
         autoComplete="username"
         autoFocus
         required
@@ -80,8 +72,8 @@ export const LoginForm: React.FC = () => {
         fullWidth
         margin="normal"
         value={password}
-        onChange={(e) => handlePasswordChange(e.target.value)}
-        disabled={isPending}
+        onChange={(e) => passwordAtom.set(e.target.value)}
+        disabled={isLogginingIn}
         autoComplete="current-password"
         required
       />
@@ -91,8 +83,8 @@ export const LoginForm: React.FC = () => {
           control={
             <Checkbox
               checked={rememberMe}
-              onChange={handleRememberMeToggle}
-              disabled={isPending}
+              onChange={rememberMeAtom.toggle}
+              disabled={isLogginingIn}
               size="small"
             />
           }
@@ -106,11 +98,11 @@ export const LoginForm: React.FC = () => {
         color="primary"
         fullWidth
         size="large"
-        disabled={!isFormValid || isPending}
-        onClick={handleLogin}
+        disabled={!isFormValid || isLogginingIn}
+        onClick={loginAction}
         className={cnLogin('Submit')}
       >
-        {isPending ? <CircularProgress size={22} color="inherit" /> : 'Sign in'}
+        {isLogginingIn ? <CircularProgress size={22} color="inherit" /> : 'Sign in'}
       </Button>
 
       <Typography variant="body2" align="center" className={cnLogin('Footer')}>
@@ -120,11 +112,11 @@ export const LoginForm: React.FC = () => {
           href="#"
           variant="body2"
           className={cnLogin('Link')}
-          onClick={wrap(() => registerRoute.go())}
+          onClick={goToRegisterPageAction}
         >
           Sign up
         </Typography>
       </Typography>
     </Box>
   );
-};
+}, 'LoginForm');

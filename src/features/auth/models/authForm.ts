@@ -1,6 +1,7 @@
 import type { SyntheticEvent } from 'react';
-import { action, atom, computed, withActions } from '@reatom/core';
+import { action, atom, computed, withActions, withAsync } from '@reatom/core';
 
+import { loginRoute, registerRoute } from '#/app/routes/routes';
 import { getRememberMe, setRememberMe } from '#/shared/api/token';
 import { addNotification } from '#/shared/ui/notification';
 
@@ -10,7 +11,6 @@ import { login, register } from './auth';
 export const usernameAtom = atom('', 'usernameAtom');
 export const passwordAtom = atom('', 'passwordAtom');
 export const confirmPasswordAtom = atom('', 'confirmPasswordAtom');
-
 export const rememberMeAtom = atom(getRememberMe(), 'rememberMeAtom').extend(
   withActions((target) => ({
     toggle: () => {
@@ -20,6 +20,8 @@ export const rememberMeAtom = atom(getRememberMe(), 'rememberMeAtom').extend(
     },
   }))
 );
+export const showPasswordAtom = atom(false, 'showPasswordAtom');
+export const showConfirmPasswordAtom = atom(false, 'showConfirmPasswordAtom');
 
 // === Password validation atoms ===
 export const isPasswordMinLengthAtom = computed(
@@ -87,12 +89,10 @@ export const isLoginFormValidAtom = computed(() => {
   const password = passwordAtom();
   return username.trim().length > 0 && password.length > 0;
 }, 'isLoginFormValidAtom');
-
 export const isRegisterFormValidAtom = computed(() => {
   const isUsernameValid = isUsernameValidAtom();
   const isPasswordValid = isPasswordValidAtom();
   const isMatch = isPasswordMatchAtom();
-
   return isUsernameValid && isPasswordValid && isMatch;
 }, 'isRegisterFormValidAtom');
 
@@ -119,8 +119,11 @@ export const loginAction = action(async (e?: SyntheticEvent) => {
   // Clear form after successful login
   usernameAtom.set('');
   passwordAtom.set('');
-}, 'loginAction');
-
+}, 'loginAction').extend(
+  withAsync({
+    status: true,
+  })
+);
 export const registerAction = action(async (e?: SyntheticEvent) => {
   e?.preventDefault();
 
@@ -155,4 +158,18 @@ export const registerAction = action(async (e?: SyntheticEvent) => {
   usernameAtom.set('');
   passwordAtom.set('');
   confirmPasswordAtom.set('');
-}, 'registerAction');
+}, 'registerAction').extend(
+  withAsync({
+    status: true,
+  })
+);
+export const goToRegisterPageAction = action(() => {
+  if (!loginAction.status().isPending) {
+    registerRoute.go();
+  }
+}, 'goToRegisterPageAction');
+export const goToLoginPageAction = action(() => {
+  if (!registerAction.status().isPending) {
+    loginRoute.go();
+  }
+}, 'goToRegisterPageAction');

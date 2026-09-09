@@ -1,4 +1,3 @@
-import React from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
   Box,
@@ -11,18 +10,18 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { wrap } from '@reatom/core';
-import { useAction, useAtom } from '@reatom/react';
+import { reatomComponent } from '@reatom/react';
 
-import { loginRoute } from '#/app/routes/routes';
 import {
   confirmPasswordAtom,
+  goToLoginPageAction,
   isPasswordMatchAtom,
   isRegisterFormValidAtom,
   passwordAtom,
-  register,
   registerAction,
   rememberMeAtom,
+  showConfirmPasswordAtom,
+  showPasswordAtom,
   usernameAtom,
 } from '#/features/auth/';
 import { cn } from '#/shared/lib/bem';
@@ -34,25 +33,18 @@ import './RegisterForm.scss';
 
 const cnRegister = cn('RegisterForm');
 
-export const RegisterForm: React.FC = () => {
-  const [username] = useAtom(usernameAtom);
-  const [password] = useAtom(passwordAtom);
-  const [confirmPassword] = useAtom(confirmPasswordAtom);
-  const [isPasswordMatch] = useAtom(isPasswordMatchAtom);
-  const [isFormValid] = useAtom(isRegisterFormValidAtom);
-  const [pending] = useAtom(register.pending);
-  const isPending = pending > 0;
+export const RegisterForm = reatomComponent(() => {
+  const username = usernameAtom();
+  const password = passwordAtom();
+  const confirmPassword = confirmPasswordAtom();
+  const rememberMe = rememberMeAtom();
 
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const showPassword = showPasswordAtom();
+  const showConfirmPassword = showConfirmPasswordAtom();
 
-  const [rememberMe] = useAtom(rememberMeAtom);
-  const handleRememberMeToggle = useAction(rememberMeAtom.toggle);
-
-  const handleRegister = useAction(registerAction);
-  const handleUsernameChange = useAction(usernameAtom.set);
-  const handlePasswordChange = useAction(passwordAtom.set);
-  const handleConfirmPasswordChange = useAction(confirmPasswordAtom.set);
+  const isPasswordMatch = isPasswordMatchAtom();
+  const isFormValid = isRegisterFormValidAtom();
+  const isLoading = registerAction.status().isPending;
 
   return (
     <Box component="form" className={cnRegister()}>
@@ -81,8 +73,8 @@ export const RegisterForm: React.FC = () => {
         fullWidth
         margin="normal"
         value={username}
-        onChange={(e) => handleUsernameChange(e.target.value)}
-        disabled={isPending}
+        onChange={(e) => usernameAtom.set(e.target.value)}
+        disabled={isLoading}
         autoComplete="username"
         autoFocus
         required
@@ -97,14 +89,14 @@ export const RegisterForm: React.FC = () => {
         fullWidth
         margin="normal"
         value={password}
-        onChange={(e) => handlePasswordChange(e.target.value)}
-        disabled={isPending}
+        onChange={(e) => passwordAtom.set(e.target.value)}
+        disabled={isLoading}
         autoComplete="new-password"
         required
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+              <IconButton onClick={() => showPasswordAtom.set(!showPassword)} edge="end">
                 {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
@@ -121,8 +113,8 @@ export const RegisterForm: React.FC = () => {
         fullWidth
         margin="normal"
         value={confirmPassword}
-        onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-        disabled={isPending}
+        onChange={(e) => confirmPasswordAtom.set(e.target.value)}
+        disabled={isLoading}
         autoComplete="new-password"
         required
         error={confirmPassword.length > 0 && !isPasswordMatch}
@@ -136,7 +128,10 @@ export const RegisterForm: React.FC = () => {
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+              <IconButton
+                onClick={() => showConfirmPasswordAtom.set(!showConfirmPassword)}
+                edge="end"
+              >
                 {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
@@ -149,8 +144,8 @@ export const RegisterForm: React.FC = () => {
           control={
             <Checkbox
               checked={rememberMe}
-              onChange={handleRememberMeToggle}
-              disabled={isPending}
+              onChange={rememberMeAtom.toggle}
+              disabled={isLoading}
               size="small"
             />
           }
@@ -164,11 +159,11 @@ export const RegisterForm: React.FC = () => {
         color="primary"
         fullWidth
         size="large"
-        disabled={!isFormValid || isPending}
-        onClick={handleRegister}
+        disabled={!isFormValid || isLoading}
+        onClick={registerAction}
         className={cnRegister('Submit')}
       >
-        {isPending ? <CircularProgress size={22} color="inherit" /> : 'Sign up'}
+        {isLoading ? <CircularProgress size={22} color="inherit" /> : 'Sign up'}
       </Button>
 
       <Typography variant="body2" align="center" className={cnRegister('Footer')}>
@@ -178,11 +173,11 @@ export const RegisterForm: React.FC = () => {
           href="#"
           variant="body2"
           className={cnRegister('Link')}
-          onClick={wrap(() => loginRoute.go())}
+          onClick={goToLoginPageAction}
         >
           Sign in
         </Typography>
       </Typography>
     </Box>
   );
-};
+}, 'RegisterForm');

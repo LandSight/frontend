@@ -34,4 +34,4 @@ export const Footer = reatomComponent(() => {
       </Typography>
     </footer>
   );
-});
+}, 'Footer');
