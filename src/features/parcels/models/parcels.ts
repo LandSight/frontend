@@ -15,6 +15,7 @@ export const newParcelNameAtom = atom('', 'newParcelNameAtom').extend(
     reset: () => target.set(''),
   }))
 );
+export const pendingDeleteParcelIdAtom = atom<string | null>(null, 'pendingDeleteParcelIdAtom');
 
 export const isCreateParcelDialogOpenAtom = atom(false, 'isCreateParcelDialogOpenAtom').extend(
   withActions((target) => ({
@@ -45,6 +46,7 @@ export const fetchParcels = action(async () => {
   parcelsAtom.set(newMap);
 }, 'fetchParcels').extend(
   withAsyncData({
+    status: true,
     parseError: (error) => {
       const msg = getApiErrorMessage(error, 'Failed to fetch all parcels');
       addNotification(msg, 'error');
@@ -52,11 +54,8 @@ export const fetchParcels = action(async () => {
     },
   })
 );
-
 export const createParcel = action(async (data: CreateParcelRequest) => {
-  // TODO: replace with real API call
   const newParcel = await parcelsApi.create(data);
-  // const newParcel = { id: String(new Date()), ...data };
   parcelsAtom.set((prev) => ({ ...prev, [newParcel.id]: newParcel }));
   selectedParcelIdAtom.set(newParcel.id);
   newParcelNameAtom.reset();
@@ -64,6 +63,7 @@ export const createParcel = action(async (data: CreateParcelRequest) => {
   return newParcel;
 }, 'createParcel').extend(
   withAsyncData({
+    status: true,
     parseError: (error) => {
       const msg = getApiErrorMessage(error, 'Failed to create parcel');
       addNotification(msg, 'error');
@@ -71,7 +71,6 @@ export const createParcel = action(async (data: CreateParcelRequest) => {
     },
   })
 );
-
 export const deleteParcel = action(async (id: string) => {
   await parcelsApi.delete(id);
   parcelsAtom.set((prev) => {
@@ -81,9 +80,10 @@ export const deleteParcel = action(async (id: string) => {
   if (selectedParcelIdAtom() === id) {
     selectedParcelIdAtom.set(null);
   }
-  addNotification(`Parcel "${id}" deleted successfully`, 'success');
+  addNotification(`Parcel deleted successfully`, 'success');
 }, 'deleteParcel').extend(
   withAsyncData({
+    status: true,
     parseError: (error) => {
       const msg = getApiErrorMessage(error, 'Failed to delete parcel');
       addNotification(msg, 'error');

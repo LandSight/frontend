@@ -5,7 +5,7 @@ import { analysesRoute, mapRoute } from '#/app/routes/routes';
 import { AnalysesPage } from '#/pages/AnalysesPage';
 import { MapPage } from '#/pages/MapPage';
 
-export const routesConfig = {
+export const getRoutesConfig = () => ({
   map: {
     route: mapRoute,
     component: MapPage,
@@ -22,4 +22,4 @@ export const routesConfig = {
     showInMenu: true,
     exact: true,
   },
-};
+});

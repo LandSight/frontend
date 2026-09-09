@@ -132,6 +132,7 @@ export const startAnalysis = action(async (data: CreateAnalysisRequest) => {
   return newAnalysis;
 }, 'startAnalysis').extend(
   withAsyncData({
+    status: true,
     parseError: (error) => {
       const msg = getApiErrorMessage(error, 'Failed to start analysis');
       addNotification(msg, 'error');

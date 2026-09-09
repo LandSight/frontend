@@ -1,50 +1,43 @@
+import { Box, CircularProgress } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
-import { computed, effect, peek, urlAtom } from '@reatom/core';
 import { reatomFactoryComponent } from '@reatom/react';
 
-import { AuthLayout } from '#/app/layouts/AuthLayout';
-import { accessTokenAtom, restoreSession } from '#/features/auth';
-import { LoginPage } from '#/pages/LoginPage';
-import { RegisterPage } from '#/pages/RegisterPage';
+import { isSessionCheckingAtom, restoreSession } from '#/features/auth';
 
-import { MainLayout } from './layouts/MainLayout';
-import { loginRoute, mapRoute, registerRoute } from './routes/routes';
-import { routesConfig } from './routes/routesConfig';
+import { AuthLayout } from './layouts/AuthLayout';
+import { rootLayout } from './routes';
 import { theme } from './theme';
 
 export const App = reatomFactoryComponent(() => {
   restoreSession();
-
-  const isAuthenticatedAtom = computed(() => accessTokenAtom() !== null, 'isAuthenticatedAtom');
-
-  effect(() => {
-    const { pathname } = urlAtom();
-    if (pathname === '/' && peek(isAuthenticatedAtom)) {
-      mapRoute.go();
-    }
-  });
-
   return () => {
-    if (loginRoute.exact() || registerRoute.exact()) {
+    const isChecking = isSessionCheckingAtom();
+
+    if (isChecking) {
       return (
         <ThemeProvider theme={theme}>
-          <AuthLayout>{registerRoute.exact() ? <RegisterPage /> : <LoginPage />}</AuthLayout>
+          <Box sx={{ position: 'relative' }}>
+            <AuthLayout>
+              <Box sx={{ height: 320, width: 420 }} />
+            </AuthLayout>
+            <Box
+              sx={{
+                position: 'fixed',
+                inset: 0,
+                bgcolor: 'rgba(0, 0, 0, 0.55)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1300,
+              }}
+            >
+              <CircularProgress size={84} thickness={4.5} />
+            </Box>
+          </Box>
         </ThemeProvider>
       );
     }
-    if (peek(isAuthenticatedAtom)) {
-      return (
-        <ThemeProvider theme={theme}>
-          <MainLayout>
-            {Object.values(routesConfig).map(({ route, component: Page, exact }) => {
-              const active = exact ? route.exact() : route();
-              return active ? <Page key={route.name} /> : null;
-            })}
-          </MainLayout>
-        </ThemeProvider>
-      );
-    } else {
-      loginRoute.go();
-    }
+
+    return <ThemeProvider theme={theme}>{rootLayout.render()}</ThemeProvider>;
   };
 }, 'App');

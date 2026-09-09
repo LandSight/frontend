@@ -2,7 +2,7 @@ import React from 'react';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { wrap } from '@reatom/core';
 
-import { routesConfig } from '#/app/routes/routesConfig';
+import { getRoutesConfig } from '#/app/routes/routesConfig';
 import { cn } from '#/shared/lib/bem';
 
 import './NavigationMenu.scss';
@@ -10,7 +10,7 @@ import './NavigationMenu.scss';
 const cnNavMenu = cn('NavigationMenu');
 
 export const NavigationMenu = () => {
-  const menuItems = Object.values(routesConfig).filter((r) => r.showInMenu);
+  const menuItems = Object.values(getRoutesConfig()).filter((r) => r.showInMenu);
 
   return (
     <List className={cnNavMenu()}>
