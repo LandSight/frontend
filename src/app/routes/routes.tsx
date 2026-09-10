@@ -13,7 +13,6 @@ export const rootLayout = reatomRoute({
   render: (self) => self.outlet(),
 });
 
-// ----- Корень "/" (гостевая зона): уже авторизован -> в приложение -----
 export const loginRoute = rootLayout.reatomRoute({
   path: 'login',
   params() {

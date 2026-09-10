@@ -22,6 +22,7 @@ const cnParcelListContainer = cn('ParcelListContainer');
 
 export const ParcelListContainer = reatomFactoryComponent(() => {
   fetchParcels();
+
   return () => {
     const parcels = parcelsListAtom();
     const isLoading = fetchParcels.status().isPending;

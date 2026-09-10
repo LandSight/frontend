@@ -5,7 +5,7 @@ import type { Parcel } from '#/shared/types/parcel';
 import { addNotification } from '#/shared/ui/notification';
 
 import type { CreateParcelRequest } from '../api/parcelsApi';
-import { parcelsApi } from '../api/parcelsApi';
+import * as parcelApi from '../api/parcelsApi';
 
 // === Atoms ===
 export const parcelsAtom = atom<Record<string, Parcel>>({}, 'parcelsAtom');
@@ -40,7 +40,7 @@ export const hasSelectedParcelAtom = computed(() => {
 
 // === Actions ===
 export const fetchParcels = action(async () => {
-  const parcels = await parcelsApi.fetchAll();
+  const parcels = await parcelApi.getAllParcels();
   const newMap: Record<string, Parcel> = {};
   parcels.forEach((parcel) => (newMap[parcel.id] = parcel));
   parcelsAtom.set(newMap);
@@ -55,7 +55,7 @@ export const fetchParcels = action(async () => {
   })
 );
 export const createParcel = action(async (data: CreateParcelRequest) => {
-  const newParcel = await parcelsApi.create(data);
+  const newParcel = await parcelApi.createParcel(data);
   parcelsAtom.set((prev) => ({ ...prev, [newParcel.id]: newParcel }));
   selectedParcelIdAtom.set(newParcel.id);
   newParcelNameAtom.reset();
@@ -72,7 +72,7 @@ export const createParcel = action(async (data: CreateParcelRequest) => {
   })
 );
 export const deleteParcel = action(async (id: string) => {
-  await parcelsApi.delete(id);
+  await parcelApi.deleteParcel(id);
   parcelsAtom.set((prev) => {
     const { [id]: _, ...rest } = prev;
     return rest;

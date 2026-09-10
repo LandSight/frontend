@@ -1,3 +1,5 @@
+import { abortVar, action } from '@reatom/core';
+
 import apiClient from '#/shared/api/client';
 import type { Point } from '#/shared/types/geometry';
 import type { Parcel } from '#/shared/types/parcel';
@@ -67,21 +69,31 @@ const featureToParcel = (feature: ParcelFeature): Parcel => ({
   polygon: polygonToPoints(feature.geometry),
 });
 
-export const parcelsApi = {
-  fetchAll: async (): Promise<Parcel[]> => {
-    const response = await apiClient.get<ParcelFeatureCollection>('/parcels/');
-    return response.data.features.map(featureToParcel);
-  },
+export const getAllParcels = action(async (): Promise<Parcel[]> => {
+  const controller = new AbortController();
+  abortVar.subscribe(() => controller.abort());
+  const response = await apiClient.get<ParcelFeatureCollection>('/parcels/', {
+    signal: controller.signal,
+  });
+  return response.data.features.map(featureToParcel);
+}, 'fetchAll');
 
-  create: async (data: CreateParcelRequest): Promise<CreateParcelResponse> => {
+export const createParcel = action(
+  async (data: CreateParcelRequest): Promise<CreateParcelResponse> => {
+    const controller = new AbortController();
+    abortVar.subscribe(() => controller.abort());
     const response = await apiClient.post<ParcelFeature>('/parcels/', {
       name: data.name,
       polygon: pointsToPolygon(data.polygon),
+      signal: controller.signal,
     });
     return featureToParcel(response.data);
   },
+  'create'
+);
 
-  delete: async (id: string): Promise<void> => {
-    await apiClient.delete(`/parcels/${id}`);
-  },
-};
+export const deleteParcel = action(async (id: string): Promise<void> => {
+  const controller = new AbortController();
+  abortVar.subscribe(() => controller.abort());
+  await apiClient.delete(`/parcels/${id}`, { signal: controller.signal });
+}, 'delete');
