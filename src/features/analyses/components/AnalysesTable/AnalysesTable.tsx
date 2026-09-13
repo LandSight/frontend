@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  Delete as DeleteIcon,
-  Download as DownloadIcon,
-  Visibility as ViewIcon,
-} from '@mui/icons-material';
+import { Visibility as ViewIcon } from '@mui/icons-material';
 import {
   Box,
   Chip,
@@ -21,12 +17,13 @@ import {
 } from '@mui/material';
 import { useAction, useAtom } from '@reatom/react';
 
+import { analysisStatusLabels } from '#/features/analyses/types';
 import { cn } from '#/shared/lib/bem';
 
-import { deleteAnalysis, exportMetrics, filtersAtom } from '../../models/analyses';
+import { filtersAtom } from '../../models/analyses';
 import type { SortBy } from '../../types';
 
-import { analysisStatusMap, formatDate } from './helpers';
+import { formatDate } from './helpers';
 import type { AnalysesTableProps } from './types';
 
 import './AnalysesTable.scss';
@@ -56,15 +53,8 @@ const columnConfig: { field: SortableColumn; label: string; align: 'center'; cla
 
 export const AnalysesTable: React.FC<AnalysesTableProps> = ({ analyses }) => {
   const [filters] = useAtom(filtersAtom);
-  const handleDelete = useAction(deleteAnalysis);
-  const handleExport = useAction(exportMetrics);
   const setSortBy = useAction(filtersAtom.setSortBy);
   const setSortOrder = useAction(filtersAtom.setSortOrder);
-
-  const handleViewReport = (analysisId: string) => {
-    // TODO: navigate to report page
-    window.open(`/reports/${analysisId}`, '_blank');
-  };
 
   const handleSort = (field: SortBy) => {
     if (filters.sortBy === field) {
@@ -108,11 +98,11 @@ export const AnalysesTable: React.FC<AnalysesTableProps> = ({ analyses }) => {
               <TableCell align="center" className={cnAnalysesTable('col-status')}>
                 <Box className={cnAnalysesTable('Status')}>
                   <Chip
-                    label={analysisStatusMap[analysis.status] || analysis.status}
+                    label={analysisStatusLabels[analysis.status] || analysis.status}
                     size="small"
                     className={cnAnalysesTable('StatusBadge', { [analysis.status]: true })}
                     icon={
-                      analysis.status === 'processing' ? <CircularProgress size={12} /> : undefined
+                      analysis.status === 'running' ? <CircularProgress size={12} /> : undefined
                     }
                   />
                 </Box>
@@ -121,7 +111,7 @@ export const AnalysesTable: React.FC<AnalysesTableProps> = ({ analyses }) => {
                 {formatDate(analysis.created_at)}
               </TableCell>
               <TableCell align="center" className={cnAnalysesTable('col-score')}>
-                {analysis.status === 'completed' && analysis.score !== undefined ? (
+                {analysis.status === 'completed' && analysis.score != null ? (
                   <Chip
                     label={analysis.score.toFixed(1)}
                     size="small"
@@ -137,28 +127,12 @@ export const AnalysesTable: React.FC<AnalysesTableProps> = ({ analyses }) => {
                 )}
               </TableCell>
               <TableCell align="center" className={cnAnalysesTable('col-actions')}>
-                <Tooltip title="View report">
-                  <IconButton
-                    size="small"
-                    onClick={() => handleViewReport(analysis.id)}
-                    disabled={analysis.status !== 'completed'}
-                  >
-                    <ViewIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Export metrics">
-                  <IconButton
-                    size="small"
-                    onClick={() => handleExport(analysis.id)}
-                    disabled={analysis.status !== 'completed'}
-                  >
-                    <DownloadIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete">
-                  <IconButton size="small" color="error" onClick={() => handleDelete(analysis.id)}>
-                    <DeleteIcon />
-                  </IconButton>
+                <Tooltip title="Report coming soon">
+                  <span>
+                    <IconButton size="small" disabled>
+                      <ViewIcon />
+                    </IconButton>
+                  </span>
                 </Tooltip>
               </TableCell>
             </TableRow>

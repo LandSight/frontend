@@ -1,3 +1,5 @@
+import { abortVar, action } from '@reatom/core';
+
 import type { Analysis } from '#/features/analyses/types';
 import apiClient from '#/shared/api/client';
 
@@ -6,40 +8,39 @@ export type CreateAnalysisRequest = {
   parcel_id: string;
 };
 
-export type CreateAnalysisResponse = {
-  id: string;
-  status: string;
-};
+export type CreateAnalysisResponse = Analysis;
 
-export type FetchAnalysesParams = {
-  limit?: number;
-  offset?: number;
-  search?: string;
-  name?: string;
-  sortBy?: string;
-  order?: 'asc' | 'desc';
-};
-
-export const analysesApi = {
-  start: async (data: CreateAnalysisRequest): Promise<CreateAnalysisResponse> => {
-    const response = await apiClient.post('/analyses', data);
+export const startAnalysis = action(
+  async (data: CreateAnalysisRequest): Promise<CreateAnalysisResponse> => {
+    const controller = new AbortController();
+    abortVar.subscribe(() => controller.abort());
+    const response = await apiClient.post<CreateAnalysisResponse>(
+      '/analysis',
+      {
+        parcel_id: data.parcel_id,
+        name: data.name,
+      },
+      { signal: controller.signal }
+    );
     return response.data;
   },
+  'startAnalysis'
+);
 
-  fetchAll: async (params?: FetchAnalysesParams): Promise<Analysis[]> => {
-    const response = await apiClient.get('/analyses', { params });
-    return response.data;
-  },
+export const getAllAnalyses = action(async (): Promise<Analysis[]> => {
+  const controller = new AbortController();
+  abortVar.subscribe(() => controller.abort());
+  const response = await apiClient.get<Analysis[]>('/analysis', {
+    signal: controller.signal,
+  });
+  return response.data;
+}, 'getAllAnalyses');
 
-  delete: async (id: string): Promise<void> => {
-    await apiClient.delete(`/analyses/${id}`);
-  },
-
-  exportMetrics: async (id: string, format: 'json' | 'csv' = 'json'): Promise<Blob> => {
-    const response = await apiClient.get(`/analyses/${id}/metrics`, {
-      params: { format },
-      responseType: 'blob',
-    });
-    return response.data;
-  },
-};
+export const getAnalysisById = action(async (id: string): Promise<Analysis> => {
+  const controller = new AbortController();
+  abortVar.subscribe(() => controller.abort());
+  const response = await apiClient.get<Analysis>(`/analysis/${id}`, {
+    signal: controller.signal,
+  });
+  return response.data;
+}, 'getAnalysisById');

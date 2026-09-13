@@ -3,9 +3,8 @@ import { action, atom, computed, withActions, withAsyncData } from '@reatom/core
 import { getApiErrorMessage } from '#/shared/api/errors';
 import { addNotification } from '#/shared/ui/notification';
 
-import type { CreateAnalysisRequest, FetchAnalysesParams } from '../api/analysesApi';
-import { analysesApi } from '../api/analysesApi';
-import { mockAnalyses } from '../mocks/analyses';
+import type { CreateAnalysisRequest } from '../api/analysesApi';
+import * as analysisApi from '../api/analysesApi';
 import type { AnalysesFilters, Analysis, AnalysisStatus, SortBy, SortOrder } from '../types';
 
 // === Atoms ===
@@ -47,6 +46,12 @@ export const analysesListAtom = computed(() => {
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 }, 'analysesListAtom');
+
+export const hasActiveAnalysesAtom = computed(
+  () => analysesListAtom().some((a) => a.status === 'pending' || a.status === 'running'),
+  'hasActiveAnalysesAtom'
+);
+
 export const filteredAnalysesAtom = computed(() => {
   const list = analysesListAtom();
   const filters = filtersAtom();
@@ -98,8 +103,8 @@ export const filteredAnalysesAtom = computed(() => {
 }, 'filteredAnalysesAtom');
 
 // === Actions ===
-export const fetchAnalyses = action(async (params?: FetchAnalysesParams) => {
-  const analyses = await analysesApi.fetchAll(params);
+export const fetchAnalyses = action(async () => {
+  const analyses = await analysisApi.getAllAnalyses();
   const map: Record<string, Analysis> = {};
   analyses.forEach((analysis) => {
     map[analysis.id] = analysis;
@@ -108,25 +113,16 @@ export const fetchAnalyses = action(async (params?: FetchAnalysesParams) => {
 }, 'fetchAnalyses').extend(
   withAsyncData({
     parseError: (error) => {
-      if (import.meta.env.DEV) {
-        const map: Record<string, Analysis> = {};
-        mockAnalyses.forEach((analysis) => {
-          map[analysis.id] = analysis;
-        });
-        analysesAtom.set(map);
-        addNotification('Using demo data (API unavailable)', 'info');
-      } else {
-        const msg = getApiErrorMessage(error, 'Failed to fetch all analyses');
-        addNotification(msg, 'error');
-        return new Error(msg);
-      }
+      const msg = getApiErrorMessage(error, 'Failed to fetch all analyses');
+      addNotification(msg, 'error');
+      return new Error(msg);
     },
   })
 );
 
 export const startAnalysis = action(async (data: CreateAnalysisRequest) => {
-  const newAnalysis = await analysesApi.start(data);
-  analysesAtom.set((prev) => ({ ...prev, [newAnalysis.id]: newAnalysis as Analysis }));
+  const newAnalysis = await analysisApi.startAnalysis(data);
+  analysesAtom.set((prev) => ({ ...prev, [newAnalysis.id]: newAnalysis }));
   newAnalysisNameAtom.reset();
   addNotification('Analysis started successfully', 'success');
   return newAnalysis;
@@ -135,44 +131,6 @@ export const startAnalysis = action(async (data: CreateAnalysisRequest) => {
     status: true,
     parseError: (error) => {
       const msg = getApiErrorMessage(error, 'Failed to start analysis');
-      addNotification(msg, 'error');
-      return new Error(msg);
-    },
-  })
-);
-
-export const deleteAnalysis = action(async (id: string) => {
-  await analysesApi.delete(id);
-  analysesAtom.set((prev) => {
-    const { [id]: _, ...rest } = prev;
-    return rest;
-  });
-  addNotification('Analysis deleted successfully', 'success');
-}, 'deleteAnalysis').extend(
-  withAsyncData({
-    parseError: (error) => {
-      const msg = getApiErrorMessage(error, 'Failed to delete analysis');
-      addNotification(msg, 'error');
-      return new Error(msg);
-    },
-  })
-);
-
-export const exportMetrics = action(async (id: string, format: 'json' | 'csv' = 'json') => {
-  const blob = await analysesApi.exportMetrics(id, format);
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `analysis_${id}_metrics.${format}`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
-  addNotification('Metrics exported successfully', 'success');
-}, 'exportMetrics').extend(
-  withAsyncData({
-    parseError: (error) => {
-      const msg = getApiErrorMessage(error, 'Failed to export metrics');
       addNotification(msg, 'error');
       return new Error(msg);
     },

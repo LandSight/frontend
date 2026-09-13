@@ -12,7 +12,11 @@ import {
 } from '@mui/material';
 import { useAction, useAtom } from '@reatom/react';
 
-import { type AnalysisStatus, analysisStatus } from '#/features/analyses/types';
+import {
+  type AnalysisStatus,
+  analysisStatus,
+  analysisStatusLabels,
+} from '#/features/analyses/types';
 import { cn } from '#/shared/lib/bem';
 
 import { filtersAtom } from '../../models/analyses';
@@ -63,7 +67,7 @@ export const AnalysesFilters: React.FC = () => {
                 {selected.map((value) => (
                   <Chip
                     key={value}
-                    label={value}
+                    label={analysisStatusLabels[value]}
                     size="small"
                     onDelete={() => handleDeleteStatus(value)}
                     onMouseDown={(event) => event.stopPropagation()}
@@ -77,7 +81,7 @@ export const AnalysesFilters: React.FC = () => {
             {analysisStatus.map((status) => (
               <MenuItem key={status} value={status} className={cnAnalysesFilters('MenuItem')}>
                 <Checkbox checked={filters.statuses.includes(status)} />
-                {status}
+                {analysisStatusLabels[status]}
               </MenuItem>
             ))}
           </Select>
