@@ -1,10 +1,11 @@
 import { action, atom, computed, withActions, withAsyncData } from '@reatom/core';
 
+import { getApiErrorMessage } from '#/shared/api/errors';
 import type { Parcel } from '#/shared/types/parcel';
 import { addNotification } from '#/shared/ui/notification';
 
 import type { CreateParcelRequest } from '../api/parcelsApi';
-import { parcelsApi } from '../api/parcelsApi';
+import * as parcelApi from '../api/parcelsApi';
 
 // === Atoms ===
 export const parcelsAtom = atom<Record<string, Parcel>>({}, 'parcelsAtom');
@@ -14,6 +15,7 @@ export const newParcelNameAtom = atom('', 'newParcelNameAtom').extend(
     reset: () => target.set(''),
   }))
 );
+export const pendingDeleteParcelIdAtom = atom<string | null>(null, 'pendingDeleteParcelIdAtom');
 
 export const isCreateParcelDialogOpenAtom = atom(false, 'isCreateParcelDialogOpenAtom').extend(
   withActions((target) => ({
@@ -38,27 +40,22 @@ export const hasSelectedParcelAtom = computed(() => {
 
 // === Actions ===
 export const fetchParcels = action(async () => {
-  const parcels = await parcelsApi.fetchAll();
+  const parcels = await parcelApi.getAllParcels();
   const newMap: Record<string, Parcel> = {};
   parcels.forEach((parcel) => (newMap[parcel.id] = parcel));
   parcelsAtom.set(newMap);
 }, 'fetchParcels').extend(
   withAsyncData({
+    status: true,
     parseError: (error) => {
-      const msg =
-        error instanceof Error
-          ? `Failed to fetch all parcels: ${error.message}`
-          : 'Failed to fetch all parcels';
+      const msg = getApiErrorMessage(error, 'Failed to fetch all parcels');
       addNotification(msg, 'error');
       return new Error(msg);
     },
   })
 );
-
 export const createParcel = action(async (data: CreateParcelRequest) => {
-  // TODO: replace with real API call
-  const newParcel = await parcelsApi.create(data);
-  // const newParcel = { id: String(new Date()), ...data };
+  const newParcel = await parcelApi.createParcel(data);
   parcelsAtom.set((prev) => ({ ...prev, [newParcel.id]: newParcel }));
   selectedParcelIdAtom.set(newParcel.id);
   newParcelNameAtom.reset();
@@ -66,19 +63,16 @@ export const createParcel = action(async (data: CreateParcelRequest) => {
   return newParcel;
 }, 'createParcel').extend(
   withAsyncData({
+    status: true,
     parseError: (error) => {
-      const msg =
-        error instanceof Error
-          ? `Failed to create parcel: ${error.message}`
-          : 'Failed to create parcel';
+      const msg = getApiErrorMessage(error, 'Failed to create parcel');
       addNotification(msg, 'error');
       return new Error(msg);
     },
   })
 );
-
 export const deleteParcel = action(async (id: string) => {
-  await parcelsApi.delete(id);
+  await parcelApi.deleteParcel(id);
   parcelsAtom.set((prev) => {
     const { [id]: _, ...rest } = prev;
     return rest;
@@ -86,14 +80,12 @@ export const deleteParcel = action(async (id: string) => {
   if (selectedParcelIdAtom() === id) {
     selectedParcelIdAtom.set(null);
   }
-  addNotification(`Parcel "${id}" deleted successfully`, 'success');
+  addNotification(`Parcel deleted successfully`, 'success');
 }, 'deleteParcel').extend(
   withAsyncData({
+    status: true,
     parseError: (error) => {
-      const msg =
-        error instanceof Error
-          ? `Failed to delete parcel: ${error.message}`
-          : 'Failed to delete parcel';
+      const msg = getApiErrorMessage(error, 'Failed to delete parcel');
       addNotification(msg, 'error');
       return new Error(msg);
     },

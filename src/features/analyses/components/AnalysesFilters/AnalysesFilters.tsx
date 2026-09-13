@@ -1,4 +1,4 @@
-import React from 'react';
+import type { ChangeEvent } from 'react';
 import type { SelectChangeEvent } from '@mui/material';
 import {
   Box,
@@ -10,9 +10,14 @@ import {
   Select,
   TextField,
 } from '@mui/material';
-import { useAction, useAtom } from '@reatom/react';
+import { wrap } from '@reatom/core';
+import { reatomComponent } from '@reatom/react';
 
-import { type AnalysisStatus, analysisStatus } from '#/features/analyses/types';
+import {
+  type AnalysisStatus,
+  analysisStatus,
+  analysisStatusLabels,
+} from '#/features/analyses/types';
 import { cn } from '#/shared/lib/bem';
 
 import { filtersAtom } from '../../models/analyses';
@@ -21,24 +26,17 @@ import './AnalysesFilters.scss';
 
 const cnAnalysesFilters = cn('AnalysesFilters');
 
-export const AnalysesFilters: React.FC = () => {
-  const [filters] = useAtom(filtersAtom);
-  const handleUpdateSearchFilter = useAction(filtersAtom.setSearch);
-  const handleUpdateStatusesFilter = useAction(filtersAtom.setStatuses);
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    handleUpdateSearchFilter(event.target.value);
-  };
+export const AnalysesFilters = reatomComponent(() => {
+  const filters = filtersAtom();
 
   const handleStatusChange = (event: SelectChangeEvent<AnalysisStatus[]>) => {
     const value = event.target.value;
     const statuses = (typeof value === 'string' ? value.split(',') : value) as AnalysisStatus[];
-    handleUpdateStatusesFilter(statuses);
+    wrap(filtersAtom.setStatuses(statuses));
   };
 
   const handleDeleteStatus = (statusToDelete: AnalysisStatus) => {
-    const newStatuses = filters.statuses.filter((status) => status !== statusToDelete);
-    handleUpdateStatusesFilter(newStatuses);
+    wrap(filtersAtom.setStatuses(filters.statuses.filter((status) => status !== statusToDelete)));
   };
 
   return (
@@ -49,7 +47,9 @@ export const AnalysesFilters: React.FC = () => {
           variant="outlined"
           className={cnAnalysesFilters('Search')}
           value={filters.search}
-          onChange={handleSearchChange}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            wrap(filtersAtom.setSearch(event.target.value))
+          }
           size="small"
         />
         <FormControl size="small" className={cnAnalysesFilters('SelectMultiple')}>
@@ -63,7 +63,7 @@ export const AnalysesFilters: React.FC = () => {
                 {selected.map((value) => (
                   <Chip
                     key={value}
-                    label={value}
+                    label={analysisStatusLabels[value]}
                     size="small"
                     onDelete={() => handleDeleteStatus(value)}
                     onMouseDown={(event) => event.stopPropagation()}
@@ -77,7 +77,7 @@ export const AnalysesFilters: React.FC = () => {
             {analysisStatus.map((status) => (
               <MenuItem key={status} value={status} className={cnAnalysesFilters('MenuItem')}>
                 <Checkbox checked={filters.statuses.includes(status)} />
-                {status}
+                {analysisStatusLabels[status]}
               </MenuItem>
             ))}
           </Select>
@@ -85,4 +85,4 @@ export const AnalysesFilters: React.FC = () => {
       </Box>
     </Box>
   );
-};
+}, 'AnalysesFilters');

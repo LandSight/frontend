@@ -24,24 +24,24 @@ export default tseslint.config(
       'vite.config.ts',
     ],
   },
-  
+
   // Основная конфигурация для TS/TSX файлов
   {
     files: ['**/*.{ts,tsx}'],
-    
+
     languageOptions: {
       ecmaVersion: 2022,
       globals: globals.browser,
       parser: tseslint.parser,
       parserOptions: {
-        ecmaFeatures: { 
-          jsx: true 
+        ecmaFeatures: {
+          jsx: true
         },
         sourceType: 'module',
         project: './tsconfig.app.json',
       },
     },
-    
+
     plugins: {
       '@typescript-eslint': tseslint.plugin,
       'react-hooks': reactHooks,
@@ -52,10 +52,10 @@ export default tseslint.config(
       'prettier': pluginPrettier,
       'simple-import-sort': simpleImportSort,
     },
-    
+
     settings: {
-      react: { 
-        version: 'detect' 
+      react: {
+        version: 'detect'
       },
       'import/resolver': {
         typescript: {
@@ -64,17 +64,17 @@ export default tseslint.config(
         },
       },
     },
-    
+
     rules: {
       // Базовые правила JS
       ...js.configs.recommended.rules,
-      
+
       // TypeScript правила
       ...tseslint.configs.recommended.rules,
-      
+
       // React правила (правильный способ для flat config)
       ...pluginReact.configs.recommended.rules,
-      
+
       // React Hooks правила
       ...reactHooks.configs.recommended.rules,
 
@@ -89,18 +89,19 @@ export default tseslint.config(
           varsIgnorePattern: '^_',
         },
       ],
-      
+
       // React Refresh
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
-      
+
       // Кастомные React правила
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react/jsx-uses-react': 'off',
-      
+      'react/display-name': 'off',
+
       // Сортировка импортов
       'simple-import-sort/imports': [
         'error',
@@ -115,24 +116,24 @@ export default tseslint.config(
         },
       ],
       'simple-import-sort/exports': 'error',
-      
+
       // Import правила
       'import/first': 'error',
       'import/no-duplicates': 'error',
       'import/newline-after-import': 'error',
-      
+
       // Prettier
       'prettier/prettier': ['error', {}, { usePrettierrc: true }],
-      
+
       // Общие правила
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      '@typescript-eslint/no-unused-vars': ['error', { 
+      '@typescript-eslint/no-unused-vars': ['error', {
         argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_' 
+        varsIgnorePattern: '^_'
       }],
     },
   },
-  
+
   // Специальные правила для тестов
   {
     files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],

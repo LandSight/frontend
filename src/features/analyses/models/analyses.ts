@@ -1,10 +1,11 @@
 import { action, atom, computed, withActions, withAsyncData } from '@reatom/core';
 
+import { selectedParcelAtom } from '#/features/parcels/models';
+import { getApiErrorMessage } from '#/shared/api/errors';
 import { addNotification } from '#/shared/ui/notification';
 
-import type { CreateAnalysisRequest, FetchAnalysesParams } from '../api/analysesApi';
-import { analysesApi } from '../api/analysesApi';
-import { mockAnalyses } from '../mocks/analyses';
+import type { CreateAnalysisRequest } from '../api/analysesApi';
+import * as analysisApi from '../api/analysesApi';
 import type { AnalysesFilters, Analysis, AnalysisStatus, SortBy, SortOrder } from '../types';
 
 // === Atoms ===
@@ -20,6 +21,49 @@ export const isAnalysisDialogOpenAtom = atom(false, 'isAnalysisDialogOpenAtom').
     close: () => target.set(false),
   }))
 );
+
+// === Analysis name validation atoms ===
+export const isAnalysisNameMinLengthAtom = computed(
+  () => newAnalysisNameAtom().trim().length >= 3,
+  'isAnalysisNameMinLengthAtom'
+);
+export const isAnalysisNameMaxLengthAtom = computed(
+  () => newAnalysisNameAtom().trim().length <= 64,
+  'isAnalysisNameMaxLengthAtom'
+);
+export const isAnalysisNameStartsWithLetterAtom = computed(
+  () => /^[A-Za-z]/.test(newAnalysisNameAtom().trim()),
+  'isAnalysisNameStartsWithLetterAtom'
+);
+export const isAnalysisNameValidCharsAtom = computed(
+  () => /^[A-Za-z][A-Za-z0-9 _-]*$/.test(newAnalysisNameAtom().trim()),
+  'isAnalysisNameValidCharsAtom'
+);
+export const isAnalysisNameValidAtom = computed(() => {
+  const trimmed = newAnalysisNameAtom().trim();
+  return (
+    trimmed.length > 0 &&
+    isAnalysisNameMinLengthAtom() &&
+    isAnalysisNameMaxLengthAtom() &&
+    isAnalysisNameValidCharsAtom()
+  );
+}, 'isAnalysisNameValidAtom');
+export const analysisNameErrorAtom = computed(() => {
+  const trimmed = newAnalysisNameAtom().trim();
+  if (trimmed.length === 0) {
+    return '';
+  }
+  if (!isAnalysisNameMinLengthAtom()) {
+    return 'Name must be at least 3 characters';
+  }
+  if (!isAnalysisNameMaxLengthAtom()) {
+    return 'Name must be at most 64 characters';
+  }
+  if (!isAnalysisNameStartsWithLetterAtom() || !isAnalysisNameValidCharsAtom()) {
+    return 'Name must start with a letter and contain only letters, digits, spaces, hyphens, and underscores';
+  }
+  return '';
+}, 'analysisNameErrorAtom');
 export const filtersAtom = atom<AnalysesFilters>(
   {
     search: '',
@@ -46,6 +90,12 @@ export const analysesListAtom = computed(() => {
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 }, 'analysesListAtom');
+
+export const hasActiveAnalysesAtom = computed(
+  () => analysesListAtom().some((a) => a.status === 'pending' || a.status === 'running'),
+  'hasActiveAnalysesAtom'
+);
+
 export const filteredAnalysesAtom = computed(() => {
   const list = analysesListAtom();
   const filters = filtersAtom();
@@ -97,8 +147,8 @@ export const filteredAnalysesAtom = computed(() => {
 }, 'filteredAnalysesAtom');
 
 // === Actions ===
-export const fetchAnalyses = action(async (params?: FetchAnalysesParams) => {
-  const analyses = await analysesApi.fetchAll(params);
+export const fetchAnalyses = action(async () => {
+  const analyses = await analysisApi.getAllAnalyses();
   const map: Record<string, Analysis> = {};
   analyses.forEach((analysis) => {
     map[analysis.id] = analysis;
@@ -107,46 +157,49 @@ export const fetchAnalyses = action(async (params?: FetchAnalysesParams) => {
 }, 'fetchAnalyses').extend(
   withAsyncData({
     parseError: (error) => {
-      if (import.meta.env.DEV) {
-        const map: Record<string, Analysis> = {};
-        mockAnalyses.forEach((analysis) => {
-          map[analysis.id] = analysis;
-        });
-        analysesAtom.set(map);
-        addNotification('Using demo data (API unavailable)', 'info');
-      } else {
-        const msg =
-          error instanceof Error
-            ? `Failed to fetch all analyses': ${error.message}`
-            : 'Failed to fetch all analyses';
-        addNotification(msg, 'error');
-        return new Error(msg);
-      }
-    },
-  })
-);
-
-export const startAnalysis = action(async (data: CreateAnalysisRequest) => {
-  const newAnalysis = await analysesApi.start(data);
-  analysesAtom.set((prev) => ({ ...prev, [newAnalysis.id]: newAnalysis as Analysis }));
-  newAnalysisNameAtom.reset();
-  addNotification('Analysis started successfully', 'success');
-  return newAnalysis;
-}, 'startAnalysis').extend(
-  withAsyncData({
-    parseError: (error) => {
-      const msg =
-        error instanceof Error
-          ? `Failed to start analysis: ${error.message}`
-          : 'Failed to start analysis';
+      const msg = getApiErrorMessage(error, 'Failed to fetch all analyses');
       addNotification(msg, 'error');
       return new Error(msg);
     },
   })
 );
 
+export const startAnalysis = action(async (data: CreateAnalysisRequest) => {
+  const newAnalysis = await analysisApi.startAnalysis(data);
+  analysesAtom.set((prev) => ({ ...prev, [newAnalysis.id]: newAnalysis }));
+  newAnalysisNameAtom.reset();
+  addNotification('Analysis started successfully', 'success');
+  return newAnalysis;
+}, 'startAnalysis').extend(
+  withAsyncData({
+    status: true,
+    parseError: (error) => {
+      const msg = getApiErrorMessage(error, 'Failed to start analysis');
+      addNotification(msg, 'error');
+      return new Error(msg);
+    },
+  })
+);
+
+export const runAnalysis = action(async () => {
+  const parcel = selectedParcelAtom();
+  const name = newAnalysisNameAtom().trim();
+
+  if (!parcel || !isAnalysisNameValidAtom()) {
+    addNotification(analysisNameErrorAtom() || 'Select a parcel and enter a valid name', 'warning');
+    return;
+  }
+
+  try {
+    await startAnalysis({ name, parcel_id: parcel.id });
+    isAnalysisDialogOpenAtom.close();
+  } catch {
+    // Errors are already surfaced by the startAnalysis error handler.
+  }
+}, 'runAnalysis');
+
 export const deleteAnalysis = action(async (id: string) => {
-  await analysesApi.delete(id);
+  await analysisApi.deleteAnalysis(id);
   analysesAtom.set((prev) => {
     const { [id]: _, ...rest } = prev;
     return rest;
@@ -155,34 +208,7 @@ export const deleteAnalysis = action(async (id: string) => {
 }, 'deleteAnalysis').extend(
   withAsyncData({
     parseError: (error) => {
-      const msg =
-        error instanceof Error
-          ? `Failed to delete analysis: ${error.message}`
-          : 'Failed to delete analysis';
-      addNotification(msg, 'error');
-      return new Error(msg);
-    },
-  })
-);
-
-export const exportMetrics = action(async (id: string, format: 'json' | 'csv' = 'json') => {
-  const blob = await analysesApi.exportMetrics(id, format);
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `analysis_${id}_metrics.${format}`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
-  addNotification('Metrics exported successfully', 'success');
-}, 'exportMetrics').extend(
-  withAsyncData({
-    parseError: (error) => {
-      const msg =
-        error instanceof Error
-          ? `Failed to export metrics: ${error.message}`
-          : 'Failed to export metrics';
+      const msg = getApiErrorMessage(error, 'Failed to delete analysis');
       addNotification(msg, 'error');
       return new Error(msg);
     },

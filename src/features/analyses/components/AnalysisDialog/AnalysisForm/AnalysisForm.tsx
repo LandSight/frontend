@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Box,
   Button,
@@ -8,33 +7,29 @@ import {
   Paper,
   TextField,
 } from '@mui/material';
+import { wrap } from '@reatom/core';
+import { reatomComponent } from '@reatom/react';
 
+import {
+  analysisNameErrorAtom,
+  isAnalysisNameValidAtom,
+  newAnalysisNameAtom,
+  runAnalysis,
+  startAnalysis,
+} from '#/features/analyses/models/analyses';
+import { selectedParcelAtom } from '#/features/parcels/models';
 import { cn } from '#/shared/lib/bem';
-
-import type { AnalysisFormProps } from './types';
 
 import './AnalysisForm.scss';
 
 const cnAnalysisForm = cn('AnalysisForm');
 
-export const AnalysisForm: React.FC<AnalysisFormProps> = ({
-  selectedParcel,
-  analysisName,
-  onAnalysisNameChange,
-  onRunAnalysis,
-  isLoading,
-}) => {
-  const handleRunAnalysis = async () => {
-    if (!selectedParcel) return;
-    try {
-      await onRunAnalysis({
-        name: analysisName,
-        parcel_id: selectedParcel.id,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+export const AnalysisForm = reatomComponent(() => {
+  const selectedParcel = selectedParcelAtom();
+  const analysisName = newAnalysisNameAtom();
+  const nameError = analysisNameErrorAtom();
+  const isNameValid = isAnalysisNameValidAtom();
+  const isLoading = startAnalysis.status().isPending;
 
   const hasSelected = !!selectedParcel;
 
@@ -56,8 +51,10 @@ export const AnalysisForm: React.FC<AnalysisFormProps> = ({
             placeholder="Enter analysis name"
             variant="outlined"
             value={analysisName}
-            onChange={(e) => onAnalysisNameChange(e.target.value)}
+            onChange={(e) => wrap(newAnalysisNameAtom.set(e.target.value))}
             disabled={!hasSelected}
+            error={Boolean(nameError)}
+            helperText={nameError}
             fullWidth
           />
         </FormControl>
@@ -65,8 +62,8 @@ export const AnalysisForm: React.FC<AnalysisFormProps> = ({
           <Button
             variant="contained"
             color="primary"
-            onClick={handleRunAnalysis}
-            disabled={!hasSelected || !analysisName || isLoading}
+            onClick={wrap(runAnalysis)}
+            disabled={!hasSelected || !isNameValid || isLoading}
             startIcon={isLoading ? <CircularProgress size={20} /> : null}
             size="large"
           >
@@ -76,4 +73,4 @@ export const AnalysisForm: React.FC<AnalysisFormProps> = ({
       </Box>
     </Paper>
   );
-};
+}, 'AnalysisForm');

@@ -1,0 +1,16 @@
+.LoginPage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  &__Card {
+    width: 100%;
+    max-width: 420px;
+    border-radius: $border-radius-xl;
+  }
+
+  &__Content {
+    padding: $spacing-xl;
+  }
+}
