@@ -2,13 +2,8 @@ import { Button } from '@mui/material';
 import { wrap } from '@reatom/core';
 import { reatomComponent } from '@reatom/react';
 
-import type { CreateAnalysisRequest } from '#/features/analyses/api/analysesApi';
 import { AnalysisDialog } from '#/features/analyses/components/AnalysisDialog';
-import {
-  isAnalysisDialogOpenAtom,
-  newAnalysisNameAtom,
-  startAnalysis,
-} from '#/features/analyses/models';
+import { isAnalysisDialogOpenAtom } from '#/features/analyses/models';
 import { MapView } from '#/features/map/components/MapView';
 import { clearDrawingState, drawingPolygonAtom } from '#/features/map/models';
 import type { CreateParcelRequest } from '#/features/parcels/api/parcelsApi';
@@ -19,7 +14,6 @@ import {
   hasSelectedParcelAtom,
   isCreateParcelDialogOpenAtom,
   newParcelNameAtom,
-  selectedParcelAtom,
 } from '#/features/parcels/models';
 import { cn } from '#/shared/lib/bem';
 
@@ -28,21 +22,12 @@ import './MapPage.scss';
 const cnMapPage = cn('MapPage');
 
 export const MapPage = reatomComponent(() => {
-  const isAnalysisDialogOpen = isAnalysisDialogOpenAtom();
-  const analysisName = newAnalysisNameAtom();
-  const selectedParcel = selectedParcelAtom();
   const hasSelected = hasSelectedParcelAtom();
-  const isAnalysisStarting = startAnalysis.status().isPending;
 
   const isCreateParcelDialogOpen = isCreateParcelDialogOpenAtom();
   const newParcelName = newParcelNameAtom();
   const drawingPolygon = drawingPolygonAtom();
   const isParcelCreating = createParcel.status().isPending;
-
-  const handleRunAnalysis = async (data: CreateAnalysisRequest) => {
-    await startAnalysis(data);
-    wrap(isAnalysisDialogOpenAtom.close());
-  };
 
   const handleCreateParcelSubmit = async () => {
     if (!drawingPolygon) return;
@@ -77,15 +62,7 @@ export const MapPage = reatomComponent(() => {
           Start analysis
         </Button>
       </div>
-      <AnalysisDialog
-        open={isAnalysisDialogOpen}
-        onClose={wrap(isAnalysisDialogOpenAtom.close)}
-        selectedParcel={selectedParcel}
-        analysisName={analysisName}
-        onAnalysisNameChange={(newName: string) => wrap(newAnalysisNameAtom.set(newName))}
-        onRunAnalysis={handleRunAnalysis}
-        isLoading={isAnalysisStarting}
-      />
+      <AnalysisDialog />
       <CreateParcelDialog
         open={isCreateParcelDialogOpen}
         onClose={handleCloseCreateParcelDialog}

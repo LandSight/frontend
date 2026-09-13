@@ -1,5 +1,6 @@
 import { action, atom, computed, withActions, withAsyncData } from '@reatom/core';
 
+import { selectedParcelAtom } from '#/features/parcels/models';
 import { getApiErrorMessage } from '#/shared/api/errors';
 import { addNotification } from '#/shared/ui/notification';
 
@@ -20,6 +21,49 @@ export const isAnalysisDialogOpenAtom = atom(false, 'isAnalysisDialogOpenAtom').
     close: () => target.set(false),
   }))
 );
+
+// === Analysis name validation atoms ===
+export const isAnalysisNameMinLengthAtom = computed(
+  () => newAnalysisNameAtom().trim().length >= 3,
+  'isAnalysisNameMinLengthAtom'
+);
+export const isAnalysisNameMaxLengthAtom = computed(
+  () => newAnalysisNameAtom().trim().length <= 64,
+  'isAnalysisNameMaxLengthAtom'
+);
+export const isAnalysisNameStartsWithLetterAtom = computed(
+  () => /^[A-Za-z]/.test(newAnalysisNameAtom().trim()),
+  'isAnalysisNameStartsWithLetterAtom'
+);
+export const isAnalysisNameValidCharsAtom = computed(
+  () => /^[A-Za-z][A-Za-z0-9 _-]*$/.test(newAnalysisNameAtom().trim()),
+  'isAnalysisNameValidCharsAtom'
+);
+export const isAnalysisNameValidAtom = computed(() => {
+  const trimmed = newAnalysisNameAtom().trim();
+  return (
+    trimmed.length > 0 &&
+    isAnalysisNameMinLengthAtom() &&
+    isAnalysisNameMaxLengthAtom() &&
+    isAnalysisNameValidCharsAtom()
+  );
+}, 'isAnalysisNameValidAtom');
+export const analysisNameErrorAtom = computed(() => {
+  const trimmed = newAnalysisNameAtom().trim();
+  if (trimmed.length === 0) {
+    return '';
+  }
+  if (!isAnalysisNameMinLengthAtom()) {
+    return 'Name must be at least 3 characters';
+  }
+  if (!isAnalysisNameMaxLengthAtom()) {
+    return 'Name must be at most 64 characters';
+  }
+  if (!isAnalysisNameStartsWithLetterAtom() || !isAnalysisNameValidCharsAtom()) {
+    return 'Name must start with a letter and contain only letters, digits, spaces, hyphens, and underscores';
+  }
+  return '';
+}, 'analysisNameErrorAtom');
 export const filtersAtom = atom<AnalysesFilters>(
   {
     search: '',
@@ -136,6 +180,23 @@ export const startAnalysis = action(async (data: CreateAnalysisRequest) => {
     },
   })
 );
+
+export const runAnalysis = action(async () => {
+  const parcel = selectedParcelAtom();
+  const name = newAnalysisNameAtom().trim();
+
+  if (!parcel || !isAnalysisNameValidAtom()) {
+    addNotification(analysisNameErrorAtom() || 'Select a parcel and enter a valid name', 'warning');
+    return;
+  }
+
+  try {
+    await startAnalysis({ name, parcel_id: parcel.id });
+    isAnalysisDialogOpenAtom.close();
+  } catch {
+    // Errors are already surfaced by the startAnalysis error handler.
+  }
+}, 'runAnalysis');
 
 export const deleteAnalysis = action(async (id: string) => {
   await analysisApi.deleteAnalysis(id);
