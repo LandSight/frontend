@@ -135,10 +135,23 @@ export const AnalysesTable: React.FC<AnalysesTableProps> = ({ analyses }) => {
                     </IconButton>
                   </span>
                 </Tooltip>
-                <Tooltip title="Delete">
-                  <IconButton size="small" color="error" onClick={() => handleDelete(analysis.id)}>
-                    <DeleteIcon />
-                  </IconButton>
+                <Tooltip
+                  title={
+                    analysis.status === 'completed' || analysis.status === 'failed'
+                      ? 'Delete'
+                      : 'Cannot delete while processing'
+                  }
+                >
+                  <span>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDelete(analysis.id)}
+                      disabled={analysis.status !== 'completed' || analysis.status !== 'failed'}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </span>
                 </Tooltip>
               </TableCell>
             </TableRow>
