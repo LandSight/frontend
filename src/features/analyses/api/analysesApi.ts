@@ -44,3 +44,11 @@ export const getAnalysisById = action(async (id: string): Promise<Analysis> => {
   });
   return response.data;
 }, 'getAnalysisById');
+
+export const deleteAnalysis = action(async (id: string): Promise<void> => {
+  const controller = new AbortController();
+  abortVar.subscribe(() => controller.abort());
+  await apiClient.delete(`/analysis/${id}`, {
+    signal: controller.signal,
+  });
+}, 'deleteAnalysis');

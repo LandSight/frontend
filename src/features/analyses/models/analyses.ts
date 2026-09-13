@@ -136,3 +136,20 @@ export const startAnalysis = action(async (data: CreateAnalysisRequest) => {
     },
   })
 );
+
+export const deleteAnalysis = action(async (id: string) => {
+  await analysisApi.deleteAnalysis(id);
+  analysesAtom.set((prev) => {
+    const { [id]: _, ...rest } = prev;
+    return rest;
+  });
+  addNotification('Analysis deleted successfully', 'success');
+}, 'deleteAnalysis').extend(
+  withAsyncData({
+    parseError: (error) => {
+      const msg = getApiErrorMessage(error, 'Failed to delete analysis');
+      addNotification(msg, 'error');
+      return new Error(msg);
+    },
+  })
+);

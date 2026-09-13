@@ -1,5 +1,5 @@
 import React from 'react';
-import { Visibility as ViewIcon } from '@mui/icons-material';
+import { Delete as DeleteIcon, Visibility as ViewIcon } from '@mui/icons-material';
 import {
   Box,
   Chip,
@@ -20,7 +20,7 @@ import { useAction, useAtom } from '@reatom/react';
 import { analysisStatusLabels } from '#/features/analyses/types';
 import { cn } from '#/shared/lib/bem';
 
-import { filtersAtom } from '../../models/analyses';
+import { deleteAnalysis, filtersAtom } from '../../models/analyses';
 import type { SortBy } from '../../types';
 
 import { formatDate } from './helpers';
@@ -53,6 +53,7 @@ const columnConfig: { field: SortableColumn; label: string; align: 'center'; cla
 
 export const AnalysesTable: React.FC<AnalysesTableProps> = ({ analyses }) => {
   const [filters] = useAtom(filtersAtom);
+  const handleDelete = useAction(deleteAnalysis);
   const setSortBy = useAction(filtersAtom.setSortBy);
   const setSortOrder = useAction(filtersAtom.setSortOrder);
 
@@ -133,6 +134,11 @@ export const AnalysesTable: React.FC<AnalysesTableProps> = ({ analyses }) => {
                       <ViewIcon />
                     </IconButton>
                   </span>
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <IconButton size="small" color="error" onClick={() => handleDelete(analysis.id)}>
+                    <DeleteIcon />
+                  </IconButton>
                 </Tooltip>
               </TableCell>
             </TableRow>

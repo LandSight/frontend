@@ -2,7 +2,7 @@
   // Local color variables
   $table-row-even: #f8f9fa;
   $table-row-hover: #e3f2fd;
-  $status-processing: #4ba6ef;
+  $status-running: #4ba6ef;
   $status-completed: #9bff9f;
   $status-failed: #e0584e;
   $table-border: #e0e0e0;
@@ -91,8 +91,8 @@
     &--pending {
       color: black !important;
     }
-    &--processing {
-      background-color: $status-processing !important;
+    &--running {
+      background-color: $status-running !important;
       color: $color-text-white !important;
 
       .MuiCircularProgress-root {
