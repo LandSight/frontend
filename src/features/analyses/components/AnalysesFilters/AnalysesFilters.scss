@@ -1,0 +1,61 @@
+.AnalysesFilters {
+  padding: 0px !important;
+
+  &__Row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: $spacing-m;
+    align-items: flex-end;
+  }
+
+  &__Search {
+    min-width: 200px;
+    flex: 1;
+
+    .MuiOutlinedInput-root {
+      border-radius: $border-radius-xl;
+    }
+  }
+
+  &__Select {
+    min-width: 150px;
+    width: 150px;
+    flex: none;
+
+    .MuiOutlinedInput-root {
+      border-radius: $border-radius-xl;
+    }
+  }
+
+  &__SelectMultiple {
+    min-width: 150px;
+    width: 300px;
+    flex: none;
+
+    .MuiOutlinedInput-root {
+      border-radius: $border-radius-xl;
+    }
+  }
+
+  &__Sort {
+    .MuiOutlinedInput-root {
+      border-radius: $border-radius-xl;
+    }
+  }
+
+  &__Chip {
+    border-radius: $border-radius-l;
+  }
+
+  &__ChipContainer {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: $spacing-xs;
+    overflow: scroll;
+    scrollbar-width: none;
+  }
+
+  &__MenuItem {
+    padding: 0 !important;
+  }
+}

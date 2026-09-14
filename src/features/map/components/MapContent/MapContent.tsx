@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Polygon, TileLayer, useMap } from 'react-leaflet';
-import { useAtom } from '@reatom/react';
+import { wrap } from '@reatom/core';
+import { reatomComponent } from '@reatom/react';
 import L from 'leaflet';
 
 import { layerConfigs } from '#/features/map/constants';
@@ -25,21 +26,20 @@ import './MapContent.scss';
 
 const cnMapContent = cn('MapContent');
 
-export const MapContent: React.FC = () => {
-  const [isDrawing, setIsDrawing] = useAtom(isDrawingAtom);
-  const [polygonCoordinates, setPolygonCoordinates] = useAtom(drawingPolygonAtom);
-  const [parcels] = useAtom(parcelsListAtom);
-  const [selectedId, setSelectedId] = useAtom(selectedParcelIdAtom);
-  const [selectedParcel] = useAtom(selectedParcelAtom);
-  const [, setIsCreateParcelDialogOpen] = useAtom(isCreateParcelDialogOpenAtom);
-  const [layer, setLayer] = useAtom(layerAtom);
+export const MapContent = reatomComponent(() => {
+  const isDrawing = isDrawingAtom();
+  const polygonCoordinates = drawingPolygonAtom();
+  const parcels = parcelsListAtom();
+  const selectedId = selectedParcelIdAtom();
+  const selectedParcel = selectedParcelAtom();
+  const layer = layerAtom();
   const map = useMap();
 
   const handlePolygonCreated = (latlngs: L.LatLng[]) => {
     const points = fromLeafletArray(latlngs);
-    setPolygonCoordinates(points);
-    setIsDrawing(false);
-    setIsCreateParcelDialogOpen(true);
+    wrap(drawingPolygonAtom.set(points));
+    wrap(isDrawingAtom.set(false));
+    wrap(isCreateParcelDialogOpenAtom.open());
   };
 
   const { undoLastPoint, clearDrawing, finishDrawing } = useDrawing({
@@ -48,13 +48,8 @@ export const MapContent: React.FC = () => {
   });
 
   const handleParcelClick = (id: string) => {
-    if (!isDrawing) {
-      if (selectedId === id) {
-        setSelectedId(null);
-      } else {
-        setSelectedId(id);
-      }
-    }
+    if (isDrawing) return;
+    wrap(selectedParcelIdAtom.set(selectedId === id ? null : id));
   };
 
   useEffect(() => {
@@ -71,7 +66,7 @@ export const MapContent: React.FC = () => {
       <TileLayer url={layerConfig.url} attribution={layerConfig.attribution} />
 
       <div className={cnMapContent('RightControls')}>
-        <LayerSwitcher layer={layer} onLayerChange={setLayer} />
+        <LayerSwitcher />
         <ZoomControls />
       </div>
 
@@ -102,4 +97,4 @@ export const MapContent: React.FC = () => {
       )}
     </div>
   );
-};
+}, 'MapContent');

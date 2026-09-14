@@ -1,15 +1,9 @@
-import React from 'react';
 import { Button } from '@mui/material';
-import { useAction, useAtom } from '@reatom/react';
+import { wrap } from '@reatom/core';
+import { reatomComponent } from '@reatom/react';
 
-import type { CreateAnalysisRequest } from '#/features/analysis/api/analysisApi';
-import { AnalysisDialog } from '#/features/analysis/components/AnalysisDialog';
-import {
-  analysisTypeAtom,
-  createAnalysis,
-  isFormOpenAtom,
-  isLoadingAtom as analysisLoadingAtom,
-} from '#/features/analysis/models';
+import { AnalysisDialog } from '#/features/analyses/components/AnalysisDialog';
+import { isAnalysisDialogOpenAtom } from '#/features/analyses/models';
 import { MapView } from '#/features/map/components/MapView';
 import { clearDrawingState, drawingPolygonAtom } from '#/features/map/models';
 import type { CreateParcelRequest } from '#/features/parcels/api/parcelsApi';
@@ -19,9 +13,7 @@ import {
   createParcel,
   hasSelectedParcelAtom,
   isCreateParcelDialogOpenAtom,
-  isCreatingAtom,
   newParcelNameAtom,
-  selectedParcelAtom,
 } from '#/features/parcels/models';
 import { cn } from '#/shared/lib/bem';
 
@@ -29,52 +21,27 @@ import './MapPage.scss';
 
 const cnMapPage = cn('MapPage');
 
-export const MapPage: React.FC = () => {
-  const [isFormOpen, setFormOpen] = useAtom(isFormOpenAtom);
-  const [analysisType, setAnalysisType] = useAtom(analysisTypeAtom);
-  const [selectedParcel] = useAtom(selectedParcelAtom);
-  const [hasSelected] = useAtom(hasSelectedParcelAtom);
-  const [analysisLoading] = useAtom(analysisLoadingAtom);
-  const handleCreateAnalysis = useAction(createAnalysis);
+export const MapPage = reatomComponent(() => {
+  const hasSelected = hasSelectedParcelAtom();
 
-  const [isCreateParcelDialogOpen, setIsCreateParcelDialogOpen] = useAtom(
-    isCreateParcelDialogOpenAtom
-  );
-  const [newParcelName, setNewParcelName] = useAtom(newParcelNameAtom);
-  const [drawingPolygon] = useAtom(drawingPolygonAtom);
-  const [parcelsCreating] = useAtom(isCreatingAtom);
-  const handleCreateParcelAction = useAction(createParcel);
-  const handleClearDrawing = useAction(clearDrawingState);
-
-  const handleOpenAnalysisDialog = () => {
-    setFormOpen(true);
-  };
-
-  const handleCloseAnalysisDialog = () => {
-    setFormOpen(false);
-  };
-
-  const handleRunAnalysis = async (data: CreateAnalysisRequest) => {
-    await handleCreateAnalysis(data);
-    handleCloseAnalysisDialog();
-  };
+  const isCreateParcelDialogOpen = isCreateParcelDialogOpenAtom();
+  const newParcelName = newParcelNameAtom();
+  const drawingPolygon = drawingPolygonAtom();
+  const isParcelCreating = createParcel.status().isPending;
 
   const handleCreateParcelSubmit = async () => {
     if (!drawingPolygon) return;
     const request: CreateParcelRequest = {
-      name: newParcelName.trim() || 'Unnamed Parcel',
+      name: newParcelName.trim(),
       polygon: drawingPolygon,
     };
-    await handleCreateParcelAction(request);
-    setIsCreateParcelDialogOpen(false);
-    setNewParcelName('');
-    handleClearDrawing();
+    await createParcel(request);
+    handleCloseCreateParcelDialog();
   };
 
-  const handleCloseCreateParcelDialogWithClear = () => {
-    setIsCreateParcelDialogOpen(false);
-    setNewParcelName('');
-    handleClearDrawing();
+  const handleCloseCreateParcelDialog = () => {
+    wrap(isCreateParcelDialogOpenAtom.close());
+    wrap(clearDrawingState());
   };
 
   return (
@@ -88,31 +55,23 @@ export const MapPage: React.FC = () => {
         <Button
           variant="contained"
           color="primary"
-          onClick={handleOpenAnalysisDialog}
+          onClick={wrap(isAnalysisDialogOpenAtom.open)}
           disabled={!hasSelected}
           size="medium"
         >
           Start analysis
         </Button>
       </div>
-      <AnalysisDialog
-        open={isFormOpen}
-        onClose={handleCloseAnalysisDialog}
-        selectedParcel={selectedParcel}
-        analysisType={analysisType}
-        onAnalysisTypeChange={setAnalysisType}
-        onRunAnalysis={handleRunAnalysis}
-        isLoading={analysisLoading}
-      />
+      <AnalysisDialog />
       <CreateParcelDialog
         open={isCreateParcelDialogOpen}
-        onClose={handleCloseCreateParcelDialogWithClear}
+        onClose={handleCloseCreateParcelDialog}
         polygon={drawingPolygon}
         name={newParcelName}
-        onNameChange={setNewParcelName}
+        onNameChange={wrap(newParcelNameAtom.set)}
         onSubmit={handleCreateParcelSubmit}
-        isLoading={parcelsCreating}
+        isLoading={isParcelCreating}
       />
     </div>
   );
-};
+}, 'MapPage');

@@ -1,7 +1,7 @@
 .ZoomControls {
   display: flex;
   flex-direction: column;
-  background-color: white;
+  background-color: $color-bg-light;
   border-radius: $border-radius-l;
   box-shadow: $box-shadow;
   overflow: hidden;
@@ -19,11 +19,11 @@
     transition: background-color $transition-fast;
 
     &:hover {
-      background-color: $color-text-muted-hover;
+      background-color: $color-text-light-muted-hover;
     }
 
     &:active {
-      background-color: $color-text-muted;
+      background-color: $color-text-light-muted;
     }
   }
 }

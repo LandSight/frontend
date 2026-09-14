@@ -47,7 +47,7 @@ export const CreateParcelDialog: React.FC<CreateParcelDialogProps> = ({
           onNameChange={onNameChange}
           onSubmit={onSubmit}
           isLoading={isLoading}
-          disabled={!polygon || polygon.length === 0}
+          disabled={!polygon || polygon.length === 0 || isLoading}
         />
       </DialogContent>
     </Dialog>

@@ -1,3 +1,6 @@
+// Local color variables for NavigationMenu
+$navigation-text-active: #d9dbdb;
+
 .NavigationMenu {
   flex: 1;
   overflow-y: auto;
@@ -13,43 +16,43 @@
 
   &__Item {
     width: 100%;
-    padding: 12px 16px;
+    padding: $spacing-s $spacing-m;
     transition: background-color $transition-fast;
 
     .NavigationMenu__ItemIcon {
-      color: $color-text-muted;
+      color: $color-text-light-muted;
       transition: color $transition-fast;
     }
 
     .NavigationMenu__ItemText {
-      color: $color-text-muted;
+      color: $color-text-light-muted;
       transition: color $transition-fast;
     }
 
     &:hover {
-      background-color: rgba(255, 255, 255, 0.05);
+      background-color: rgba($color-bg-light, 0.05);
 
       .NavigationMenu__ItemIcon,
       .NavigationMenu__ItemText {
-        color: $color-text-muted-hover;
+        color: $color-text-light-muted-hover;
       }
     }
 
     &--selected {
       border-left: $border-radius-s solid $color-selected !important;
       background-color: $color-control-selected !important;
-      color: $color-text-active;
+      color: $navigation-text-active;
 
       .NavigationMenu__ItemIcon {
-        color: $color-text-active;
+        color: $navigation-text-active;
       }
 
       .NavigationMenu__ItemText {
-        color: $color-text-active;
+        color: $navigation-text-active;
       }
 
       &:hover {
-        background-color: $color-bg-dark-lighter;
+        background-color: $color-bg-dark-light;
 
         .NavigationMenu__ItemIcon,
         .NavigationMenu__ItemText {

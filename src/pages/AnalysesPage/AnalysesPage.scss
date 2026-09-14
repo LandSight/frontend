@@ -1,0 +1,35 @@
+.AnalysesPage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: $spacing-l 0;
+
+  &__Header {
+    margin-bottom: $spacing-l;
+    font-weight: $font-weight-regular;
+  }
+
+  &__Filters {
+    margin-bottom: $spacing-l;
+    padding: $spacing-m;
+    border-radius: $border-radius-xxl !important;
+    box-shadow: $box-shadow-light;
+    overflow: hidden;
+  }
+
+  &__Skeleton {
+    width: 100%;
+  }
+
+  &__Empty {
+    padding: $spacing-xl 0;
+    text-align: center;
+    color: $color-text-secondary;
+  }
+
+  &__TableContainer {
+    flex: 1;
+    overflow: auto;
+    padding: $spacing-s;
+  }
+}
