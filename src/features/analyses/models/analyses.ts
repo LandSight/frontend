@@ -156,6 +156,7 @@ export const fetchAnalyses = action(async () => {
   analysesAtom.set(map);
 }, 'fetchAnalyses').extend(
   withAsyncData({
+    status: true,
     parseError: (error) => {
       const msg = getApiErrorMessage(error, 'Failed to fetch all analyses');
       addNotification(msg, 'error');
@@ -207,6 +208,7 @@ export const deleteAnalysis = action(async (id: string) => {
   addNotification('Analysis deleted successfully', 'success');
 }, 'deleteAnalysis').extend(
   withAsyncData({
+    status: true,
     parseError: (error) => {
       const msg = getApiErrorMessage(error, 'Failed to delete analysis');
       addNotification(msg, 'error');
