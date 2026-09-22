@@ -14,14 +14,14 @@
     align-items: flex-end;
   }
 
-  &__LeftControls {
+  &__RightTopControls {
     position: absolute;
-    bottom: $spacing-l;
-    left: $spacing-l;
+    top: $spacing-l;
+    right: $spacing-l;
     z-index: 1000;
     display: flex;
     flex-direction: column;
     gap: $spacing-s;
-    align-items: flex-start;
+    align-items: flex-end;
   }
 }
