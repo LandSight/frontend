@@ -9,11 +9,11 @@ import { cn } from '#/shared/lib/bem';
 
 import { AnalysisForm } from './AnalysisForm';
 
-import './AnalysisDialog.scss';
+import './AnalysisStartDialog.scss';
 
-const cnAnalysisDialog = cn('AnalysisDialog');
+const cnAnalysisStartDialog = cn('AnalysisStartDialog');
 
-export const AnalysisDialog = reatomComponent(() => {
+export const AnalysisStartDialog = reatomComponent(() => {
   const open = isAnalysisDialogOpenAtom();
 
   return (
@@ -23,21 +23,24 @@ export const AnalysisDialog = reatomComponent(() => {
       maxWidth="sm"
       fullWidth
       PaperProps={{
-        className: cnAnalysisDialog('Paper'),
+        className: cnAnalysisStartDialog('Paper'),
       }}
     >
-      <DialogTitle className={cnAnalysisDialog('Title')}>
-        <span className={cnAnalysisDialog('TitleContent')}>
-          <AssessmentIcon className={cnAnalysisDialog('TitleIcon')} sx={{ fontSize: '32px' }} />
-          Parcel analysis
+      <DialogTitle className={cnAnalysisStartDialog('Title')}>
+        <span className={cnAnalysisStartDialog('TitleContent')}>
+          <AssessmentIcon
+            className={cnAnalysisStartDialog('TitleIcon')}
+            sx={{ fontSize: '32px' }}
+          />
+          Start analysis
         </span>
         <IconButton onClick={wrap(isAnalysisDialogOpenAtom.close)} size="small">
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent className={cnAnalysisDialog('Content')}>
+      <DialogContent className={cnAnalysisStartDialog('Content')}>
         <AnalysisForm />
       </DialogContent>
     </Dialog>
   );
-}, 'AnalysisDialog');
+}, 'AnalysisStartDialog');
