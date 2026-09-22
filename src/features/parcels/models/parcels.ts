@@ -15,6 +15,49 @@ export const newParcelNameAtom = atom('', 'newParcelNameAtom').extend(
     reset: () => target.set(''),
   }))
 );
+
+// === Parcel name validation atoms ===
+export const isParcelNameMinLengthAtom = computed(
+  () => newParcelNameAtom().trim().length >= 3,
+  'isParcelNameMinLengthAtom'
+);
+export const isParcelNameMaxLengthAtom = computed(
+  () => newParcelNameAtom().trim().length <= 64,
+  'isParcelNameMaxLengthAtom'
+);
+export const isParcelNameStartsWithLetterAtom = computed(
+  () => /^[A-Za-z]/.test(newParcelNameAtom().trim()),
+  'isParcelNameStartsWithLetterAtom'
+);
+export const isParcelNameValidCharsAtom = computed(
+  () => /^[A-Za-z][A-Za-z0-9 _-]*$/.test(newParcelNameAtom().trim()),
+  'isParcelNameValidCharsAtom'
+);
+export const isParcelNameValidAtom = computed(() => {
+  const trimmed = newParcelNameAtom().trim();
+  return (
+    trimmed.length > 0 &&
+    isParcelNameMinLengthAtom() &&
+    isParcelNameMaxLengthAtom() &&
+    isParcelNameValidCharsAtom()
+  );
+}, 'isParcelNameValidAtom');
+export const parcelNameErrorAtom = computed(() => {
+  const trimmed = newParcelNameAtom().trim();
+  if (trimmed.length === 0) {
+    return '';
+  }
+  if (!isParcelNameMinLengthAtom()) {
+    return 'Name must be at least 3 characters';
+  }
+  if (!isParcelNameMaxLengthAtom()) {
+    return 'Name must be at most 64 characters';
+  }
+  if (!isParcelNameStartsWithLetterAtom() || !isParcelNameValidCharsAtom()) {
+    return 'Name must start with a letter and contain only letters, digits, spaces, hyphens, and underscores';
+  }
+  return '';
+}, 'parcelNameErrorAtom');
 export const pendingDeleteParcelIdAtom = atom<string | null>(null, 'pendingDeleteParcelIdAtom');
 
 export const isCreateParcelDialogOpenAtom = atom(false, 'isCreateParcelDialogOpenAtom').extend(
