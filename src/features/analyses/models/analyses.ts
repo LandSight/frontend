@@ -216,3 +216,22 @@ export const deleteAnalysis = action(async (id: string) => {
     },
   })
 );
+
+export const pendingDeleteAnalysisIdAtom = atom<string | null>(null, 'pendingDeleteAnalysisIdAtom');
+
+export const requestDeleteAnalysis = action((analysisId: string) => {
+  pendingDeleteAnalysisIdAtom.set(analysisId);
+}, 'requestDeleteAnalysis');
+
+export const cancelDeleteAnalysis = action(() => {
+  pendingDeleteAnalysisIdAtom.set(null);
+}, 'cancelDeleteAnalysis');
+
+export const confirmDeleteAnalysis = action(async () => {
+  const analysisId = pendingDeleteAnalysisIdAtom();
+  if (!analysisId) {
+    return;
+  }
+  await deleteAnalysis(analysisId);
+  pendingDeleteAnalysisIdAtom.set(null);
+}, 'confirmDeleteAnalysis');
