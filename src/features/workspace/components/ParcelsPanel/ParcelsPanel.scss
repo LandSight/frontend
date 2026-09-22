@@ -1,0 +1,64 @@
+.ParcelsPanel {
+  padding: $spacing-s;
+
+  &__Item {
+    border-radius: $border-radius-xl;
+    margin: 0 0 $spacing-xs;
+    border-right: 3px solid transparent;
+    transition:
+      border-right-color $transition-fast,
+      background-color $transition-fast;
+
+    &:hover {
+      border-right-color: rgba(255, 255, 255, 0.35);
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+
+    &--selected {
+      border-right-color: $color-selected;
+      background-color: $color-control-selected;
+    }
+  }
+
+  &__ExpandButton {
+    color: $color-text-light-muted !important;
+    transition: transform $transition-fast;
+
+    &--expanded {
+      transform: rotate(0deg);
+    }
+
+    &:not(&--expanded) {
+      transform: rotate(-90deg);
+    }
+  }
+
+  &__StartButton {
+    color: $color-selected !important;
+    background-color: transparent !important;
+    margin-right: $spacing-xs;
+
+    &:hover {
+      background-color: rgba(33, 150, 243, 0.15) !important;
+    }
+  }
+
+  &__SubList {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: $border-radius-l;
+    margin: 0 0 $spacing-xs $spacing-l;
+    padding: $spacing-xs 0;
+
+    .AnalysisRow {
+      border-radius: 0;
+      margin: 0;
+      border-right: none;
+    }
+  }
+
+  &__Empty {
+    padding: $spacing-m;
+    color: $color-text-light-muted;
+    font-size: $font-size-m;
+  }
+}

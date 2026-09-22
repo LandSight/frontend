@@ -1,0 +1,33 @@
+.WorkspaceSidebar {
+  width: 340px;
+  flex-shrink: 0;
+  height: 100%;
+  background-color: $color-bg-dark;
+  color: $color-text-light;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  transition: width $transition-fast;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+
+  &--report {
+    width: 440px;
+    background-color: $color-bg-light;
+    color: $color-bg-dark;
+  }
+
+  &__Title {
+    padding: $spacing-m $spacing-m $spacing-s;
+    color: $color-text-light;
+    font-size: $font-size-m;
+    font-weight: $font-weight-bold;
+  }
+
+  &__Divider {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .MuiTypography-root {
+    color: inherit;
+  }
+}
