@@ -1,0 +1,66 @@
+.AnalysisRow {
+  border-radius: $border-radius-xl;
+  margin: 0 0 $spacing-xs;
+  border-right: 3px solid transparent;
+  transition:
+    border-right-color $transition-fast,
+    background-color $transition-fast;
+
+  &:hover {
+    border-right-color: rgba(255, 255, 255, 0.35);
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+
+  &--selected {
+    border-right-color: $color-selected;
+    background-color: $color-control-selected;
+  }
+
+  &__Status {
+    font-weight: $font-weight-regular;
+    margin-right: $spacing-xs;
+
+    &--pending {
+      background-color: #cfd8dc !important;
+      color: #000000 !important;
+    }
+
+    &--running {
+      background-color: #4ba6ef !important;
+      color: $color-text-white !important;
+    }
+
+    &--completed {
+      background-color: #9bff9f !important;
+      color: #000000 !important;
+    }
+
+    &--failed {
+      background-color: #e0584e !important;
+      color: $color-text-white !important;
+    }
+  }
+
+  &__Score {
+    margin-right: $spacing-xs;
+    color: #1b1b1b !important;
+    font-weight: $font-weight-bold;
+  }
+
+  &__ScoreDash {
+    margin-right: $spacing-xs;
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    color: $color-text-light-muted !important;
+  }
+
+  &__Delete {
+    &.Mui-disabled {
+      color: rgba(255, 255, 255, 0.35) !important;
+    }
+  }
+
+  &__Secondary {
+    color: inherit;
+    opacity: 0.7;
+  }
+}
