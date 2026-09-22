@@ -6,21 +6,17 @@ import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { cn } from '#/shared/lib/bem';
 
 import { CreateParcelForm } from './CreateParcelForm';
-import type { CreateParcelDialogProps } from './types';
 
 import './CreateParcelDialog.scss';
 
 const cnCreateParcelDialog = cn('CreateParcelDialog');
 
-export const CreateParcelDialog: React.FC<CreateParcelDialogProps> = ({
-  open,
-  onClose,
-  polygon,
-  name,
-  onNameChange,
-  onSubmit,
-  isLoading,
-}) => {
+export interface CreateParcelDialogProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export const CreateParcelDialog: React.FC<CreateParcelDialogProps> = ({ open, onClose }) => {
   return (
     <Dialog
       open={open}
@@ -41,14 +37,7 @@ export const CreateParcelDialog: React.FC<CreateParcelDialogProps> = ({
         </IconButton>
       </DialogTitle>
       <DialogContent className={cnCreateParcelDialog('Content')}>
-        <CreateParcelForm
-          polygon={polygon}
-          name={name}
-          onNameChange={onNameChange}
-          onSubmit={onSubmit}
-          isLoading={isLoading}
-          disabled={!polygon || polygon.length === 0 || isLoading}
-        />
+        <CreateParcelForm />
       </DialogContent>
     </Dialog>
   );
