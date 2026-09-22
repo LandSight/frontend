@@ -1,12 +1,14 @@
 .MainLayout {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
 
   &__Content {
     flex: 1;
-    overflow-y: auto;
+    min-height: 0;
+    overflow: hidden;
     box-sizing: border-box;
   }
 }

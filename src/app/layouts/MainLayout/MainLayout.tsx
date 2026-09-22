@@ -3,7 +3,7 @@ import React from 'react';
 import { cn } from '#/shared/lib/bem';
 import { NotificationStack } from '#/shared/ui/notification';
 
-import { Sidebar } from '../Sidebar';
+import { WorkspaceHeader } from '../WorkspaceHeader';
 
 import './MainLayout.scss';
 
@@ -16,8 +16,8 @@ export interface MainLayoutProps {
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <div className={cnMainLayout()}>
-      <Sidebar />
-      <div className={cnMainLayout('Content')}>{children}</div>
+      <WorkspaceHeader />
+      <div className={cnMainLayout('Content')}>{React.Children.toArray(children)}</div>
       <NotificationStack />
     </div>
   );
