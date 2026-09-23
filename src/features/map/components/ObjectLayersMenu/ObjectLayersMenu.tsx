@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import MapIcon from '@mui/icons-material/Map';
-import { Checkbox, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
+import { Box, Checkbox, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
 import { wrap } from '@reatom/core';
 import { reatomComponent } from '@reatom/react';
 
+import { getCategoryColor } from '#/features/infrastructure';
 import {
   analysisMetricRefsAtom,
   infrastructureCategoriesAtom,
@@ -67,6 +68,15 @@ export const ObjectLayersMenu = reatomComponent(() => {
               }
             >
               <Checkbox size="small" checked={visible.includes(option.category)} />
+              <Box
+                sx={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: '50%',
+                  backgroundColor: getCategoryColor(option.category),
+                  mr: 1,
+                }}
+              />
               <Typography variant="body2">{option.label}</Typography>
             </MenuItem>
           ))
