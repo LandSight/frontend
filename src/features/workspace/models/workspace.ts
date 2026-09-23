@@ -1,7 +1,11 @@
 import { action, atom, computed } from '@reatom/core';
 
 import { analysesAtom, analysesListAtom } from '#/features/analyses/models/analyses';
-import { fetchAnalysisMetricRefs, resetObjectCategories } from '#/features/infrastructure/models';
+import {
+  enableAllObjectCategories,
+  fetchAnalysisMetricRefs,
+  resetObjectCategories,
+} from '#/features/infrastructure/models';
 import { selectedParcelIdAtom } from '#/features/parcels/models';
 
 export type WorkspaceView = 'parcels' | 'analyses';
@@ -47,7 +51,7 @@ export const toggleParcelExpanded = action((parcelId: string) => {
   );
 }, 'toggleParcelExpanded');
 
-export const selectAnalysis = action((id: string) => {
+export const selectAnalysis = action(async (id: string) => {
   const analysis = analysesAtom()[id];
   if (!analysis) return;
 
@@ -58,7 +62,8 @@ export const selectAnalysis = action((id: string) => {
 
   selectedParcelIdAtom.set(analysis.parcel_id);
   selectedAnalysisIdAtom.set(id);
-  fetchAnalysisMetricRefs(id);
+  await fetchAnalysisMetricRefs(id);
+  await enableAllObjectCategories(id);
 }, 'selectAnalysis');
 
 export const selectParcel = action((id: string | null) => {
