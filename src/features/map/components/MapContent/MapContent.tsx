@@ -12,7 +12,7 @@ import {
   visibleObjectCategoriesAtom,
 } from '#/features/infrastructure/models';
 import { layerConfigs } from '#/features/map/constants';
-import { drawingPolygonAtom, isDrawingAtom, layerAtom } from '#/features/map/models';
+import { drawingPolygonAtom, isDrawingAtom, layerAtom, mapViewAtom } from '#/features/map/models';
 import {
   isCreateParcelDialogOpenAtom,
   parcelsListAtom,
@@ -91,6 +91,35 @@ export const MapContent = reatomComponent(() => {
     return () => {
       clearTimeout(timeoutId);
       window.removeEventListener('resize', handleResize);
+    };
+  }, [map]);
+
+  // Apply the restored viewport once on mount (when the URL carries coordinates).
+  useEffect(() => {
+    const view = mapViewAtom();
+    if (view) {
+      map.setView([view.center.lat, view.center.lng], view.zoom, { animate: false });
+    }
+  }, [map]);
+
+  // Track the map viewport for the URL.
+  useEffect(() => {
+    const updateViewport = () => {
+      const center = map.getCenter();
+      mapViewAtom.set({
+        center: {
+          lat: Math.round(center.lat * 1e5) / 1e5,
+          lng: Math.round(center.lng * 1e5) / 1e5,
+        },
+        zoom: map.getZoom(),
+      });
+    };
+    map.on('moveend', updateViewport);
+    map.on('zoomend', updateViewport);
+    updateViewport();
+    return () => {
+      map.off('moveend', updateViewport);
+      map.off('zoomend', updateViewport);
     };
   }, [map]);
 
