@@ -105,3 +105,17 @@ export const resetObjectCategories = action((analysisId: string) => {
     Object.fromEntries(Object.entries(prev).filter(([key]) => !key.startsWith(`${analysisId}:`)))
   );
 }, 'resetObjectCategories');
+
+export const enableAllObjectCategories = action(async (analysisId: string) => {
+  const refs = analysisMetricRefsAtom()[analysisId] ?? [];
+  const categories = refs
+    .filter((ref) => ref.category != null)
+    .map((ref) => ({ category: ref.category as string, metricsId: ref.metrics_id }));
+
+  for (const { category, metricsId } of categories) {
+    const visible = visibleObjectCategoriesAtom()[analysisId] ?? [];
+    if (!visible.includes(category)) {
+      await toggleObjectCategory(analysisId, category, metricsId);
+    }
+  }
+}, 'enableAllObjectCategories');
