@@ -1,7 +1,7 @@
-import React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { reatomComponent } from '@reatom/react';
 
 import { cn } from '#/shared/lib/bem';
 
@@ -16,7 +16,7 @@ export interface CreateParcelDialogProps {
   onClose: () => void;
 }
 
-export const CreateParcelDialog: React.FC<CreateParcelDialogProps> = ({ open, onClose }) => {
+export const CreateParcelDialog = reatomComponent<CreateParcelDialogProps>(({ open, onClose }) => {
   return (
     <Dialog
       open={open}
@@ -41,4 +41,4 @@ export const CreateParcelDialog: React.FC<CreateParcelDialogProps> = ({ open, on
       </DialogContent>
     </Dialog>
   );
-};
+}, 'CreateParcelDialog');

@@ -3,12 +3,12 @@ import { wrap } from '@reatom/core';
 import { reatomComponent } from '@reatom/react';
 
 import { clearDrawingState, drawingPolygonAtom } from '#/features/map/models';
+import { ParcelNameIndicator } from '#/features/parcels/components/ParcelNameIndicator';
 import {
   createParcel,
   isCreateParcelDialogOpenAtom,
   isParcelNameValidAtom,
   newParcelNameAtom,
-  parcelNameErrorAtom,
 } from '#/features/parcels/models';
 import { cn } from '#/shared/lib/bem';
 
@@ -19,7 +19,6 @@ const cnCreateParcelForm = cn('CreateParcelForm');
 export const CreateParcelForm = reatomComponent(() => {
   const polygon = drawingPolygonAtom();
   const name = newParcelNameAtom();
-  const nameError = parcelNameErrorAtom();
   const isNameValid = isParcelNameValidAtom();
   const isLoading = createParcel.status().isPending;
 
@@ -52,11 +51,10 @@ export const CreateParcelForm = reatomComponent(() => {
           value={name}
           onChange={(event) => wrap(newParcelNameAtom.set(event.target.value))}
           disabled={isLoading}
-          error={Boolean(nameError)}
-          helperText={nameError || '3–64 characters, must start with a letter'}
           required
           autoFocus
         />
+        <ParcelNameIndicator />
         <Box className={cnCreateParcelForm('ButtonContainer')}>
           <Button
             type="submit"
