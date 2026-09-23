@@ -10,8 +10,8 @@ import {
 import { wrap } from '@reatom/core';
 import { reatomComponent } from '@reatom/react';
 
+import { AnalysisNameIndicator } from '#/features/analyses/components/AnalysisNameIndicator';
 import {
-  analysisNameErrorAtom,
   isAnalysisNameValidAtom,
   newAnalysisNameAtom,
   runAnalysis,
@@ -27,7 +27,6 @@ const cnAnalysisForm = cn('AnalysisForm');
 export const AnalysisForm = reatomComponent(() => {
   const selectedParcel = selectedParcelAtom();
   const analysisName = newAnalysisNameAtom();
-  const nameError = analysisNameErrorAtom();
   const isNameValid = isAnalysisNameValidAtom();
   const isLoading = startAnalysis.status().isPending;
 
@@ -53,10 +52,9 @@ export const AnalysisForm = reatomComponent(() => {
             value={analysisName}
             onChange={(e) => wrap(newAnalysisNameAtom.set(e.target.value))}
             disabled={!hasSelected}
-            error={Boolean(nameError)}
-            helperText={nameError}
             fullWidth
           />
+          <AnalysisNameIndicator />
         </FormControl>
         <Box className={cnAnalysisForm('ButtonContainer')}>
           <Button
