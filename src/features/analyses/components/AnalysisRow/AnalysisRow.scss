@@ -1,18 +1,12 @@
 .AnalysisRow {
-  border-radius: $border-radius-xl;
   margin: 0 0 $spacing-xs;
-  border-right: 3px solid transparent;
-  transition:
-    border-right-color $transition-fast,
-    background-color $transition-fast;
+  transition: background-color $transition-fast;
 
   &:hover {
-    border-right-color: rgba(255, 255, 255, 0.35);
     background-color: rgba(255, 255, 255, 0.06);
   }
 
   &--selected {
-    border-right-color: $color-selected;
     background-color: $color-control-selected;
   }
 
