@@ -5,6 +5,7 @@ import { reatomComponent } from '@reatom/react';
 import type { FeatureCollection } from 'geojson';
 import L from 'leaflet';
 
+import { getCategoryColor } from '#/features/infrastructure';
 import {
   objectLayerKey,
   objectLayersAtom,
@@ -116,9 +117,17 @@ export const MapContent = reatomComponent(() => {
       visibleCategories.forEach((category) => {
         const collection = objectLayers[objectLayerKey(analysisId, category)];
         if (!collection) return;
+        const color = getCategoryColor(category);
         L.geoJSON(collection as unknown as FeatureCollection, {
-          pointToLayer: (_feature, latlng) => L.circleMarker(latlng, { radius: 5, weight: 1 }),
-          style: { weight: 3 },
+          pointToLayer: (_feature, latlng) =>
+            L.circleMarker(latlng, {
+              radius: 5,
+              weight: 1,
+              color,
+              fillColor: color,
+              fillOpacity: 0.8,
+            }),
+          style: { color, weight: 3 },
         }).addTo(group);
       });
     }
