@@ -36,7 +36,11 @@ import { ZoomControls } from '../ZoomControls';
 import { useDrawing } from './hooks/useDrawing';
 import { getParcelStyle } from './helpers';
 
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import './MapContent.scss';
+
+import 'leaflet.markercluster';
 
 const cnMapContent = cn('MapContent');
 
@@ -64,6 +68,29 @@ const createCategoryMarkerIcon = (category: string, Icon: ElementType): L.DivIco
 
   markerIconCache.set(category, icon);
   return icon;
+};
+
+const createCategoryClusterIcon = (
+  category: string,
+  Icon: ElementType,
+  count: number
+): L.DivIcon => {
+  const html = renderToStaticMarkup(
+    <span
+      className={cnMapContent('Cluster')}
+      style={{ backgroundColor: getCategoryColor(category) }}
+    >
+      <Icon style={{ fontSize: 16, color: '#fff' }} />
+      <span className={cnMapContent('ClusterCount')}>{count}</span>
+    </span>
+  );
+
+  return L.divIcon({
+    className: cnMapContent('ClusterWrapper'),
+    html,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+  });
 };
 
 export const MapContent = reatomComponent(() => {
@@ -167,7 +194,8 @@ export const MapContent = reatomComponent(() => {
   }, [focusKey, selectedParcel, map]);
 
   useEffect(() => {
-    const group = L.layerGroup().addTo(map);
+    const vectorGroup = L.layerGroup().addTo(map);
+    const clusterGroups: L.MarkerClusterGroup[] = [];
 
     if (analysisId) {
       visibleCategories.forEach((category) => {
@@ -175,6 +203,19 @@ export const MapContent = reatomComponent(() => {
         if (!collection) return;
         const color = getCategoryColor(category);
         const Icon = getCategoryIcon(category);
+
+        let group: L.LayerGroup = vectorGroup;
+        if (Icon) {
+          const clusterGroup = L.markerClusterGroup({
+            showCoverageOnHover: false,
+            maxClusterRadius: 50,
+            iconCreateFunction: (cluster) =>
+              createCategoryClusterIcon(category, Icon, cluster.getChildCount()),
+          }).addTo(map);
+          clusterGroups.push(clusterGroup);
+          group = clusterGroup;
+        }
+
         L.geoJSON(collection as unknown as FeatureCollection, {
           pointToLayer: (_feature, latlng) =>
             Icon
@@ -192,7 +233,8 @@ export const MapContent = reatomComponent(() => {
     }
 
     return () => {
-      group.remove();
+      clusterGroups.forEach((clusterGroup) => clusterGroup.remove());
+      vectorGroup.remove();
     };
     // The layer signature tracks which object layers should be present on the map.
     // eslint-disable-next-line react-hooks/exhaustive-deps

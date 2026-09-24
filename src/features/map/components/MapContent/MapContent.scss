@@ -34,10 +34,44 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     border: 2px solid $color-bg-light;
     box-shadow: $box-shadow;
+  }
+
+  &__ClusterWrapper {
+    background: transparent;
+    border: none;
+  }
+
+  &__Cluster {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid $color-bg-light;
+    box-shadow: $box-shadow;
+  }
+
+  &__ClusterCount {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 $spacing-xs;
+    border-radius: 9px;
+    background-color: $color-bg-dark;
+    color: $color-text-white;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
   }
 }
