@@ -8,6 +8,7 @@
   &__Icon {
     color: $color-text-light;
     opacity: 0.7;
+
     &:hover {
       opacity: 1;
     }
@@ -20,10 +21,6 @@
     margin-bottom: $spacing-xs;
     transition: background-color $transition-fast;
     color: $color-text-light !important;
-
-    &:hover {
-      background-color: $color-control-hovered;
-    }
 
     &--selected {
       border-left: $border-radius-s solid $color-selected;

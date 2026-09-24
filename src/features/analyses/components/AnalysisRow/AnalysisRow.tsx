@@ -56,7 +56,12 @@ export const AnalysisRow = reatomComponent<AnalysisRowProps>(
             style={{ backgroundColor: `hsl(${(analysis.score ?? 0) * 12}, 90%, 45%)` }}
           />
         ) : (
-          <Chip label="—" size="small" className={cnAnalysisRow('ScoreDash')} />
+          <Chip
+            label="0.0"
+            size="small"
+            className={cnAnalysisRow('Score')}
+            style={{ backgroundColor: `#cfd8dc` }}
+          />
         )}
         <Tooltip title={canDelete ? 'Delete' : 'Cannot delete while processing'}>
           <span>

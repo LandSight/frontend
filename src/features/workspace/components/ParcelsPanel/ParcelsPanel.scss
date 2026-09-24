@@ -44,20 +44,21 @@
   }
 
   &__SubList {
-    background-color: rgba(255, 255, 255, 0.05);
     margin: 0 0 $spacing-xs $spacing-xl !important;
     padding: $spacing-xs 0 $spacing-xs $spacing-xl;
 
     .AnalysisRow {
       border-radius: 0;
+      background-color: rgba(255, 255, 255, 0.05);
+      margin-top: 2px !important;
       margin: 0;
-      border-right: none;
     }
   }
 
   &__Empty {
-    padding: $spacing-s $spacing-s $spacing-s $spacing-l;
+    padding: $spacing-s 0 $spacing-s $spacing-m;
     color: $color-text-light-muted;
+    background-color: rgba(255, 255, 255, 0.05);
     font-size: $font-size-m;
   }
 }

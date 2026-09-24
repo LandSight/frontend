@@ -14,11 +14,6 @@
     font-weight: $font-weight-regular !important;
     text-transform: none !important;
 
-    &:hover {
-      color: $color-text-light !important;
-      background-color: rgba(255, 255, 255, 0.06) !important;
-    }
-
     &--active {
       background-color: $color-selected !important;
       color: $color-text-white !important;

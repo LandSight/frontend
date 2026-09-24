@@ -11,38 +11,39 @@
   }
 
   &__Status {
-    font-weight: $font-weight-regular;
+    // font-weight: $font-weight-regular;
+    font-size: $font-size-xs !important;
     margin-right: $spacing-xs;
+    border: 1px solid transparent !important;
 
     &--pending {
-      background-color: #cfd8dc !important;
-      color: #000000 !important;
+      border-color: #cfd8dc !important;
+      color: #cfd8dc !important;
     }
 
     &--running {
-      background-color: #4ba6ef !important;
-      color: $color-text-white !important;
+      border-color: #8aedff !important;
+      color: #8aedff !important;
     }
 
     &--completed {
-      background-color: #9bff9f !important;
-      color: #000000 !important;
+      border-color: #9bff9f !important;
+      color: #9bff9f !important;
     }
 
     &--failed {
-      background-color: #e0584e !important;
-      color: $color-text-white !important;
+      border-color: #ff7369 !important;
+      color: #ff7369 !important;
     }
   }
 
   &__Score {
-    margin-right: $spacing-xs;
+    margin: 0 $spacing-xs !important;
     color: #1b1b1b !important;
     font-weight: $font-weight-bold;
   }
 
   &__ScoreDash {
-    margin-right: $spacing-xs;
     background-color: rgba(255, 255, 255, 0.12) !important;
     color: $color-text-light-muted !important;
   }
