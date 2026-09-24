@@ -1,5 +1,5 @@
 import { Box, Divider } from '@mui/material';
-import { wrap } from '@reatom/core';
+import { effect, wrap } from '@reatom/core';
 import { reatomFactoryComponent } from '@reatom/react';
 
 import { AnalysisDeleteDialog } from '#/features/analyses/components/AnalysisDeleteDialog';
@@ -23,13 +23,11 @@ import './WorkspaceSidebar.scss';
 const cnWorkspaceSidebar = cn('WorkspaceSidebar');
 
 export const WorkspaceSidebar = reatomFactoryComponent(() => {
-  // If the selected analysis was deleted, the report no longer has a subject:
-  // clear the stale selection and the object layers.
-  selectedAnalysisAtom.subscribe((analysis) => {
-    if (analysis === null && selectedAnalysisIdAtom() !== null) {
+  effect(() => {
+    if (selectedAnalysisAtom() === null && selectedAnalysisIdAtom() !== null) {
       closeReport();
     }
-  });
+  }, 'closeDeletedAnalysisEffect');
 
   return () => {
     const isReportOpen = isReportOpenAtom();
