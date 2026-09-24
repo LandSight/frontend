@@ -1,16 +1,16 @@
 .DrawingControls {
   display: flex;
   flex-direction: column;
-  gap: $spacing-s;
+  gap: 2px;
   background-color: $color-bg-light;
   padding: $spacing-xs;
   border-radius: $border-radius-l;
   box-shadow: $box-shadow;
 
   &__Button {
-    border-radius: 0 !important;
-    min-width: $icon-size;
-    min-height: $icon-size;
+    border-radius: $border-radius-m !important;
+    min-width: 32px;
+    min-height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -20,14 +20,17 @@
     color: $color-text-secondary;
     transition: all $transition-fast;
 
+    &--active {
+      color: $color-selected;
+      background-color: $color-control-selected;
+    }
+
     &:hover {
       background-color: $color-text-light-muted-hover;
-      transform: scale(1.05);
     }
 
     &:active {
       background-color: $color-text-light-muted;
-      transform: scale(0.95);
     }
   }
 }

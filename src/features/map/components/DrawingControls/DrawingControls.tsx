@@ -27,38 +27,37 @@ export const DrawingControls = reatomFactoryComponent(
 
       return (
         <div className={cnDrawingControls()}>
-          <Tooltip
-            title={isDrawing ? 'Decline new polygon' : 'Start new polygon'}
-            placement="right"
-          >
+          <Tooltip title={isDrawing ? 'Decline new polygon' : 'Start new polygon'} placement="left">
             <IconButton
-              size="medium"
+              size="small"
               onClick={handleToggleDrawing}
               className={cnDrawingControls('Button', { active: isDrawing })}
             >
-              {isDrawing ? <CloseIcon /> : <EditIcon />}
+              {isDrawing ? <CloseIcon fontSize="small" /> : <EditIcon fontSize="small" />}
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Decline last pint" placement="right">
+          <Tooltip title="Decline last point" placement="left">
             <IconButton
-              size="medium"
+              size="small"
               onClick={undoLastPoint}
               className={cnDrawingControls('Button')}
             >
-              <UndoIcon />
+              <UndoIcon fontSize="small" />
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Create new parcel" placement="right">
-            <IconButton
-              size="medium"
-              onClick={finishDrawing}
-              disabled={!isDrawing}
-              className={cnDrawingControls('Button')}
-            >
-              <CheckIcon />
-            </IconButton>
+          <Tooltip title="Create new parcel" placement="left">
+            <span>
+              <IconButton
+                size="small"
+                onClick={finishDrawing}
+                disabled={!isDrawing}
+                className={cnDrawingControls('Button')}
+              >
+                <CheckIcon fontSize="small" />
+              </IconButton>
+            </span>
           </Tooltip>
         </div>
       );

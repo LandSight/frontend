@@ -1,7 +1,7 @@
 import type { SyntheticEvent } from 'react';
 import { action, atom, computed, withActions, withAsync } from '@reatom/core';
 
-import { loginRoute, mapRoute, registerRoute } from '#/app/routes/routes';
+import { loginRoute, registerRoute, workspaceRoute } from '#/app/routes/routes';
 import { getRememberMe, setRememberMe } from '#/shared/api/token';
 import { addNotification } from '#/shared/ui/notification';
 
@@ -120,7 +120,7 @@ export const loginAction = action(async (e?: SyntheticEvent) => {
   usernameAtom.set('');
   passwordAtom.set('');
 
-  mapRoute.go();
+  workspaceRoute.go();
 }, 'loginAction').extend(
   withAsync({
     status: true,
@@ -161,7 +161,7 @@ export const registerAction = action(async (e?: SyntheticEvent) => {
   passwordAtom.set('');
   confirmPasswordAtom.set('');
 
-  mapRoute.go();
+  workspaceRoute.go();
 }, 'registerAction').extend(
   withAsync({
     status: true,

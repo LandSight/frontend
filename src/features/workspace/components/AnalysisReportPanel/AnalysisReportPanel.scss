@@ -1,0 +1,51 @@
+.AnalysisReportPanel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+
+  &__Header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-s;
+    padding: $spacing-s;
+  }
+
+  &__Title {
+    flex: 1;
+    min-width: 0;
+    font-weight: $font-weight-bold;
+  }
+
+  &__Info {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-s;
+    padding: 0 $spacing-m;
+    margin: $spacing-m 0;
+  }
+
+  &__InfoRow {
+    display: flex;
+    align-items: center;
+    gap: $spacing-s;
+  }
+
+  &__InfoLabel {
+    color: $color-text-secondary;
+  }
+
+  &__Divider {
+    border-color: rgba(0, 0, 0, 0.12);
+  }
+
+  &__Body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    gap: $spacing-s;
+    padding: $spacing-m;
+  }
+}

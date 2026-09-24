@@ -1,30 +1,97 @@
-import { useEffect } from 'react';
+import { type ElementType, useEffect, useRef } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { Polygon, TileLayer, useMap } from 'react-leaflet';
 import { wrap } from '@reatom/core';
 import { reatomComponent } from '@reatom/react';
+import type { FeatureCollection } from 'geojson';
 import L from 'leaflet';
 
+import { getCategoryColor, getCategoryIcon } from '#/features/infrastructure';
+import {
+  objectLayerKey,
+  objectLayersAtom,
+  visibleObjectCategoriesAtom,
+} from '#/features/infrastructure/models';
 import { layerConfigs } from '#/features/map/constants';
-import { drawingPolygonAtom, isDrawingAtom, layerAtom } from '#/features/map/models';
+import { drawingPolygonAtom, isDrawingAtom, layerAtom, mapViewAtom } from '#/features/map/models';
 import {
   isCreateParcelDialogOpenAtom,
   parcelsListAtom,
   selectedParcelAtom,
   selectedParcelIdAtom,
 } from '#/features/parcels/models/parcels';
+import {
+  isReportOpenAtom,
+  selectedAnalysisIdAtom,
+  selectParcel,
+} from '#/features/workspace/models';
 import { cn } from '#/shared/lib/bem';
 import { fromLeafletArray, toLeafletArray } from '#/shared/types/geometry';
 
 import { DrawingControls } from '../DrawingControls';
 import { LayerSwitcher } from '../LayerSwitcher';
+import { ObjectLayersMenu } from '../ObjectLayersMenu';
 import { ZoomControls } from '../ZoomControls';
 
 import { useDrawing } from './hooks/useDrawing';
-import { computeCentroid, getParcelStyle } from './helpers';
+import { getParcelStyle } from './helpers';
 
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import './MapContent.scss';
 
+import 'leaflet.markercluster';
+
 const cnMapContent = cn('MapContent');
+
+const markerIconCache = new Map<string, L.DivIcon>();
+
+const createCategoryMarkerIcon = (category: string, Icon: ElementType): L.DivIcon => {
+  const cached = markerIconCache.get(category);
+  if (cached) return cached;
+
+  const html = renderToStaticMarkup(
+    <span
+      className={cnMapContent('Marker')}
+      style={{ backgroundColor: getCategoryColor(category) }}
+    >
+      <Icon style={{ fontSize: 12, color: '#fff' }} />
+    </span>
+  );
+
+  const icon = L.divIcon({
+    className: cnMapContent('MarkerWrapper'),
+    html,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  });
+
+  markerIconCache.set(category, icon);
+  return icon;
+};
+
+const createCategoryClusterIcon = (
+  category: string,
+  Icon: ElementType,
+  count: number
+): L.DivIcon => {
+  const html = renderToStaticMarkup(
+    <span
+      className={cnMapContent('Cluster')}
+      style={{ backgroundColor: getCategoryColor(category) }}
+    >
+      <Icon style={{ fontSize: 16, color: '#fff' }} />
+      <span className={cnMapContent('ClusterCount')}>{count}</span>
+    </span>
+  );
+
+  return L.divIcon({
+    className: cnMapContent('ClusterWrapper'),
+    html,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+  });
+};
 
 export const MapContent = reatomComponent(() => {
   const isDrawing = isDrawingAtom();
@@ -33,7 +100,26 @@ export const MapContent = reatomComponent(() => {
   const selectedId = selectedParcelIdAtom();
   const selectedParcel = selectedParcelAtom();
   const layer = layerAtom();
+  const isReportOpen = isReportOpenAtom();
+
+  const analysisId = selectedAnalysisIdAtom();
+  const objectLayers = objectLayersAtom();
+  const visibleCategories = analysisId ? (visibleObjectCategoriesAtom()[analysisId] ?? []) : [];
+  const layerSignature = visibleCategories
+    .map(
+      (category) =>
+        `${category}:${objectLayers[objectLayerKey(analysisId ?? '', category)] ? 1 : 0}`
+    )
+    .join(',');
+
+  const visibleParcels =
+    isReportOpen && selectedId !== null
+      ? parcels.filter((parcel) => parcel.id === selectedId)
+      : parcels;
+
   const map = useMap();
+  const fittedFocusKeyRef = useRef<string | null>(null);
+  const focusKey = analysisId ?? selectedId;
 
   const handlePolygonCreated = (latlngs: L.LatLng[]) => {
     const points = fromLeafletArray(latlngs);
@@ -48,16 +134,111 @@ export const MapContent = reatomComponent(() => {
   });
 
   const handleParcelClick = (id: string) => {
-    if (isDrawing) return;
-    wrap(selectedParcelIdAtom.set(selectedId === id ? null : id));
+    if (isDrawing || isReportOpen) return;
+    wrap(selectParcel(selectedId === id ? null : id));
   };
 
   useEffect(() => {
-    if (selectedParcel !== null) {
-      const center = computeCentroid(selectedParcel.polygon);
-      map.panTo(center, { animate: true, duration: 0.5 });
+    const timeoutId = setTimeout(() => map.invalidateSize(), 0);
+    const handleResize = () => map.invalidateSize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [map]);
+
+  // Apply the restored viewport once on mount (when the URL carries coordinates).
+  useEffect(() => {
+    const view = mapViewAtom();
+    if (view) {
+      map.setView([view.center.lat, view.center.lng], view.zoom, { animate: false });
     }
-  }, [selectedParcel, map]);
+  }, [map]);
+
+  // Track the map viewport for the URL.
+  useEffect(() => {
+    const updateViewport = () => {
+      const center = map.getCenter();
+      mapViewAtom.set({
+        center: {
+          lat: Math.round(center.lat * 1e5) / 1e5,
+          lng: Math.round(center.lng * 1e5) / 1e5,
+        },
+        zoom: map.getZoom(),
+      });
+    };
+    map.on('moveend', updateViewport);
+    map.on('zoomend', updateViewport);
+    updateViewport();
+    return () => {
+      map.off('moveend', updateViewport);
+      map.off('zoomend', updateViewport);
+    };
+  }, [map]);
+
+  useEffect(() => {
+    map.invalidateSize();
+  }, [map, isReportOpen]);
+
+  useEffect(() => {
+    if (focusKey === null || selectedParcel === null) {
+      return;
+    }
+    if (fittedFocusKeyRef.current === focusKey) {
+      return;
+    }
+    const bounds = L.latLngBounds(toLeafletArray(selectedParcel.polygon));
+    map.flyToBounds(bounds.pad(1), { animate: true, duration: 1.2, padding: [20, 20] });
+    fittedFocusKeyRef.current = focusKey;
+  }, [focusKey, selectedParcel, map]);
+
+  useEffect(() => {
+    const vectorGroup = L.layerGroup().addTo(map);
+    const clusterGroups: L.MarkerClusterGroup[] = [];
+
+    if (analysisId) {
+      visibleCategories.forEach((category) => {
+        const collection = objectLayers[objectLayerKey(analysisId, category)];
+        if (!collection) return;
+        const color = getCategoryColor(category);
+        const Icon = getCategoryIcon(category);
+
+        let group: L.LayerGroup = vectorGroup;
+        if (Icon) {
+          const clusterGroup = L.markerClusterGroup({
+            showCoverageOnHover: false,
+            maxClusterRadius: 50,
+            iconCreateFunction: (cluster) =>
+              createCategoryClusterIcon(category, Icon, cluster.getChildCount()),
+          }).addTo(map);
+          clusterGroups.push(clusterGroup);
+          group = clusterGroup;
+        }
+
+        L.geoJSON(collection as unknown as FeatureCollection, {
+          pointToLayer: (_feature, latlng) =>
+            Icon
+              ? L.marker(latlng, { icon: createCategoryMarkerIcon(category, Icon) })
+              : L.circleMarker(latlng, {
+                  radius: 5,
+                  weight: 1,
+                  color,
+                  fillColor: color,
+                  fillOpacity: 0.8,
+                }),
+          style: { color, weight: 3 },
+        }).addTo(group);
+      });
+    }
+
+    return () => {
+      clusterGroups.forEach((clusterGroup) => clusterGroup.remove());
+      vectorGroup.remove();
+    };
+    // The layer signature tracks which object layers should be present on the map.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, analysisId, layerSignature]);
 
   const layerConfig = layerConfigs[layer];
 
@@ -65,20 +246,23 @@ export const MapContent = reatomComponent(() => {
     <div className={cnMapContent()}>
       <TileLayer url={layerConfig.url} attribution={layerConfig.attribution} />
 
+      {!isReportOpen && (
+        <div className={cnMapContent('RightTopControls')}>
+          <DrawingControls
+            undoLastPoint={undoLastPoint}
+            clearDrawing={clearDrawing}
+            finishDrawing={finishDrawing}
+          />
+        </div>
+      )}
+
       <div className={cnMapContent('RightControls')}>
+        {isReportOpen && <ObjectLayersMenu />}
         <LayerSwitcher />
         <ZoomControls />
       </div>
 
-      <div className={cnMapContent('LeftControls')}>
-        <DrawingControls
-          undoLastPoint={undoLastPoint}
-          clearDrawing={clearDrawing}
-          finishDrawing={finishDrawing}
-        />
-      </div>
-
-      {parcels.map((parcel) => (
+      {visibleParcels.map((parcel) => (
         <Polygon
           key={parcel.id}
           positions={toLeafletArray(parcel.polygon)}

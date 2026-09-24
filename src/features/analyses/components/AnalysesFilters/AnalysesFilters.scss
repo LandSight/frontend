@@ -1,57 +1,52 @@
 .AnalysesFilters {
-  padding: 0px !important;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-m;
+  padding: $spacing-s;
 
-  &__Row {
+  &__Controls {
     display: flex;
-    flex-wrap: nowrap;
-    gap: $spacing-m;
-    align-items: flex-end;
+    align-items: center;
+    gap: $spacing-s;
   }
 
-  &__Search {
-    min-width: 200px;
+  &__Control {
     flex: 1;
-
-    .MuiOutlinedInput-root {
-      border-radius: $border-radius-xl;
-    }
+    min-width: 0;
   }
 
-  &__Select {
-    min-width: 150px;
-    width: 150px;
+  &__SortOrder {
     flex: none;
+    color: $color-text-light-muted !important;
 
-    .MuiOutlinedInput-root {
-      border-radius: $border-radius-xl;
-    }
-  }
-
-  &__SelectMultiple {
-    min-width: 150px;
-    width: 300px;
-    flex: none;
-
-    .MuiOutlinedInput-root {
-      border-radius: $border-radius-xl;
-    }
-  }
-
-  &__Sort {
-    .MuiOutlinedInput-root {
-      border-radius: $border-radius-xl;
+    &:hover {
+      color: $color-text-light !important;
     }
   }
 
   &__Chip {
-    border-radius: $border-radius-l;
+    border-radius: $border-radius-s !important;
+    background-color: rgba(255, 255, 255, 0.16) !important;
+    color: $color-text-light !important;
+
+    .MuiChip-label {
+      color: inherit !important;
+    }
+
+    .MuiChip-deleteIcon {
+      color: $color-text-light-muted !important;
+
+      &:hover {
+        color: $color-text-light !important;
+      }
+    }
   }
 
   &__ChipContainer {
     display: flex;
     flex-wrap: nowrap;
     gap: $spacing-xs;
-    overflow: scroll;
+    overflow: auto;
     scrollbar-width: none;
   }
 

@@ -1,6 +1,6 @@
 import { action, atom, computed, withActions, withAsyncData } from '@reatom/core';
 
-import { selectedParcelAtom } from '#/features/parcels/models';
+import { selectedParcelIdAtom } from '#/features/parcels/models';
 import { getApiErrorMessage } from '#/shared/api/errors';
 import { addNotification } from '#/shared/ui/notification';
 
@@ -21,6 +21,12 @@ export const isAnalysisDialogOpenAtom = atom(false, 'isAnalysisDialogOpenAtom').
     close: () => target.set(false),
   }))
 );
+export const analysisParcelIdAtom = atom<string | null>(null, 'analysisParcelIdAtom');
+
+export const openAnalysisDialog = action((parcelId?: string | null) => {
+  analysisParcelIdAtom.set(parcelId ?? selectedParcelIdAtom());
+  isAnalysisDialogOpenAtom.open();
+}, 'openAnalysisDialog');
 
 // === Analysis name validation atoms ===
 export const isAnalysisNameMinLengthAtom = computed(
@@ -68,6 +74,7 @@ export const filtersAtom = atom<AnalysesFilters>(
   {
     search: '',
     statuses: [],
+    parcelId: null,
     sortBy: 'created_at',
     sortOrder: 'desc',
   },
@@ -76,6 +83,7 @@ export const filtersAtom = atom<AnalysesFilters>(
   withActions((target) => ({
     setSearch: (search: string) => target.set((prev) => ({ ...prev, search })),
     setStatuses: (statuses: AnalysisStatus[]) => target.set((prev) => ({ ...prev, statuses })),
+    setParcelId: (parcelId: string | null) => target.set((prev) => ({ ...prev, parcelId })),
     setSortBy: (sortBy: SortBy) => target.set((prev) => ({ ...prev, sortBy })),
     setSortOrder: (sortOrder: SortOrder) => target.set((prev) => ({ ...prev, sortOrder })),
     setPartial: (partial: Partial<AnalysesFilters>) =>
@@ -113,6 +121,10 @@ export const filteredAnalysesAtom = computed(() => {
 
   if (filters.statuses.length > 0) {
     filtered = filtered.filter((analysis) => filters.statuses.includes(analysis.status));
+  }
+
+  if (filters.parcelId) {
+    filtered = filtered.filter((analysis) => analysis.parcel_id === filters.parcelId);
   }
 
   filtered = [...filtered].sort((a, b) => {
@@ -156,6 +168,7 @@ export const fetchAnalyses = action(async () => {
   analysesAtom.set(map);
 }, 'fetchAnalyses').extend(
   withAsyncData({
+    status: true,
     parseError: (error) => {
       const msg = getApiErrorMessage(error, 'Failed to fetch all analyses');
       addNotification(msg, 'error');
@@ -182,16 +195,16 @@ export const startAnalysis = action(async (data: CreateAnalysisRequest) => {
 );
 
 export const runAnalysis = action(async () => {
-  const parcel = selectedParcelAtom();
+  const parcelId = analysisParcelIdAtom();
   const name = newAnalysisNameAtom().trim();
 
-  if (!parcel || !isAnalysisNameValidAtom()) {
+  if (!parcelId || !isAnalysisNameValidAtom()) {
     addNotification(analysisNameErrorAtom() || 'Select a parcel and enter a valid name', 'warning');
     return;
   }
 
   try {
-    await startAnalysis({ name, parcel_id: parcel.id });
+    await startAnalysis({ name, parcel_id: parcelId });
     isAnalysisDialogOpenAtom.close();
   } catch {
     // Errors are already surfaced by the startAnalysis error handler.
@@ -207,6 +220,7 @@ export const deleteAnalysis = action(async (id: string) => {
   addNotification('Analysis deleted successfully', 'success');
 }, 'deleteAnalysis').extend(
   withAsyncData({
+    status: true,
     parseError: (error) => {
       const msg = getApiErrorMessage(error, 'Failed to delete analysis');
       addNotification(msg, 'error');
@@ -214,3 +228,22 @@ export const deleteAnalysis = action(async (id: string) => {
     },
   })
 );
+
+export const pendingDeleteAnalysisIdAtom = atom<string | null>(null, 'pendingDeleteAnalysisIdAtom');
+
+export const requestDeleteAnalysis = action((analysisId: string) => {
+  pendingDeleteAnalysisIdAtom.set(analysisId);
+}, 'requestDeleteAnalysis');
+
+export const cancelDeleteAnalysis = action(() => {
+  pendingDeleteAnalysisIdAtom.set(null);
+}, 'cancelDeleteAnalysis');
+
+export const confirmDeleteAnalysis = action(async () => {
+  const analysisId = pendingDeleteAnalysisIdAtom();
+  if (!analysisId) {
+    return;
+  }
+  await deleteAnalysis(analysisId);
+  pendingDeleteAnalysisIdAtom.set(null);
+}, 'confirmDeleteAnalysis');

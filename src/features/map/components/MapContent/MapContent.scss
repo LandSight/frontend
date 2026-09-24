@@ -14,14 +14,64 @@
     align-items: flex-end;
   }
 
-  &__LeftControls {
+  &__RightTopControls {
     position: absolute;
-    bottom: $spacing-l;
-    left: $spacing-l;
+    top: $spacing-l;
+    right: $spacing-l;
     z-index: 1000;
     display: flex;
     flex-direction: column;
     gap: $spacing-s;
-    align-items: flex-start;
+    align-items: flex-end;
+  }
+
+  &__MarkerWrapper {
+    background: transparent;
+    border: none;
+  }
+
+  &__Marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid $color-bg-light;
+    box-shadow: $box-shadow;
+  }
+
+  &__ClusterWrapper {
+    background: transparent;
+    border: none;
+  }
+
+  &__Cluster {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid $color-bg-light;
+    box-shadow: $box-shadow;
+  }
+
+  &__ClusterCount {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 $spacing-xs;
+    border-radius: 9px;
+    background-color: $color-bg-dark;
+    color: $color-text-white;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
   }
 }

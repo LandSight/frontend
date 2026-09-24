@@ -1,0 +1,79 @@
+.ParcelsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  flex: 1;
+  min-height: 0;
+
+  &__Search {
+    flex: none;
+    margin: $spacing-s;
+  }
+
+  &__Scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  &__Item {
+    border-radius: $border-radius-xl;
+    margin: 0 0 $spacing-xs !important;
+    border-left: 3px solid transparent;
+    background-color: rgba(255, 255, 255, 0.05);
+    transition:
+      border-right-color $transition-fast,
+      background-color $transition-fast;
+
+    &:hover {
+      border-right-color: rgba(255, 255, 255, 0.35) !important;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &--selected {
+      border-left-color: $color-selected !important;
+      background-color: $color-control-selected;
+    }
+  }
+
+  &__ExpandButton {
+    color: $color-text-light-muted !important;
+    transition: transform $transition-fast;
+
+    &--expanded {
+      transform: rotate(0deg);
+    }
+
+    &:not(&--expanded) {
+      transform: rotate(-90deg);
+    }
+  }
+
+  &__StartButton {
+    color: $color-selected !important;
+    background-color: transparent !important;
+    margin-right: $spacing-xs;
+
+    &:hover {
+      background-color: rgba(33, 150, 243, 0.15) !important;
+    }
+  }
+
+  &__SubList {
+    margin: 0 0 $spacing-xs $spacing-xl !important;
+    padding: $spacing-xs 0 $spacing-xs $spacing-xl;
+
+    .AnalysisRow {
+      border-radius: 0;
+      background-color: rgba(255, 255, 255, 0.05);
+      margin: 0;
+    }
+  }
+
+  &__Empty {
+    padding: $spacing-s 0 $spacing-s $spacing-m;
+    color: $color-text-light-muted;
+    background-color: rgba(255, 255, 255, 0.05);
+    font-size: $font-size-m;
+  }
+}

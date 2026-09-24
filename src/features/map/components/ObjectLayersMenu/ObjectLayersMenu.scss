@@ -1,0 +1,26 @@
+.ObjectLayersMenu {
+  background-color: $color-bg-light;
+  border-radius: $border-radius-l;
+  box-shadow: $box-shadow;
+
+  &__Button {
+    border-radius: 0 !important;
+    min-width: $icon-size;
+    min-height: $icon-size;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    color: #37474f;
+    transition: background-color $transition-fast;
+
+    &:hover {
+      background-color: $color-text-light-muted-hover;
+    }
+
+    &:active {
+      background-color: $color-text-light-muted;
+    }
+  }
+}

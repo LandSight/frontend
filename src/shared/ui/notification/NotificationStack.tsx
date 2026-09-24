@@ -1,4 +1,3 @@
-import React from 'react';
 import { Alert, Snackbar } from '@mui/material';
 import { useAction, useAtom } from '@reatom/react';
 

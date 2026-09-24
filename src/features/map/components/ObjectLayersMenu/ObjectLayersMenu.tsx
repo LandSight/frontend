@@ -1,0 +1,103 @@
+import { useState } from 'react';
+import MapIcon from '@mui/icons-material/Map';
+import { Box, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
+import { wrap } from '@reatom/core';
+import { reatomComponent } from '@reatom/react';
+
+import { getCategoryColor, getCategoryIcon } from '#/features/infrastructure';
+import {
+  analysisMetricRefsAtom,
+  infrastructureCategoriesAtom,
+  toggleObjectCategory,
+  visibleObjectCategoriesAtom,
+} from '#/features/infrastructure/models';
+import { selectedAnalysisIdAtom } from '#/features/workspace/models';
+import { cn } from '#/shared/lib/bem';
+
+import './ObjectLayersMenu.scss';
+
+const cnObjectLayersMenu = cn('ObjectLayersMenu');
+
+export const ObjectLayersMenu = reatomComponent(() => {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const analysisId = selectedAnalysisIdAtom();
+  const refs = analysisId ? (analysisMetricRefsAtom()[analysisId] ?? []) : [];
+  const labels = infrastructureCategoriesAtom();
+  const visible = analysisId ? (visibleObjectCategoriesAtom()[analysisId] ?? []) : [];
+
+  const options = refs
+    .filter((ref) => ref.category != null && labels[ref.category] != null)
+    .map((ref) => ({
+      category: ref.category as string,
+      label: labels[ref.category as string],
+      metricsId: ref.metrics_id,
+    }));
+
+  const disabled = analysisId == null || options.length === 0;
+
+  return (
+    <div className={cnObjectLayersMenu()}>
+      <Tooltip title="Objects on map" placement="left">
+        <span>
+          <IconButton
+            size="medium"
+            disabled={disabled}
+            onClick={(event) => setAnchorEl(event.currentTarget)}
+            className={cnObjectLayersMenu('Button')}
+          >
+            <MapIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={anchorEl !== null}
+        onClose={() => setAnchorEl(null)}
+        anchorOrigin={{ vertical: 'center', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'center', horizontal: 'right' }}
+      >
+        {analysisId != null && options.length > 0 ? (
+          options.map((option) => {
+            const Icon = getCategoryIcon(option.category);
+            const isVisible = visible.includes(option.category);
+            const color = getCategoryColor(option.category);
+            return (
+              <MenuItem
+                key={option.category}
+                dense
+                onClick={() =>
+                  wrap(toggleObjectCategory(analysisId, option.category, option.metricsId))
+                }
+              >
+                <Box
+                  sx={{
+                    width: 18,
+                    height: 18,
+                    mr: 1,
+                    flexShrink: 0,
+                    borderRadius: '50%',
+                    border: '2px solid',
+                    borderColor: isVisible ? color : 'text.disabled',
+                    backgroundColor: isVisible ? color : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {Icon && (
+                    <Icon sx={{ fontSize: 10, color: isVisible ? '#fff' : 'text.disabled' }} />
+                  )}
+                </Box>
+                <Typography variant="body2">{option.label}</Typography>
+              </MenuItem>
+            );
+          })
+        ) : (
+          <MenuItem disabled>Select an analysis to show objects</MenuItem>
+        )}
+      </Menu>
+    </div>
+  );
+}, 'ObjectLayersMenu');

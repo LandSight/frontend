@@ -1,0 +1,54 @@
+.WorkspaceHeader {
+  background-color: $color-bg-dark !important;
+  color: $color-text-light !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+
+  .MuiSvgIcon-root {
+    color: inherit;
+  }
+
+  &__Logo {
+    height: 44px;
+  }
+
+  &__ViewSwitch {
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+    border-radius: $border-radius-l;
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  &__ViewSwitchButton {
+    border-radius: $border-radius-m !important;
+    padding: 4px 12px !important;
+    color: $color-text-light-muted !important;
+    font-weight: $font-weight-regular !important;
+    text-transform: none !important;
+
+    &:hover {
+      color: $color-text-light !important;
+      background-color: rgba(255, 255, 255, 0.06) !important;
+    }
+
+    &--active {
+      background-color: $color-selected !important;
+      color: $color-text-white !important;
+    }
+  }
+
+  &__Title {
+    color: $color-text-light;
+    font-weight: $font-weight-bold;
+  }
+
+  &__Account {
+    display: flex;
+    align-items: center;
+    gap: $spacing-s;
+  }
+
+  &__Username {
+    color: $color-text-light-muted;
+  }
+}

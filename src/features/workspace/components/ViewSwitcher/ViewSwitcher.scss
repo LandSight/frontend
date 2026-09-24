@@ -1,0 +1,22 @@
+.ViewSwitcher {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  margin: $spacing-s;
+  border-radius: $border-radius-l;
+  background-color: rgba(255, 255, 255, 0.08);
+
+  &__Button {
+    flex: 1;
+    border-radius: $border-radius-m !important;
+    padding: 4px 12px !important;
+    color: $color-text-light-muted !important;
+    font-weight: $font-weight-regular !important;
+    text-transform: none !important;
+
+    &--active {
+      background-color: $color-selected !important;
+      color: $color-text-white !important;
+    }
+  }
+}

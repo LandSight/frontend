@@ -1,23 +1,23 @@
+import React from 'react';
 import { reatomRoute } from '@reatom/core';
 
 import { AuthLayout } from '#/app/layouts/AuthLayout';
 import { MainLayout } from '#/app/layouts/MainLayout';
 import { userAtom } from '#/features/auth';
-import { AnalysesPage } from '#/pages/AnalysesPage';
 import { LoginPage } from '#/pages/LoginPage';
-import { MapPage } from '#/pages/MapPage';
 import { RegisterPage } from '#/pages/RegisterPage';
+import { WorkspacePage } from '#/pages/WorkspacePage';
 
 export const rootLayout = reatomRoute({
   layout: true,
-  render: (self) => self.outlet(),
+  render: (self) => <>{React.Children.toArray(self.outlet())}</>,
 });
 
 export const loginRoute = rootLayout.reatomRoute({
   path: 'login',
   params() {
     if (userAtom()) {
-      mapRoute.go();
+      workspaceRoute.go();
       return null;
     }
     return {};
@@ -33,7 +33,7 @@ export const registerRoute = rootLayout.reatomRoute({
   path: 'register',
   params() {
     if (userAtom()) {
-      mapRoute.go();
+      workspaceRoute.go();
       return null;
     }
     return {};
@@ -56,14 +56,10 @@ export const protectedLayout = rootLayout.reatomRoute({
     }
     return {};
   },
-  render: (self) => <MainLayout>{self.outlet()}</MainLayout>,
+  render: (self) => <MainLayout>{React.Children.toArray(self.outlet())}</MainLayout>,
 });
 
-export const mapRoute = protectedLayout.reatomRoute({
-  path: 'map',
-  render: () => <MapPage />,
-});
-export const analysesRoute = protectedLayout.reatomRoute({
-  path: 'analyses',
-  render: () => <AnalysesPage />,
+export const workspaceRoute = protectedLayout.reatomRoute({
+  path: '',
+  render: () => <WorkspacePage />,
 });
