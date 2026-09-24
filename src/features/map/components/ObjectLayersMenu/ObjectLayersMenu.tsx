@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import MapIcon from '@mui/icons-material/Map';
-import { Box, Checkbox, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
 import { wrap } from '@reatom/core';
 import { reatomComponent } from '@reatom/react';
 
-import { getCategoryColor } from '#/features/infrastructure';
+import { getCategoryColor, getCategoryIcon } from '#/features/infrastructure';
 import {
   analysisMetricRefsAtom,
   infrastructureCategoriesAtom,
@@ -59,27 +59,41 @@ export const ObjectLayersMenu = reatomComponent(() => {
         transformOrigin={{ vertical: 'center', horizontal: 'right' }}
       >
         {analysisId != null && options.length > 0 ? (
-          options.map((option) => (
-            <MenuItem
-              key={option.category}
-              dense
-              onClick={() =>
-                wrap(toggleObjectCategory(analysisId, option.category, option.metricsId))
-              }
-            >
-              <Checkbox size="small" checked={visible.includes(option.category)} />
-              <Box
-                sx={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
-                  backgroundColor: getCategoryColor(option.category),
-                  mr: 1,
-                }}
-              />
-              <Typography variant="body2">{option.label}</Typography>
-            </MenuItem>
-          ))
+          options.map((option) => {
+            const Icon = getCategoryIcon(option.category);
+            const isVisible = visible.includes(option.category);
+            const color = getCategoryColor(option.category);
+            return (
+              <MenuItem
+                key={option.category}
+                dense
+                onClick={() =>
+                  wrap(toggleObjectCategory(analysisId, option.category, option.metricsId))
+                }
+              >
+                <Box
+                  sx={{
+                    width: 18,
+                    height: 18,
+                    mr: 1,
+                    flexShrink: 0,
+                    borderRadius: '50%',
+                    border: '2px solid',
+                    borderColor: isVisible ? color : 'text.disabled',
+                    backgroundColor: isVisible ? color : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {Icon && (
+                    <Icon sx={{ fontSize: 10, color: isVisible ? '#fff' : 'text.disabled' }} />
+                  )}
+                </Box>
+                <Typography variant="body2">{option.label}</Typography>
+              </MenuItem>
+            );
+          })
         ) : (
           <MenuItem disabled>Select an analysis to show objects</MenuItem>
         )}

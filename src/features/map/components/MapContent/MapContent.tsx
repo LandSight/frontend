@@ -1,11 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { type ElementType, useEffect, useRef } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { Polygon, TileLayer, useMap } from 'react-leaflet';
 import { wrap } from '@reatom/core';
 import { reatomComponent } from '@reatom/react';
 import type { FeatureCollection } from 'geojson';
 import L from 'leaflet';
 
-import { getCategoryColor } from '#/features/infrastructure';
+import { getCategoryColor, getCategoryIcon } from '#/features/infrastructure';
 import {
   objectLayerKey,
   objectLayersAtom,
@@ -38,6 +39,32 @@ import { getParcelStyle } from './helpers';
 import './MapContent.scss';
 
 const cnMapContent = cn('MapContent');
+
+const markerIconCache = new Map<string, L.DivIcon>();
+
+const createCategoryMarkerIcon = (category: string, Icon: ElementType): L.DivIcon => {
+  const cached = markerIconCache.get(category);
+  if (cached) return cached;
+
+  const html = renderToStaticMarkup(
+    <span
+      className={cnMapContent('Marker')}
+      style={{ backgroundColor: getCategoryColor(category) }}
+    >
+      <Icon style={{ fontSize: 12, color: '#fff' }} />
+    </span>
+  );
+
+  const icon = L.divIcon({
+    className: cnMapContent('MarkerWrapper'),
+    html,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  });
+
+  markerIconCache.set(category, icon);
+  return icon;
+};
 
 export const MapContent = reatomComponent(() => {
   const isDrawing = isDrawingAtom();
@@ -147,15 +174,18 @@ export const MapContent = reatomComponent(() => {
         const collection = objectLayers[objectLayerKey(analysisId, category)];
         if (!collection) return;
         const color = getCategoryColor(category);
+        const Icon = getCategoryIcon(category);
         L.geoJSON(collection as unknown as FeatureCollection, {
           pointToLayer: (_feature, latlng) =>
-            L.circleMarker(latlng, {
-              radius: 5,
-              weight: 1,
-              color,
-              fillColor: color,
-              fillOpacity: 0.8,
-            }),
+            Icon
+              ? L.marker(latlng, { icon: createCategoryMarkerIcon(category, Icon) })
+              : L.circleMarker(latlng, {
+                  radius: 5,
+                  weight: 1,
+                  color,
+                  fillColor: color,
+                  fillOpacity: 0.8,
+                }),
           style: { color, weight: 3 },
         }).addTo(group);
       });

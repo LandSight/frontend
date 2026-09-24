@@ -24,4 +24,20 @@
     gap: $spacing-s;
     align-items: flex-end;
   }
+
+  &__MarkerWrapper {
+    background: transparent;
+    border: none;
+  }
+
+  &__Marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid $color-bg-light;
+    box-shadow: $box-shadow;
+  }
 }
