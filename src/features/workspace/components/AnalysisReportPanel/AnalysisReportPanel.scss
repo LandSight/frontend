@@ -6,8 +6,36 @@
   &__Header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: $spacing-s;
     padding: $spacing-s;
+  }
+
+  &__Title {
+    flex: 1;
+    min-width: 0;
+    font-weight: $font-weight-bold;
+  }
+
+  &__Info {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-s;
+    padding: 0 $spacing-m;
+    margin: $spacing-m 0;
+  }
+
+  &__InfoRow {
+    display: flex;
+    align-items: center;
+    gap: $spacing-s;
+  }
+
+  &__InfoLabel {
+    color: $color-text-secondary;
+  }
+
+  &__Divider {
+    border-color: rgba(0, 0, 0, 0.12);
   }
 
   &__Body {
@@ -15,53 +43,5 @@
     flex-direction: column;
     gap: $spacing-s;
     padding: $spacing-m;
-    padding-top: 0;
-  }
-
-  &__Title {
-    font-weight: $font-weight-bold;
-  }
-
-  &__Muted {
-    color: $color-text-secondary;
-  }
-
-  &__Divider {
-    border-color: rgba(0, 0, 0, 0.12);
-    margin: $spacing-xs 0;
-  }
-
-  &__Status {
-    font-weight: $font-weight-regular;
-
-    &--pending {
-      background-color: #cfd8dc !important;
-      color: #000000 !important;
-    }
-
-    &--running {
-      background-color: #4ba6ef !important;
-      color: $color-text-white !important;
-    }
-
-    &--completed {
-      background-color: #9bff9f !important;
-      color: #000000 !important;
-    }
-
-    &--failed {
-      background-color: #e0584e !important;
-      color: $color-text-white !important;
-    }
-  }
-
-  &__Score {
-    color: #1b1b1b !important;
-    font-weight: $font-weight-bold;
-  }
-
-  &__ScoreDash {
-    background-color: rgba(0, 0, 0, 0.08) !important;
-    color: $color-text-secondary !important;
   }
 }

@@ -1,7 +1,9 @@
 import { Box, Divider } from '@mui/material';
+import { wrap } from '@reatom/core';
 import { reatomFactoryComponent } from '@reatom/react';
 
 import { AnalysisDeleteDialog } from '#/features/analyses/components/AnalysisDeleteDialog';
+import { requestDeleteAnalysis } from '#/features/analyses/models';
 import { cn } from '#/shared/lib/bem';
 
 import {
@@ -39,7 +41,11 @@ export const WorkspaceSidebar = reatomFactoryComponent(() => {
     return (
       <Box component="aside" className={cnWorkspaceSidebar({ report: showReport })}>
         {showReport && analysis ? (
-          <AnalysisReportPanel analysisId={analysis.id} />
+          <AnalysisReportPanel
+            analysis={analysis}
+            onClose={wrap(closeReport)}
+            onDelete={wrap(requestDeleteAnalysis)}
+          />
         ) : (
           <>
             <ViewSwitcher />

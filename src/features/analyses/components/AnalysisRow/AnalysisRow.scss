@@ -1,51 +1,15 @@
 .AnalysisRow {
-  margin: 0 0 $spacing-xs;
+  margin: 0 0 $spacing-xs !important;
   transition: background-color $transition-fast;
+  background-color: rgba(255, 255, 255, 0.05) !important;
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.06);
   }
 
-  &--selected {
-    background-color: $color-control-selected;
-  }
-
-  &__Status {
-    // font-weight: $font-weight-regular;
-    font-size: $font-size-xs !important;
-    margin-right: $spacing-xs;
-    border: 1px solid transparent !important;
-
-    &--pending {
-      border-color: #cfd8dc !important;
-      color: #cfd8dc !important;
-    }
-
-    &--running {
-      border-color: #8aedff !important;
-      color: #8aedff !important;
-    }
-
-    &--completed {
-      border-color: #9bff9f !important;
-      color: #9bff9f !important;
-    }
-
-    &--failed {
-      border-color: #ff7369 !important;
-      color: #ff7369 !important;
-    }
-  }
-
-  &__Score {
-    margin: 0 $spacing-xs !important;
-    color: #1b1b1b !important;
-    font-weight: $font-weight-bold;
-  }
-
-  &__ScoreDash {
-    background-color: rgba(255, 255, 255, 0.12) !important;
-    color: $color-text-light-muted !important;
+  &__Chips {
+    flex-shrink: 0;
+    margin: 0 $spacing-xs;
   }
 
   &__Delete {

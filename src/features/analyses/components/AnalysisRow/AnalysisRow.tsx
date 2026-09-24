@@ -1,10 +1,13 @@
 import type { MouseEvent } from 'react';
 import { Delete as DeleteIcon } from '@mui/icons-material';
-import { Chip, IconButton, ListItemButton, ListItemText, Tooltip } from '@mui/material';
+import { IconButton, ListItemButton, ListItemText, Stack, Tooltip } from '@mui/material';
 import { reatomComponent } from '@reatom/react';
 
-import { type Analysis, analysisStatusLabels } from '#/features/analyses/types';
+import type { Analysis } from '#/features/analyses/types';
 import { cn } from '#/shared/lib/bem';
+
+import { AnalysisScoreChip } from '../AnalysisScoreChip';
+import { AnalysisStatusChip } from '../AnalysisStatusChip';
 
 import './AnalysisRow.scss';
 
@@ -26,8 +29,6 @@ export const AnalysisRow = reatomComponent<AnalysisRowProps>(
       onDelete(analysis.id);
     };
 
-    const hasScore = analysis.status === 'completed' && analysis.score != null;
-
     return (
       <ListItemButton
         selected={selected}
@@ -43,26 +44,12 @@ export const AnalysisRow = reatomComponent<AnalysisRowProps>(
             secondary: { noWrap: true, className: cnAnalysisRow('Secondary') },
           }}
         />
-        <Chip
-          label={analysisStatusLabels[analysis.status]}
-          size="small"
-          className={cnAnalysisRow('Status', { [analysis.status]: true })}
-        />
-        {hasScore ? (
-          <Chip
-            label={analysis.score?.toFixed(1)}
-            size="small"
-            className={cnAnalysisRow('Score')}
-            style={{ backgroundColor: `hsl(${(analysis.score ?? 0) * 12}, 90%, 45%)` }}
-          />
-        ) : (
-          <Chip
-            label="0.0"
-            size="small"
-            className={cnAnalysisRow('Score')}
-            style={{ backgroundColor: `#cfd8dc` }}
-          />
-        )}
+        <Stack direction="row" spacing={0.5} alignItems="center" className={cnAnalysisRow('Chips')}>
+          <AnalysisStatusChip status={analysis.status} variant="outlined" />
+          {analysis.status === 'completed' && analysis.score != null && (
+            <AnalysisScoreChip score={analysis.score} variant="outlined" />
+          )}
+        </Stack>
         <Tooltip title={canDelete ? 'Delete' : 'Cannot delete while processing'}>
           <span>
             <IconButton
