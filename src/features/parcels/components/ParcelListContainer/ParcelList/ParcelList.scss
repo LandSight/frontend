@@ -16,7 +16,6 @@
 
   &__Item {
     cursor: pointer;
-    background-color: transparent;
     border-radius: $border-radius-s;
     margin-bottom: $spacing-xs;
     transition: background-color $transition-fast;
@@ -24,7 +23,7 @@
 
     &--selected {
       border-left: $border-radius-s solid $color-selected;
-      background-color: $color-control-selected;
+      background-color: $color-control-selected !important;
     }
   }
 

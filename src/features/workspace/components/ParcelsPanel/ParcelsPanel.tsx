@@ -17,7 +17,7 @@ import { wrap } from '@reatom/core';
 import { reatomComponent } from '@reatom/react';
 
 import { AnalysisRow } from '#/features/analyses/components/AnalysisRow';
-import { isAnalysisDialogOpenAtom, requestDeleteAnalysis } from '#/features/analyses/models';
+import { openAnalysisDialog, requestDeleteAnalysis } from '#/features/analyses/models';
 import { ParcelDeleteDialog } from '#/features/parcels/components/ParcelDeleteDialog';
 import {
   deleteParcel,
@@ -100,7 +100,7 @@ export const ParcelsPanel = reatomComponent(() => {
                       className={cnParcelsPanel('StartButton')}
                       onClick={(event) => {
                         event.stopPropagation();
-                        wrap(isAnalysisDialogOpenAtom.open());
+                        wrap(openAnalysisDialog(parcel.id));
                       }}
                     >
                       <PlayArrowIcon fontSize="small" />

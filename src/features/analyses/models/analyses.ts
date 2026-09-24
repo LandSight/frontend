@@ -1,6 +1,6 @@
 import { action, atom, computed, withActions, withAsyncData } from '@reatom/core';
 
-import { selectedParcelAtom } from '#/features/parcels/models';
+import { selectedParcelIdAtom } from '#/features/parcels/models';
 import { getApiErrorMessage } from '#/shared/api/errors';
 import { addNotification } from '#/shared/ui/notification';
 
@@ -21,6 +21,12 @@ export const isAnalysisDialogOpenAtom = atom(false, 'isAnalysisDialogOpenAtom').
     close: () => target.set(false),
   }))
 );
+export const analysisParcelIdAtom = atom<string | null>(null, 'analysisParcelIdAtom');
+
+export const openAnalysisDialog = action((parcelId?: string | null) => {
+  analysisParcelIdAtom.set(parcelId ?? selectedParcelIdAtom());
+  isAnalysisDialogOpenAtom.open();
+}, 'openAnalysisDialog');
 
 // === Analysis name validation atoms ===
 export const isAnalysisNameMinLengthAtom = computed(
@@ -183,16 +189,16 @@ export const startAnalysis = action(async (data: CreateAnalysisRequest) => {
 );
 
 export const runAnalysis = action(async () => {
-  const parcel = selectedParcelAtom();
+  const parcelId = analysisParcelIdAtom();
   const name = newAnalysisNameAtom().trim();
 
-  if (!parcel || !isAnalysisNameValidAtom()) {
+  if (!parcelId || !isAnalysisNameValidAtom()) {
     addNotification(analysisNameErrorAtom() || 'Select a parcel and enter a valid name', 'warning');
     return;
   }
 
   try {
-    await startAnalysis({ name, parcel_id: parcel.id });
+    await startAnalysis({ name, parcel_id: parcelId });
     isAnalysisDialogOpenAtom.close();
   } catch {
     // Errors are already surfaced by the startAnalysis error handler.

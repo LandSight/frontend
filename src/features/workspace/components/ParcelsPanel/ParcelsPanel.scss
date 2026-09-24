@@ -5,13 +5,14 @@
     border-radius: $border-radius-xl;
     margin: 0 0 $spacing-xs !important;
     border-left: 3px solid transparent;
+    background-color: rgba(255, 255, 255, 0.05);
     transition:
       border-right-color $transition-fast,
       background-color $transition-fast;
 
     &:hover {
       border-right-color: rgba(255, 255, 255, 0.35) !important;
-      background-color: rgba(255, 255, 255, 0.06);
+      background-color: rgba(255, 255, 255, 0.1);
     }
 
     &--selected {
