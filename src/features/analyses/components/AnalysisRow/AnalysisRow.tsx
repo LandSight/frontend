@@ -44,7 +44,7 @@ export const AnalysisRow = reatomComponent<AnalysisRowProps>(
             secondary: { noWrap: true, className: cnAnalysisRow('Secondary') },
           }}
         />
-        <Stack direction="row" spacing={0.5} alignItems="center" className={cnAnalysisRow('Chips')}>
+        <Stack direction="row" spacing={1} alignItems="center" className={cnAnalysisRow('Chips')}>
           <AnalysisStatusChip status={analysis.status} variant="outlined" />
           {analysis.status === 'completed' && analysis.score != null && (
             <AnalysisScoreChip score={analysis.score} variant="outlined" />
