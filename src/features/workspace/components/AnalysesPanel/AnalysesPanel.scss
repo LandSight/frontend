@@ -1,0 +1,17 @@
+.AnalysesPanel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+
+  &__Scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  &__Footer {
+    flex: none;
+    padding: $spacing-s;
+  }
+}

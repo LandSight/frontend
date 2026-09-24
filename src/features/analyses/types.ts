@@ -32,6 +32,7 @@ export type SortOrder = (typeof sortOrderValues)[number];
 export type AnalysesFilters = {
   search: string;
   statuses: AnalysisStatus[];
+  parcelId: string | null;
   sortBy: SortBy;
   sortOrder: SortOrder;
 };

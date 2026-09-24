@@ -67,11 +67,29 @@ export const isCreateParcelDialogOpenAtom = atom(false, 'isCreateParcelDialogOpe
   }))
 );
 
+// === Filters ===
+export const parcelFiltersAtom = atom<{ search: string }>(
+  { search: '' },
+  'parcelFiltersAtom'
+).extend(
+  withActions((target) => ({
+    setSearch: (search: string) => target.set((prev) => ({ ...prev, search })),
+  }))
+);
+
 // === Computed atoms ===
 export const parcelsListAtom = computed(() => {
   const map = parcelsAtom();
   return Object.values(map).sort((a, b) => a.name.localeCompare(b.name));
 });
+export const filteredParcelsAtom = computed(() => {
+  const search = parcelFiltersAtom().search.trim().toLowerCase();
+  const parcels = parcelsListAtom();
+  if (!search) {
+    return parcels;
+  }
+  return parcels.filter((parcel) => parcel.name.toLowerCase().includes(search));
+}, 'filteredParcelsAtom');
 export const selectedParcelAtom = computed(() => {
   const id = selectedParcelIdAtom();
   if (!id) return null;

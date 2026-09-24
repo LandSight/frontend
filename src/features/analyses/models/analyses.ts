@@ -74,6 +74,7 @@ export const filtersAtom = atom<AnalysesFilters>(
   {
     search: '',
     statuses: [],
+    parcelId: null,
     sortBy: 'created_at',
     sortOrder: 'desc',
   },
@@ -82,6 +83,7 @@ export const filtersAtom = atom<AnalysesFilters>(
   withActions((target) => ({
     setSearch: (search: string) => target.set((prev) => ({ ...prev, search })),
     setStatuses: (statuses: AnalysisStatus[]) => target.set((prev) => ({ ...prev, statuses })),
+    setParcelId: (parcelId: string | null) => target.set((prev) => ({ ...prev, parcelId })),
     setSortBy: (sortBy: SortBy) => target.set((prev) => ({ ...prev, sortBy })),
     setSortOrder: (sortOrder: SortOrder) => target.set((prev) => ({ ...prev, sortOrder })),
     setPartial: (partial: Partial<AnalysesFilters>) =>
@@ -119,6 +121,10 @@ export const filteredAnalysesAtom = computed(() => {
 
   if (filters.statuses.length > 0) {
     filtered = filtered.filter((analysis) => filters.statuses.includes(analysis.status));
+  }
+
+  if (filters.parcelId) {
+    filtered = filtered.filter((analysis) => analysis.parcel_id === filters.parcelId);
   }
 
   filtered = [...filtered].sort((a, b) => {

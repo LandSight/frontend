@@ -6,7 +6,7 @@
   color: $color-text-light;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
   transition: width $transition-fast;
   border-left: 1px solid rgba(255, 255, 255, 0.12);
 
@@ -29,5 +29,38 @@
 
   .MuiTypography-root {
     color: inherit;
+  }
+
+  &:not(.WorkspaceSidebar--report) {
+    .MuiInputLabel-root,
+    .MuiFormLabel-root {
+      color: $color-text-light-muted;
+    }
+
+    .MuiInputLabel-root.Mui-focused,
+    .MuiFormLabel-root.Mui-focused {
+      color: $color-selected;
+    }
+
+    .MuiOutlinedInput-notchedOutline {
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+      border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+      border-color: $color-selected;
+    }
+
+    .MuiInputBase-input,
+    .MuiSelect-select {
+      color: $color-text-light;
+    }
+
+    .MuiSelect-icon {
+      color: $color-text-light-muted;
+    }
   }
 }
