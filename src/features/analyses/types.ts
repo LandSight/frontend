@@ -23,6 +23,9 @@ export const analysisStatusLabels: Record<AnalysisStatus, string> = {
   failed: 'Failed',
 };
 
+export const isAnalysisFinished = (status: AnalysisStatus): boolean =>
+  status === 'completed' || status === 'failed';
+
 export const sortByFields = ['parcel_name', 'name', 'status', 'created_at', 'score'] as const;
 export type SortBy = (typeof sortByFields)[number];
 

@@ -18,12 +18,13 @@ export interface AnalysisRowProps {
   selected: boolean;
   showParcel?: boolean;
   canDelete: boolean;
+  disabled?: boolean;
   onSelect: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
 export const AnalysisRow = reatomComponent<AnalysisRowProps>(
-  ({ analysis, selected, showParcel = false, canDelete, onSelect, onDelete }) => {
+  ({ analysis, selected, showParcel = false, canDelete, disabled = false, onSelect, onDelete }) => {
     const handleDelete = (event: MouseEvent) => {
       event.stopPropagation();
       onDelete(analysis.id);
@@ -32,6 +33,7 @@ export const AnalysisRow = reatomComponent<AnalysisRowProps>(
     return (
       <ListItemButton
         selected={selected}
+        disabled={disabled}
         onClick={() => onSelect(analysis.id)}
         dense
         className={cnAnalysisRow({ selected })}

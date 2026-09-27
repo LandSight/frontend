@@ -1,6 +1,7 @@
 import { action, atom, computed } from '@reatom/core';
 
 import { analysesAtom, analysesListAtom } from '#/features/analyses/models/analyses';
+import { isAnalysisFinished } from '#/features/analyses/types';
 import {
   enableAllObjectCategories,
   fetchAnalysisMetricRefs,
@@ -19,10 +20,14 @@ export const selectedAnalysisAtom = computed(() => {
   return id ? (analysesAtom()[id] ?? null) : null;
 }, 'selectedAnalysisAtom');
 
-export const isReportOpenAtom = computed(
-  () => selectedAnalysisIdAtom() !== null,
-  'isReportOpenAtom'
-);
+export const isReportOpenAtom = computed(() => {
+  const id = selectedAnalysisIdAtom();
+  if (!id) {
+    return false;
+  }
+  const analysis = analysesAtom()[id];
+  return analysis != null && isAnalysisFinished(analysis.status);
+}, 'isReportOpenAtom');
 
 export const analysesByParcelAtom = computed(() => {
   const grouped: Record<string, ReturnType<typeof analysesListAtom>> = {};
@@ -53,7 +58,9 @@ export const toggleParcelExpanded = action((parcelId: string) => {
 
 export const selectAnalysis = action(async (id: string) => {
   const analysis = analysesAtom()[id];
-  if (!analysis) return;
+  if (!analysis || !isAnalysisFinished(analysis.status)) {
+    return;
+  }
 
   const previousId = selectedAnalysisIdAtom();
   if (previousId && previousId !== id) {

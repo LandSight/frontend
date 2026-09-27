@@ -11,6 +11,7 @@ import {
   requestDeleteAnalysis,
 } from '#/features/analyses/models';
 import { analysesListAtom, filteredAnalysesAtom } from '#/features/analyses/models/analyses';
+import { isAnalysisFinished } from '#/features/analyses/types';
 import { parcelsListAtom } from '#/features/parcels/models';
 import { cn } from '#/shared/lib/bem';
 
@@ -52,6 +53,7 @@ export const AnalysesPanel = reatomComponent(() => {
                 selected={selectedAnalysisId === analysis.id}
                 showParcel
                 canDelete={analysis.status === 'completed' || analysis.status === 'failed'}
+                disabled={!isAnalysisFinished(analysis.status)}
                 onSelect={wrap(selectAnalysis)}
                 onDelete={wrap(requestDeleteAnalysis)}
               />

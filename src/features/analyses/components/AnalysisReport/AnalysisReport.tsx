@@ -13,14 +13,17 @@ export interface AnalysisReportProps {
 }
 
 export const AnalysisReport = reatomComponent<AnalysisReportProps>(({ analysis }) => {
-  const isCompleted = analysis.status === 'completed';
+  const message =
+    analysis.status === 'completed'
+      ? 'Report text will be available later. For now this is the current analysis information.'
+      : analysis.status === 'failed'
+        ? 'Analysis failed before a report could be generated.'
+        : 'Report will be generated once the analysis is completed.';
 
   return (
     <div className={cnAnalysisReport()}>
       <Typography variant="body2" className={cnAnalysisReport('Muted')}>
-        {isCompleted
-          ? 'Report text will be available later. For now this is the current analysis information.'
-          : 'Report will be generated once the analysis is completed.'}
+        {message}
       </Typography>
     </div>
   );
