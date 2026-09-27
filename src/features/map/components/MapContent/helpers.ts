@@ -21,9 +21,9 @@ export const getParcelStyle = (
   const baseOpacity = isDrawing ? 0.3 : 0.6;
   const baseFillOpacity = isDrawing ? 0.1 : 0.2;
   return {
-    color: isSelected ? '#2196f3' : '#a32727',
+    color: isSelected ? '#ff8e1d' : '#a32a2a',
     weight: isSelected ? 3 : 2,
-    fillOpacity: isSelected ? (isDrawing ? 0.15 : 0.3) : baseFillOpacity,
+    fillOpacity: isSelected ? (isDrawing ? 0.15 : 0.4) : baseFillOpacity,
     opacity: isSelected ? (isDrawing ? 0.5 : 0.9) : baseOpacity,
   };
 };
