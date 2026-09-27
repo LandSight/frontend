@@ -32,7 +32,6 @@ import { DrawingControls } from '../DrawingControls';
 import { FocusParcelControl } from '../FocusParcelControl';
 import { LayerSwitcher } from '../LayerSwitcher';
 import { ObjectLayersMenu } from '../ObjectLayersMenu';
-import { ScaleControl } from '../ScaleControl';
 import { ZoomControls } from '../ZoomControls';
 
 import { useDrawing } from './hooks/useDrawing';
@@ -247,8 +246,6 @@ export const MapContent = reatomComponent(() => {
   return (
     <div className={cnMapContent()}>
       <TileLayer url={layerConfig.url} attribution={layerConfig.attribution} />
-
-      <ScaleControl />
 
       {!isReportOpen && (
         <div className={cnMapContent('RightTopControls')}>
