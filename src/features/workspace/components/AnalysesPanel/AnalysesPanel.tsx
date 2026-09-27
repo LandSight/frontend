@@ -25,7 +25,7 @@ export const AnalysesPanel = reatomComponent(() => {
   const allAnalyses = analysesListAtom();
   const analyses = filteredAnalysesAtom();
   const selectedAnalysisId = selectedAnalysisIdAtom();
-  const isLoading = fetchAnalyses.status().isPending;
+  const isInitialLoading = fetchAnalyses.status().isFirstPending;
   const hasParcels = parcelsListAtom().length > 0;
   const hasAnalyses = allAnalyses.length > 0;
 
@@ -34,7 +34,7 @@ export const AnalysesPanel = reatomComponent(() => {
       {hasAnalyses && <AnalysesFilters />}
 
       <Box className={cnAnalysesPanel('Scroll')}>
-        {isLoading && <LinearProgress />}
+        {isInitialLoading && <LinearProgress />}
 
         {!hasAnalyses ? (
           <Typography variant="body2" sx={{ p: 2 }}>

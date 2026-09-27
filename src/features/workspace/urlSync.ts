@@ -1,4 +1,4 @@
-import { computed } from '@reatom/core';
+import { action, atom, computed, effect } from '@reatom/core';
 
 import { analysesAtom } from '#/features/analyses/models/analyses';
 import { isAnalysisFinished } from '#/features/analyses/types';
@@ -34,19 +34,13 @@ const urlStateAtom = computed<UrlState>(
   'urlStateAtom'
 );
 
+const isUrlRestoredAtom = atom(false, 'isUrlRestoredAtom');
+const pendingAnalysisIdAtom = atom<string | null>(null, 'pendingAnalysisIdAtom');
+
 const isLayerType = (value: string | null): value is LayerType =>
   value === 'osm' || value === 'satellite';
 
-let syncStarted = false;
-let urlRestored = false;
-let writeEnabled = false;
-let pendingAnalysisId: string | null = null;
-
 const writeUrl = (state: UrlState) => {
-  if (!writeEnabled) {
-    return;
-  }
-
   const params = new URLSearchParams();
   params.set('view', state.view);
   params.set('layer', state.layer);
@@ -64,20 +58,8 @@ const writeUrl = (state: UrlState) => {
   window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
 };
 
-const selectPendingAnalysis = () => {
-  if (pendingAnalysisId === null) {
-    return;
-  }
-  const analysis = analysesAtom()[pendingAnalysisId];
-  if (analysis && isAnalysisFinished(analysis.status)) {
-    const id = pendingAnalysisId;
-    pendingAnalysisId = null;
-    selectAnalysis(id);
-  }
-};
-
-const restoreFromUrl = () => {
-  if (urlRestored) {
+const restoreFromUrl = action(() => {
+  if (isUrlRestoredAtom()) {
     return;
   }
 
@@ -105,23 +87,33 @@ const restoreFromUrl = () => {
     }
   }
   if (urlAnalysis) {
-    pendingAnalysisId = urlAnalysis;
-    selectPendingAnalysis();
+    pendingAnalysisIdAtom.set(urlAnalysis);
   } else if (urlParcel) {
     selectParcel(urlParcel);
   }
 
-  urlRestored = true;
-  writeEnabled = true;
-};
+  isUrlRestoredAtom.set(true);
+}, 'restoreFromUrl');
 
-export const initWorkspaceUrlSync = () => {
-  if (syncStarted) {
+effect(() => {
+  const id = pendingAnalysisIdAtom();
+  if (id === null) {
     return;
   }
-  syncStarted = true;
+  const analysis = analysesAtom()[id];
+  if (analysis && isAnalysisFinished(analysis.status)) {
+    pendingAnalysisIdAtom.set(null);
+    selectAnalysis(id);
+  }
+}, 'selectPendingAnalysisEffect');
 
+effect(() => {
+  if (!isUrlRestoredAtom()) {
+    return;
+  }
+  writeUrl(urlStateAtom());
+}, 'writeWorkspaceUrlEffect');
+
+export const initWorkspaceUrlSync = () => {
   restoreFromUrl();
-  analysesAtom.subscribe(selectPendingAnalysis);
-  urlStateAtom.subscribe(writeUrl);
 };
