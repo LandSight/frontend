@@ -29,8 +29,10 @@ import { cn } from '#/shared/lib/bem';
 import { fromLeafletArray, toLeafletArray } from '#/shared/types/geometry';
 
 import { DrawingControls } from '../DrawingControls';
+import { FocusParcelControl } from '../FocusParcelControl';
 import { LayerSwitcher } from '../LayerSwitcher';
 import { ObjectLayersMenu } from '../ObjectLayersMenu';
+import { ScaleControl } from '../ScaleControl';
 import { ZoomControls } from '../ZoomControls';
 
 import { useDrawing } from './hooks/useDrawing';
@@ -246,6 +248,8 @@ export const MapContent = reatomComponent(() => {
     <div className={cnMapContent()}>
       <TileLayer url={layerConfig.url} attribution={layerConfig.attribution} />
 
+      <ScaleControl />
+
       {!isReportOpen && (
         <div className={cnMapContent('RightTopControls')}>
           <DrawingControls
@@ -259,6 +263,7 @@ export const MapContent = reatomComponent(() => {
       <div className={cnMapContent('RightControls')}>
         {isReportOpen && <ObjectLayersMenu />}
         <LayerSwitcher />
+        <FocusParcelControl />
         <ZoomControls />
       </div>
 
