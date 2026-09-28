@@ -10,7 +10,7 @@ import './ProfileSelector.scss';
 const cnProfileSelector = cn('ProfileSelector');
 
 const COMING_SOON_TOOLTIP =
-  'В скором времени появятся новые профили: Сельское хозяйство, Коммерческая застройка';
+  'New profiles will soon be available: Agriculture and Commercial Development.';
 
 export const ProfileSelector = reatomComponent(() => {
   const profiles = profilesListAtom();
