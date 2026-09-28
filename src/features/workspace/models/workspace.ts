@@ -1,6 +1,10 @@
 import { action, atom, computed } from '@reatom/core';
 
-import { analysesAtom, analysesListAtom } from '#/features/analyses/models/analyses';
+import {
+  analysesAtom,
+  analysesListAtom,
+  fetchAnalysisEvaluation,
+} from '#/features/analyses/models/analyses';
 import { isAnalysisFinished } from '#/features/analyses/types';
 import {
   enableAllObjectCategories,
@@ -69,6 +73,9 @@ export const selectAnalysis = action(async (id: string) => {
 
   selectedParcelIdAtom.set(analysis.parcel_id);
   selectedAnalysisIdAtom.set(id);
+  if (analysis.status === 'completed') {
+    await fetchAnalysisEvaluation(id);
+  }
   await fetchAnalysisMetricRefs(id);
   await enableAllObjectCategories(id);
 }, 'selectAnalysis');

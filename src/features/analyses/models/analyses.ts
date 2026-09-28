@@ -6,7 +6,17 @@ import { addNotification } from '#/shared/ui/notification';
 
 import type { CreateAnalysisRequest } from '../api/analysesApi';
 import * as analysisApi from '../api/analysesApi';
-import type { AnalysesFilters, Analysis, AnalysisStatus, SortBy, SortOrder } from '../types';
+import * as catalogApi from '../api/catalogApi';
+import type {
+  AnalysesFilters,
+  Analysis,
+  AnalysisEvaluation,
+  AnalysisStatus,
+  Engine,
+  Profile,
+  SortBy,
+  SortOrder,
+} from '../types';
 
 // === Atoms ===
 export const analysesAtom = atom<Record<string, Analysis>>({}, 'analysesAtom');
@@ -22,6 +32,29 @@ export const isAnalysisDialogOpenAtom = atom(false, 'isAnalysisDialogOpenAtom').
   }))
 );
 export const analysisParcelIdAtom = atom<string | null>(null, 'analysisParcelIdAtom');
+
+// === Catalog ===
+export const profilesAtom = atom<Record<string, Profile>>({}, 'profilesAtom');
+export const enginesAtom = atom<Record<string, Engine>>({}, 'enginesAtom');
+export const selectedProfileKeyAtom = atom<string | null>(null, 'selectedProfileKeyAtom');
+export const selectedEngineKeyAtom = atom<string | null>(null, 'selectedEngineKeyAtom');
+export const analysisEvaluationAtom = atom<AnalysisEvaluation | null>(
+  null,
+  'analysisEvaluationAtom'
+);
+
+export const profilesListAtom = computed(() => Object.values(profilesAtom()), 'profilesListAtom');
+export const enginesListAtom = computed(() => Object.values(enginesAtom()), 'enginesListAtom');
+
+export const selectedProfileAtom = computed(() => {
+  const key = selectedProfileKeyAtom();
+  return key ? (profilesAtom()[key] ?? null) : null;
+}, 'selectedProfileAtom');
+
+export const selectedEngineAtom = computed(() => {
+  const key = selectedEngineKeyAtom();
+  return key ? (enginesAtom()[key] ?? null) : null;
+}, 'selectedEngineAtom');
 
 export const openAnalysisDialog = action((parcelId?: string | null) => {
   analysisParcelIdAtom.set(parcelId ?? selectedParcelIdAtom());
@@ -177,6 +210,64 @@ export const fetchAnalyses = action(async () => {
   })
 );
 
+export const fetchProfiles = action(async () => {
+  const profiles = await catalogApi.getProfiles();
+  const map: Record<string, Profile> = {};
+  profiles.forEach((profile) => {
+    map[profile.key] = profile;
+  });
+  profilesAtom.set(map);
+  selectedProfileKeyAtom.set((prev) => prev ?? profiles[0]?.key ?? null);
+}, 'fetchProfiles').extend(
+  withAsyncData({
+    status: true,
+    parseError: (error) => {
+      const msg = getApiErrorMessage(error, 'Failed to fetch analysis profiles');
+      addNotification(msg, 'error');
+      return new Error(msg);
+    },
+  })
+);
+
+export const fetchEngines = action(async () => {
+  const engines = await catalogApi.getEngines();
+  const map: Record<string, Engine> = {};
+  engines.forEach((engine) => {
+    map[engine.key] = engine;
+  });
+  enginesAtom.set(map);
+  selectedEngineKeyAtom.set((prev) => prev ?? engines[0]?.key ?? null);
+}, 'fetchEngines').extend(
+  withAsyncData({
+    status: true,
+    parseError: (error) => {
+      const msg = getApiErrorMessage(error, 'Failed to fetch scoring engines');
+      addNotification(msg, 'error');
+      return new Error(msg);
+    },
+  })
+);
+
+export const fetchCatalogs = action(() => {
+  fetchProfiles();
+  fetchEngines();
+}, 'fetchCatalogs');
+
+export const fetchAnalysisEvaluation = action(async (analysisId: string) => {
+  analysisEvaluationAtom.set(null);
+  const evaluation = await analysisApi.getAnalysisEvaluation(analysisId);
+  analysisEvaluationAtom.set(evaluation);
+}, 'fetchAnalysisEvaluation').extend(
+  withAsyncData({
+    status: true,
+    parseError: (error) => {
+      const msg = getApiErrorMessage(error, 'Failed to fetch the analysis report');
+      addNotification(msg, 'error');
+      return new Error(msg);
+    },
+  })
+);
+
 export const startAnalysis = action(async (data: CreateAnalysisRequest) => {
   const newAnalysis = await analysisApi.startAnalysis(data);
   analysesAtom.set((prev) => ({ ...prev, [newAnalysis.id]: newAnalysis }));
@@ -204,7 +295,12 @@ export const runAnalysis = action(async () => {
   }
 
   try {
-    await startAnalysis({ name, parcel_id: parcelId });
+    await startAnalysis({
+      name,
+      parcel_id: parcelId,
+      scenario: selectedProfileKeyAtom() ?? 'izhs',
+      engine: selectedEngineKeyAtom() ?? 'baseline',
+    });
     isAnalysisDialogOpenAtom.close();
   } catch {
     // Errors are already surfaced by the startAnalysis error handler.

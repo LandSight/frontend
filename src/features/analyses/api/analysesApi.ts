@@ -1,11 +1,13 @@
 import { abortVar, action } from '@reatom/core';
 
-import type { Analysis } from '#/features/analyses/types';
+import type { Analysis, AnalysisEvaluation } from '#/features/analyses/types';
 import apiClient from '#/shared/api/client';
 
 export type CreateAnalysisRequest = {
   name: string;
   parcel_id: string;
+  scenario: string;
+  engine: string;
 };
 
 export type CreateAnalysisResponse = Analysis;
@@ -19,6 +21,8 @@ export const startAnalysis = action(
       {
         parcel_id: data.parcel_id,
         name: data.name,
+        scenario: data.scenario,
+        engine: data.engine,
       },
       { signal: controller.signal }
     );
@@ -44,6 +48,15 @@ export const getAnalysisById = action(async (id: string): Promise<Analysis> => {
   });
   return response.data;
 }, 'getAnalysisById');
+
+export const getAnalysisEvaluation = action(async (id: string): Promise<AnalysisEvaluation> => {
+  const controller = new AbortController();
+  abortVar.subscribe(() => controller.abort());
+  const response = await apiClient.get<AnalysisEvaluation>(`/analysis/${id}/evaluation`, {
+    signal: controller.signal,
+  });
+  return response.data;
+}, 'getAnalysisEvaluation');
 
 export const deleteAnalysis = action(async (id: string): Promise<void> => {
   const controller = new AbortController();

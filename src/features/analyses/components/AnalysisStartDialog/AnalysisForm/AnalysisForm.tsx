@@ -12,6 +12,8 @@ import { wrap } from '@reatom/core';
 import { reatomComponent } from '@reatom/react';
 
 import { AnalysisNameIndicator } from '#/features/analyses/components/AnalysisNameIndicator';
+import { EngineSelector } from '#/features/analyses/components/EngineSelector';
+import { ProfileSelector } from '#/features/analyses/components/ProfileSelector';
 import {
   analysisParcelIdAtom,
   isAnalysisNameValidAtom,
@@ -59,6 +61,8 @@ export const AnalysisForm = reatomComponent(() => {
             </MenuItem>
           ))}
         </TextField>
+        <ProfileSelector />
+        <EngineSelector />
         <FormControl component="fieldset" margin="normal" required fullWidth>
           <FormLabel component="legend">Analysis name</FormLabel>
           <TextField

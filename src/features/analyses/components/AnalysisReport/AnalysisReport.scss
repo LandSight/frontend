@@ -6,4 +6,25 @@
   &__Muted {
     color: $color-text-secondary;
   }
+
+  &__Cluster {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__ClusterHeader {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-s;
+    font-weight: $font-weight-bold;
+  }
+
+  &__Metric {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-s;
+    font-size: $font-size-s;
+    color: $color-text-secondary;
+  }
 }

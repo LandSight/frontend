@@ -5,6 +5,7 @@ import { reatomComponent } from '@reatom/react';
 import { AnalysisReport } from '#/features/analyses/components/AnalysisReport';
 import { AnalysisScoreChip } from '#/features/analyses/components/AnalysisScoreChip';
 import { AnalysisStatusChip } from '#/features/analyses/components/AnalysisStatusChip';
+import { enginesAtom, profilesAtom } from '#/features/analyses/models/analyses';
 import type { Analysis } from '#/features/analyses/types';
 import { cn } from '#/shared/lib/bem';
 
@@ -23,6 +24,9 @@ const formatDate = (value: string) => new Date(value).toLocaleString();
 export const AnalysisReportPanel = reatomComponent<AnalysisReportPanelProps>(
   ({ analysis, onClose, onDelete }) => {
     const canDelete = analysis.status === 'completed' || analysis.status === 'failed';
+    const profileName = profilesAtom()[analysis.scenario]?.name ?? analysis.scenario;
+    const engine = enginesAtom()[analysis.engine];
+    const engineLabel = engine ? `${engine.name} ${engine.version}` : analysis.engine;
 
     return (
       <div className={cnAnalysisReportPanel()}>
@@ -61,6 +65,14 @@ export const AnalysisReportPanel = reatomComponent<AnalysisReportPanelProps>(
           <div className={cnAnalysisReportPanel('InfoRow')}>
             <span className={cnAnalysisReportPanel('InfoLabel')}>Status:</span>
             <AnalysisStatusChip status={analysis.status} />
+          </div>
+          <div className={cnAnalysisReportPanel('InfoRow')}>
+            <span className={cnAnalysisReportPanel('InfoLabel')}>Profile:</span>
+            <span>{profileName}</span>
+          </div>
+          <div className={cnAnalysisReportPanel('InfoRow')}>
+            <span className={cnAnalysisReportPanel('InfoLabel')}>Engine:</span>
+            <span>{engineLabel}</span>
           </div>
           <div className={cnAnalysisReportPanel('InfoRow')}>
             <span className={cnAnalysisReportPanel('InfoLabel')}>Score:</span>
