@@ -1,11 +1,12 @@
-import { CircularProgress, Typography } from '@mui/material';
+import { Button, CircularProgress, Typography } from '@mui/material';
 import { reatomComponent } from '@reatom/react';
 
 import {
-  analysisEvaluationAtom,
-  fetchAnalysisEvaluation,
+  fetchInterpretation,
+  interpretationAtom,
+  regenerateInterpretation,
 } from '#/features/analyses/models/analyses';
-import type { Analysis, ClusterScore } from '#/features/analyses/types';
+import type { Analysis, AspectInterpretation, MetricInfo } from '#/features/analyses/types';
 import { cn } from '#/shared/lib/bem';
 
 import './AnalysisReport.scss';
@@ -16,39 +17,58 @@ export interface AnalysisReportProps {
   analysis: Analysis;
 }
 
-interface ClusterNodeProps {
-  cluster: ClusterScore;
-  depth: number;
-}
+const roleLabels: Record<MetricInfo['role'], string> = {
+  strong: 'strong',
+  weak: 'weak',
+  neutral: 'neutral',
+};
 
-const ClusterNode = ({ cluster, depth }: ClusterNodeProps) => (
-  <div className={cnAnalysisReport('Cluster')} style={{ paddingLeft: `${depth * 12}px` }}>
-    <div className={cnAnalysisReport('ClusterHeader')}>
-      <span>{cluster.key}</span>
-      <span>
-        {cluster.score.toFixed(2)} · w {cluster.weight.toFixed(2)}
-      </span>
+const formatNumber = (value: number): string =>
+  Number.isInteger(value) ? String(value) : value.toFixed(2);
+
+const MetricRow = ({ metric }: { metric: MetricInfo }) => (
+  <div className={cnAnalysisReport('Metric')}>
+    <span className={cnAnalysisReport('MetricName')}>{metric.label || metric.key}</span>
+    <span className={cnAnalysisReport('MetricValue')}>
+      {metric.raw_value != null
+        ? `${formatNumber(metric.raw_value)}${metric.unit ? ` ${metric.unit}` : ''}`
+        : '—'}
+    </span>
+    <span className={cnAnalysisReport('MetricRole')} data-role={metric.role}>
+      {roleLabels[metric.role]}
+    </span>
+  </div>
+);
+
+const AspectCard = ({ aspect }: { aspect: AspectInterpretation }) => (
+  <div className={cnAnalysisReport('Aspect')}>
+    <div className={cnAnalysisReport('AspectHeader')}>
+      <span className={cnAnalysisReport('AspectName')}>{aspect.name || aspect.key}</span>
+      <span className={cnAnalysisReport('AspectScore')}>{aspect.score.toFixed(2)}</span>
     </div>
-    {cluster.metrics.map((metric) => (
-      <div key={metric.key} className={cnAnalysisReport('Metric')}>
-        <span>{metric.key}</span>
-        <span>
-          {metric.raw_value != null
-            ? `${metric.raw_value}${metric.unit ? ` ${metric.unit}` : ''}`
-            : '—'}
-        </span>
-        <span>{metric.normalized_value != null ? metric.normalized_value.toFixed(2) : '—'}</span>
+    {aspect.explanation && (
+      <Typography variant="body2" className={cnAnalysisReport('Explanation')}>
+        {aspect.explanation}
+      </Typography>
+    )}
+    {aspect.top_metrics.length > 0 && (
+      <div className={cnAnalysisReport('Metrics')}>
+        {aspect.top_metrics.map((metric) => (
+          <MetricRow key={metric.key} metric={metric} />
+        ))}
       </div>
-    ))}
-    {cluster.subclusters.map((subcluster) => (
-      <ClusterNode key={subcluster.key} cluster={subcluster} depth={depth + 1} />
-    ))}
+    )}
   </div>
 );
 
 export const AnalysisReport = reatomComponent<AnalysisReportProps>(({ analysis }) => {
-  const evaluation = analysisEvaluationAtom();
-  const isLoading = fetchAnalysisEvaluation.status().isPending;
+  const report = interpretationAtom();
+  const isLoading = fetchInterpretation.status().isPending;
+  const isRegenerating = regenerateInterpretation.status().isPending;
+
+  const regenerate = () => {
+    void regenerateInterpretation(analysis.id);
+  };
 
   if (analysis.status === 'failed') {
     return (
@@ -70,34 +90,42 @@ export const AnalysisReport = reatomComponent<AnalysisReportProps>(({ analysis }
     return <CircularProgress size={20} />;
   }
 
-  if (!evaluation) {
+  if (!report) {
     return (
-      <Typography variant="body2" className={cnAnalysisReport('Muted')}>
-        Report is not available yet.
-      </Typography>
+      <div className={cnAnalysisReport()}>
+        <Typography variant="body2" className={cnAnalysisReport('Muted')}>
+          Report is not available yet. It is generated automatically after scoring.
+        </Typography>
+        <Button variant="outlined" size="small" disabled={isRegenerating} onClick={regenerate}>
+          {isRegenerating ? 'Generating…' : 'Generate report'}
+        </Button>
+      </div>
     );
   }
-
-  const clusters = evaluation.extensions.hierarchical?.clusters ?? [];
-  const ruleBased = evaluation.extensions.rule_based;
-  const constraintBased = evaluation.extensions.constraint_based;
 
   return (
     <div className={cnAnalysisReport()}>
       <Typography variant="body2" className={cnAnalysisReport('Muted')}>
-        {evaluation.engine} · {evaluation.model_version} · scale {evaluation.scale}
+        {report.scenario} · score {report.total_score.toFixed(2)} of {report.scale}
       </Typography>
-      {clusters.map((cluster) => (
-        <ClusterNode key={cluster.key} cluster={cluster} depth={0} />
-      ))}
-      {ruleBased && (
-        <Typography variant="body2">Base score: {ruleBased.base_score.toFixed(2)}</Typography>
-      )}
-      {constraintBased && (
-        <Typography variant="body2">
-          Constraints applied: {constraintBased.applied_constraints.length}
+
+      {report.top_aspects_summary && (
+        <Typography variant="body1" className={cnAnalysisReport('Summary')}>
+          {report.top_aspects_summary}
         </Typography>
       )}
+
+      <div className={cnAnalysisReport('Aspects')}>
+        {report.aspects.map((aspect) => (
+          <AspectCard key={aspect.key} aspect={aspect} />
+        ))}
+      </div>
+
+      <div className={cnAnalysisReport('Actions')}>
+        <Button variant="text" size="small" disabled={isRegenerating} onClick={regenerate}>
+          {isRegenerating ? 'Regenerating…' : 'Regenerate report'}
+        </Button>
+      </div>
     </div>
   );
 }, 'AnalysisReport');

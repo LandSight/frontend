@@ -1,4 +1,5 @@
 import { action, atom, computed, withActions, withAsyncData } from '@reatom/core';
+import axios from 'axios';
 
 import { selectedParcelIdAtom } from '#/features/parcels/models';
 import { getApiErrorMessage } from '#/shared/api/errors';
@@ -10,9 +11,9 @@ import * as catalogApi from '../api/catalogApi';
 import type {
   AnalysesFilters,
   Analysis,
-  AnalysisEvaluation,
   AnalysisStatus,
   Engine,
+  InterpretationReport,
   Profile,
   SortBy,
   SortOrder,
@@ -38,10 +39,7 @@ export const profilesAtom = atom<Record<string, Profile>>({}, 'profilesAtom');
 export const enginesAtom = atom<Record<string, Engine>>({}, 'enginesAtom');
 export const selectedProfileKeyAtom = atom<string | null>(null, 'selectedProfileKeyAtom');
 export const selectedEngineKeyAtom = atom<string | null>(null, 'selectedEngineKeyAtom');
-export const analysisEvaluationAtom = atom<AnalysisEvaluation | null>(
-  null,
-  'analysisEvaluationAtom'
-);
+export const interpretationAtom = atom<InterpretationReport | null>(null, 'interpretationAtom');
 
 export const profilesListAtom = computed(() => Object.values(profilesAtom()), 'profilesListAtom');
 export const enginesListAtom = computed(() => Object.values(enginesAtom()), 'enginesListAtom');
@@ -253,15 +251,40 @@ export const fetchCatalogs = action(() => {
   fetchEngines();
 }, 'fetchCatalogs');
 
-export const fetchAnalysisEvaluation = action(async (analysisId: string) => {
-  analysisEvaluationAtom.set(null);
-  const evaluation = await analysisApi.getAnalysisEvaluation(analysisId);
-  analysisEvaluationAtom.set(evaluation);
-}, 'fetchAnalysisEvaluation').extend(
+export const fetchInterpretation = action(async (analysisId: string) => {
+  interpretationAtom.set(null);
+  try {
+    const report = await analysisApi.getInterpretation(analysisId);
+    interpretationAtom.set(report);
+  } catch (error) {
+    // The report is generated asynchronously after the evaluation, so a missing
+    // report is an expected state rather than an error.
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return;
+    }
+    throw error;
+  }
+}, 'fetchInterpretation').extend(
   withAsyncData({
     status: true,
     parseError: (error) => {
-      const msg = getApiErrorMessage(error, 'Failed to fetch the analysis report');
+      const msg = getApiErrorMessage(error, 'Failed to fetch the interpretation report');
+      addNotification(msg, 'error');
+      return new Error(msg);
+    },
+  })
+);
+
+export const regenerateInterpretation = action(async (analysisId: string) => {
+  const report = await analysisApi.generateInterpretation(analysisId);
+  interpretationAtom.set(report);
+  addNotification('Interpretation report regenerated', 'success');
+  return report;
+}, 'regenerateInterpretation').extend(
+  withAsyncData({
+    status: true,
+    parseError: (error) => {
+      const msg = getApiErrorMessage(error, 'Failed to regenerate the interpretation report');
       addNotification(msg, 'error');
       return new Error(msg);
     },

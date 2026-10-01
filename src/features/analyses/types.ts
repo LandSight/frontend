@@ -31,57 +31,35 @@ export type Engine = {
   version: string;
 };
 
-export type MetricContribution = {
+export const metricRoles = ['strong', 'weak', 'neutral'] as const;
+export type MetricRole = (typeof metricRoles)[number];
+
+export type MetricInfo = {
   key: string;
+  label: string;
   raw_value: number | null;
   normalized_value: number | null;
-  weight: number;
   contribution: number | null;
   unit: string;
-  data_available: boolean;
-  membership_function: string | null;
-  membership_params: Record<string, number> | null;
+  role: MetricRole;
 };
 
-export type ClusterScore = {
+export type AspectInterpretation = {
   key: string;
+  name: string;
   score: number;
   weight: number;
   contribution: number;
-  subclusters: ClusterScore[];
-  metrics: MetricContribution[];
+  explanation: string;
+  top_metrics: MetricInfo[];
 };
 
-export type HierarchicalExtension = {
-  clusters: ClusterScore[];
-};
-
-export type RuleBasedExtension = {
-  base_score: number;
-  applied_rules: Record<string, unknown>[];
-};
-
-export type ConstraintBasedExtension = {
-  applied_constraints: Record<string, unknown>[];
-};
-
-export type EvaluationExtensions = {
-  hierarchical?: HierarchicalExtension;
-  rule_based?: RuleBasedExtension;
-  constraint_based?: ConstraintBasedExtension;
-};
-
-export type AnalysisEvaluation = {
-  scenario: string;
-  engine: string;
-  model_version: string;
+export type InterpretationReport = {
   total_score: number;
   scale: string;
-  metadata: {
-    evaluated_at: string | null;
-    parcel_id: string;
-  };
-  extensions: EvaluationExtensions;
+  scenario: string;
+  aspects: AspectInterpretation[];
+  top_aspects_summary: string;
 };
 
 export const analysisStatusLabels: Record<AnalysisStatus, string> = {

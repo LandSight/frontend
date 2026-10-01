@@ -3,7 +3,7 @@ import { action, atom, computed } from '@reatom/core';
 import {
   analysesAtom,
   analysesListAtom,
-  fetchAnalysisEvaluation,
+  fetchInterpretation,
 } from '#/features/analyses/models/analyses';
 import { isAnalysisFinished } from '#/features/analyses/types';
 import {
@@ -74,7 +74,7 @@ export const selectAnalysis = action(async (id: string) => {
   selectedParcelIdAtom.set(analysis.parcel_id);
   selectedAnalysisIdAtom.set(id);
   if (analysis.status === 'completed') {
-    await fetchAnalysisEvaluation(id);
+    await fetchInterpretation(id);
   }
   await fetchAnalysisMetricRefs(id);
   await enableAllObjectCategories(id);
