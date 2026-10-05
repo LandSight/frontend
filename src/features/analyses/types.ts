@@ -31,35 +31,49 @@ export type Engine = {
   version: string;
 };
 
-export const metricRoles = ['strong', 'weak', 'neutral'] as const;
-export type MetricRole = (typeof metricRoles)[number];
-
-export type MetricInfo = {
+export type MetricContribution = {
   key: string;
-  label: string;
   raw_value: number | null;
   normalized_value: number | null;
+  weight: number;
   contribution: number | null;
   unit: string;
-  role: MetricRole;
+  data_available: boolean;
+  membership_function: string | null;
+  membership_params: Record<string, number> | null;
+  label: string;
 };
 
-export type AspectInterpretation = {
+export type ClusterScore = {
   key: string;
-  name: string;
   score: number;
   weight: number;
   contribution: number;
-  explanation: string;
-  top_metrics: MetricInfo[];
+  subclusters: ClusterScore[];
+  metrics: MetricContribution[];
+  name: string;
 };
 
-export type InterpretationReport = {
-  total_score: number;
-  scale: string;
+export type HierarchicalExtension = {
+  clusters: ClusterScore[];
+};
+
+export type EvaluationExtension = HierarchicalExtension | Record<string, unknown>;
+
+export type EvaluationMetadata = {
+  evaluated_at: string | null;
+  parcel_id: string;
+};
+
+export type Evaluation = {
   scenario: string;
-  aspects: AspectInterpretation[];
-  top_aspects_summary: string;
+  engine: string;
+  model_version: string;
+  total_score: number;
+  scale_max: number;
+  metadata: EvaluationMetadata;
+  extensions: Record<string, EvaluationExtension>;
+  scenario_description: string;
 };
 
 export const analysisStatusLabels: Record<AnalysisStatus, string> = {

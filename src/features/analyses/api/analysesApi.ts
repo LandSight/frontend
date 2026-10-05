@@ -1,6 +1,6 @@
 import { abortVar, action } from '@reatom/core';
 
-import type { Analysis, InterpretationReport } from '#/features/analyses/types';
+import type { Analysis, Evaluation } from '#/features/analyses/types';
 import apiClient from '#/shared/api/client';
 
 export type CreateAnalysisRequest = {
@@ -49,25 +49,14 @@ export const getAnalysisById = action(async (id: string): Promise<Analysis> => {
   return response.data;
 }, 'getAnalysisById');
 
-export const getInterpretation = action(async (id: string): Promise<InterpretationReport> => {
+export const getEvaluation = action(async (id: string): Promise<Evaluation> => {
   const controller = new AbortController();
   abortVar.subscribe(() => controller.abort());
-  const response = await apiClient.get<InterpretationReport>(`/analysis/${id}/interpretation`, {
+  const response = await apiClient.get<Evaluation>(`/analysis/${id}/evaluation`, {
     signal: controller.signal,
   });
   return response.data;
-}, 'getInterpretation');
-
-export const generateInterpretation = action(async (id: string): Promise<InterpretationReport> => {
-  const controller = new AbortController();
-  abortVar.subscribe(() => controller.abort());
-  const response = await apiClient.post<InterpretationReport>(
-    `/analysis/${id}/interpretation`,
-    {},
-    { signal: controller.signal }
-  );
-  return response.data;
-}, 'generateInterpretation');
+}, 'getEvaluation');
 
 export const deleteAnalysis = action(async (id: string): Promise<void> => {
   const controller = new AbortController();

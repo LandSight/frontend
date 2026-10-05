@@ -39,6 +39,10 @@
     border-color: rgba(0, 0, 0, 0.12);
   }
 
+  &__Tabs {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
   &__Body {
     display: flex;
     flex-direction: column;

@@ -1,12 +1,17 @@
 import { Button, CircularProgress, Typography } from '@mui/material';
 import { reatomComponent } from '@reatom/react';
 
+import type { Analysis } from '#/features/analyses/types';
 import {
-  fetchInterpretation,
+  generateReport,
   interpretationAtom,
-  regenerateInterpretation,
-} from '#/features/analyses/models/analyses';
-import type { Analysis, AspectInterpretation, MetricInfo } from '#/features/analyses/types';
+  interpretationStatusAtom,
+} from '#/features/interpretation/models';
+import type {
+  AspectInterpretation,
+  InterpretationStatus,
+  MetricInfo,
+} from '#/features/interpretation/types';
 import { cn } from '#/shared/lib/bem';
 
 import './AnalysisReport.scss';
@@ -22,6 +27,15 @@ const roleLabels: Record<MetricInfo['role'], string> = {
   weak: 'weak',
   neutral: 'neutral',
 };
+
+const generatingMessages: Partial<Record<InterpretationStatus, string>> = {
+  ordered: 'The report has been queued for generation… This usually takes a few minutes.',
+  running:
+    'The report is being generated… This usually takes a few minutes. In the meantime, you can review the assessment results on the "Assessment" tab.',
+  failed: 'Failed to generate the report. Try generating it again.',
+};
+
+const noReportMessage = 'No report has been generated for this analysis yet.';
 
 const formatNumber = (value: number): string =>
   Number.isInteger(value) ? String(value) : value.toFixed(2);
@@ -63,11 +77,11 @@ const AspectCard = ({ aspect }: { aspect: AspectInterpretation }) => (
 
 export const AnalysisReport = reatomComponent<AnalysisReportProps>(({ analysis }) => {
   const report = interpretationAtom();
-  const isLoading = fetchInterpretation.status().isPending;
-  const isRegenerating = regenerateInterpretation.status().isPending;
+  const status = interpretationStatusAtom();
+  const isGenerating = generateReport.status().isPending;
 
-  const regenerate = () => {
-    void regenerateInterpretation(analysis.id);
+  const generate = () => {
+    void generateReport(analysis.id);
   };
 
   if (analysis.status === 'failed') {
@@ -86,18 +100,27 @@ export const AnalysisReport = reatomComponent<AnalysisReportProps>(({ analysis }
     );
   }
 
-  if (isLoading) {
-    return <CircularProgress size={20} />;
-  }
-
   if (!report) {
+    // The button stays visible but is disabled while a generation is in
+    // progress, so the user cannot order a duplicate run.
+    const isGeneratingNow = status === 'ordered' || status === 'running';
+    const message = (status ? generatingMessages[status] : null) ?? noReportMessage;
+
     return (
       <div className={cnAnalysisReport()}>
-        <Typography variant="body2" className={cnAnalysisReport('Muted')}>
-          Report is not available yet. It is generated automatically after scoring.
-        </Typography>
-        <Button variant="outlined" size="small" disabled={isRegenerating} onClick={regenerate}>
-          {isRegenerating ? 'Generating…' : 'Generate report'}
+        <div className={cnAnalysisReport('Generating')}>
+          {isGeneratingNow && <CircularProgress size={18} />}
+          <Typography variant="body2" className={cnAnalysisReport('Muted')}>
+            {message}
+          </Typography>
+        </div>
+        <Button
+          variant="outlined"
+          size="small"
+          disabled={isGeneratingNow || isGenerating}
+          onClick={generate}
+        >
+          {isGeneratingNow || isGenerating ? 'Generating…' : 'Generate report'}
         </Button>
       </div>
     );
@@ -106,7 +129,7 @@ export const AnalysisReport = reatomComponent<AnalysisReportProps>(({ analysis }
   return (
     <div className={cnAnalysisReport()}>
       <Typography variant="body2" className={cnAnalysisReport('Muted')}>
-        {report.scenario} · score {report.total_score.toFixed(2)} of {report.scale}
+        {report.scenario} · score {report.total_score.toFixed(2)} / {formatNumber(report.scale_max)}
       </Typography>
 
       {report.top_aspects_summary && (
@@ -119,12 +142,6 @@ export const AnalysisReport = reatomComponent<AnalysisReportProps>(({ analysis }
         {report.aspects.map((aspect) => (
           <AspectCard key={aspect.key} aspect={aspect} />
         ))}
-      </div>
-
-      <div className={cnAnalysisReport('Actions')}>
-        <Button variant="text" size="small" disabled={isRegenerating} onClick={regenerate}>
-          {isRegenerating ? 'Regenerating…' : 'Regenerate report'}
-        </Button>
       </div>
     </div>
   );

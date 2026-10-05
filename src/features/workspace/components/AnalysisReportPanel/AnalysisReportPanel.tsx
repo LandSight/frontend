@@ -1,13 +1,17 @@
 import { ChevronRight as ChevronRightIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { Divider, IconButton, Tooltip, Typography } from '@mui/material';
+import { Divider, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import { reatomComponent } from '@reatom/react';
 
-import { AnalysisReport } from '#/features/analyses/components/AnalysisReport';
 import { AnalysisScoreChip } from '#/features/analyses/components/AnalysisScoreChip';
 import { AnalysisStatusChip } from '#/features/analyses/components/AnalysisStatusChip';
+import { EvaluationView } from '#/features/analyses/components/EvaluationView';
 import { enginesAtom, profilesAtom } from '#/features/analyses/models/analyses';
 import type { Analysis } from '#/features/analyses/types';
+import { AnalysisReport } from '#/features/interpretation/components/AnalysisReport';
 import { cn } from '#/shared/lib/bem';
+
+import type { ReportTab } from '../../models';
+import { reportTabAtom, setReportTab } from '../../models';
 
 import './AnalysisReportPanel.scss';
 
@@ -23,6 +27,7 @@ const formatDate = (value: string) => new Date(value).toLocaleString();
 
 export const AnalysisReportPanel = reatomComponent<AnalysisReportPanelProps>(
   ({ analysis, onClose, onDelete }) => {
+    const tab = reportTabAtom();
     const canDelete = analysis.status === 'completed' || analysis.status === 'failed';
     const profileName = profilesAtom()[analysis.scenario]?.name ?? analysis.scenario;
     const engine = enginesAtom()[analysis.engine];
@@ -86,13 +91,23 @@ export const AnalysisReportPanel = reatomComponent<AnalysisReportPanelProps>(
 
         <Divider className={cnAnalysisReportPanel('Divider')} />
 
+        <Tabs
+          className={cnAnalysisReportPanel('Tabs')}
+          value={tab}
+          onChange={(_event, value: ReportTab) => setReportTab(value)}
+          variant="fullWidth"
+        >
+          <Tab value="report" label="Report" />
+          <Tab value="evaluation" label="Evaluation" />
+        </Tabs>
+
         <div className={cnAnalysisReportPanel('Body')}>
           {analysis.status_reason && (
             <Typography variant="body2" color="error">
               {analysis.status_reason}
             </Typography>
           )}
-          <AnalysisReport analysis={analysis} />
+          {tab === 'evaluation' ? <EvaluationView /> : <AnalysisReport analysis={analysis} />}
         </div>
       </div>
     );

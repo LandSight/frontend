@@ -74,8 +74,9 @@
     }
   }
 
-  &__Actions {
+  &__Generating {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    gap: $spacing-s;
   }
 }

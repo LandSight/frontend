@@ -1,5 +1,4 @@
 import { action, atom, computed, withActions, withAsyncData } from '@reatom/core';
-import axios from 'axios';
 
 import { selectedParcelIdAtom } from '#/features/parcels/models';
 import { getApiErrorMessage } from '#/shared/api/errors';
@@ -13,7 +12,7 @@ import type {
   Analysis,
   AnalysisStatus,
   Engine,
-  InterpretationReport,
+  Evaluation,
   Profile,
   SortBy,
   SortOrder,
@@ -39,7 +38,7 @@ export const profilesAtom = atom<Record<string, Profile>>({}, 'profilesAtom');
 export const enginesAtom = atom<Record<string, Engine>>({}, 'enginesAtom');
 export const selectedProfileKeyAtom = atom<string | null>(null, 'selectedProfileKeyAtom');
 export const selectedEngineKeyAtom = atom<string | null>(null, 'selectedEngineKeyAtom');
-export const interpretationAtom = atom<InterpretationReport | null>(null, 'interpretationAtom');
+export const evaluationAtom = atom<Evaluation | null>(null, 'evaluationAtom');
 
 export const profilesListAtom = computed(() => Object.values(profilesAtom()), 'profilesListAtom');
 export const enginesListAtom = computed(() => Object.values(enginesAtom()), 'enginesListAtom');
@@ -251,40 +250,24 @@ export const fetchCatalogs = action(() => {
   fetchEngines();
 }, 'fetchCatalogs');
 
-export const fetchInterpretation = action(async (analysisId: string) => {
-  interpretationAtom.set(null);
-  try {
-    const report = await analysisApi.getInterpretation(analysisId);
-    interpretationAtom.set(report);
-  } catch (error) {
-    // The report is generated asynchronously after the evaluation, so a missing
-    // report is an expected state rather than an error.
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return;
-    }
-    throw error;
-  }
-}, 'fetchInterpretation').extend(
-  withAsyncData({
-    status: true,
-    parseError: (error) => {
-      const msg = getApiErrorMessage(error, 'Failed to fetch the interpretation report');
-      addNotification(msg, 'error');
-      return new Error(msg);
-    },
-  })
-);
+// Guards against a slow poll of a previously selected analysis overwriting the
+// evaluation of the analysis the user is looking at now.
+const activeEvaluationIdAtom = atom<string | null>(null, 'activeEvaluationIdAtom');
 
-export const regenerateInterpretation = action(async (analysisId: string) => {
-  const report = await analysisApi.generateInterpretation(analysisId);
-  interpretationAtom.set(report);
-  addNotification('Interpretation report regenerated', 'success');
-  return report;
-}, 'regenerateInterpretation').extend(
+export const fetchEvaluation = action(async (analysisId: string) => {
+  activeEvaluationIdAtom.set(analysisId);
+  evaluationAtom.set(null);
+
+  const evaluation = await analysisApi.getEvaluation(analysisId);
+  if (activeEvaluationIdAtom() === analysisId) {
+    evaluationAtom.set(evaluation);
+  }
+  return evaluation;
+}, 'fetchEvaluation').extend(
   withAsyncData({
     status: true,
     parseError: (error) => {
-      const msg = getApiErrorMessage(error, 'Failed to regenerate the interpretation report');
+      const msg = getApiErrorMessage(error, 'Failed to fetch the analysis evaluation');
       addNotification(msg, 'error');
       return new Error(msg);
     },

@@ -3,7 +3,7 @@ import { action, atom, computed } from '@reatom/core';
 import {
   analysesAtom,
   analysesListAtom,
-  fetchInterpretation,
+  fetchEvaluation,
 } from '#/features/analyses/models/analyses';
 import { isAnalysisFinished } from '#/features/analyses/types';
 import {
@@ -11,6 +11,7 @@ import {
   fetchAnalysisMetricRefs,
   resetObjectCategories,
 } from '#/features/infrastructure/models';
+import { fetchInterpretation, resetInterpretation } from '#/features/interpretation/models';
 import { selectedParcelIdAtom } from '#/features/parcels/models';
 
 export type WorkspaceView = 'parcels' | 'analyses';
@@ -18,6 +19,14 @@ export type WorkspaceView = 'parcels' | 'analyses';
 export const workspaceViewAtom = atom<WorkspaceView>('parcels', 'workspaceViewAtom');
 export const selectedAnalysisIdAtom = atom<string | null>(null, 'selectedAnalysisIdAtom');
 export const expandedParcelIdsAtom = atom<string[]>([], 'expandedParcelIdsAtom');
+
+export type ReportTab = 'report' | 'evaluation';
+
+export const reportTabAtom = atom<ReportTab>('report', 'reportTabAtom');
+
+export const setReportTab = action((tab: ReportTab) => {
+  reportTabAtom.set(tab);
+}, 'setReportTab');
 
 export const selectedAnalysisAtom = computed(() => {
   const id = selectedAnalysisIdAtom();
@@ -46,6 +55,7 @@ export const closeReport = action(() => {
   if (analysisId) {
     resetObjectCategories(analysisId);
   }
+  resetInterpretation();
   selectedAnalysisIdAtom.set(null);
 }, 'closeReport');
 
@@ -74,7 +84,8 @@ export const selectAnalysis = action(async (id: string) => {
   selectedParcelIdAtom.set(analysis.parcel_id);
   selectedAnalysisIdAtom.set(id);
   if (analysis.status === 'completed') {
-    await fetchInterpretation(id);
+    fetchEvaluation(id);
+    fetchInterpretation(id);
   }
   await fetchAnalysisMetricRefs(id);
   await enableAllObjectCategories(id);
