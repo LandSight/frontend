@@ -40,7 +40,21 @@
     --verdict-color: #c62828;
   }
 
+  // The icon spans both the verdict and the profile lines.
   &__Verdict {
+    display: flex;
+    align-items: center;
+    gap: $spacing-s;
+    min-width: 0;
+  }
+
+  &__Icon {
+    flex-shrink: 0;
+    font-size: 2.5rem !important;
+    color: var(--verdict-color);
+  }
+
+  &__Text {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -48,18 +62,15 @@
   }
 
   &__Label {
-    display: flex;
-    align-items: center;
-    gap: $spacing-s;
     font-size: 1.25rem;
     font-weight: $font-weight-bold;
     line-height: 1.2;
     color: var(--verdict-color);
   }
 
-  &__Icon {
-    flex-shrink: 0;
-    font-size: 1.375rem;
+  &__Profile {
+    font-size: $font-size-s;
+    color: $color-text-secondary;
   }
 
   &__Gauge {

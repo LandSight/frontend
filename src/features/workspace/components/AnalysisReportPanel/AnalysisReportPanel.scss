@@ -4,39 +4,62 @@
   flex: 1;
   min-height: 0;
 
+  // The close and delete buttons are centred against the whole heading block.
   &__Header {
     display: flex;
     align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-s $spacing-s $spacing-s $spacing-xs;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  &__Heading {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__TitleRow {
+    display: flex;
+    align-items: baseline;
     gap: $spacing-s;
-    padding: $spacing-s;
+    min-width: 0;
   }
 
   &__Title {
-    flex: 1;
+    flex-shrink: 1;
     min-width: 0;
     font-weight: $font-weight-bold;
+    line-height: 1.3;
   }
 
-  &__Info {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-s;
-    padding: 0 $spacing-m;
-    margin: $spacing-m 0;
-  }
-
-  &__InfoRow {
-    display: flex;
-    align-items: center;
-    gap: $spacing-s;
-  }
-
-  &__InfoLabel {
+  // Secondary to the analysis name, so it gives way first when space runs out.
+  &__Parcel {
+    flex-shrink: 100;
+    min-width: 3em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: $font-size-m;
     color: $color-text-secondary;
   }
 
-  &__Divider {
-    border-color: rgba(0, 0, 0, 0.12);
+  // Profile · date, wrapping instead of truncating.
+  &__Meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: $spacing-s;
+    row-gap: 2px;
+    font-size: $font-size-s;
+    color: $color-text-secondary;
+
+    > span:not(:last-of-type)::after {
+      content: '·';
+      margin-left: $spacing-s;
+    }
   }
 
   &__Tabs {
