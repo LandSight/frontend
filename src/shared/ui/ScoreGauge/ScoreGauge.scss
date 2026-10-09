@@ -1,0 +1,27 @@
+.ScoreGauge {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+
+  &__Text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+  }
+
+  &__Value {
+    font-size: 1rem;
+    font-weight: $font-weight-bold;
+    color: $color-bg-dark;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__Scale {
+    font-size: 0.6875rem;
+    color: $color-text-secondary;
+  }
+}

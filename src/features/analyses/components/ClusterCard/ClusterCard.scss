@@ -1,0 +1,7 @@
+.ClusterCard {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-m;
+  padding: $spacing-m;
+  border-radius: $border-radius-m;
+}

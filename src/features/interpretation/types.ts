@@ -39,6 +39,8 @@ export type AspectInterpretation = {
   loss_share: number;
   explanation: string;
   top_metrics: MetricInfo[];
+  // Every metric of the aspect: strengths, then weaknesses, then metrics without data.
+  metrics: MetricInfo[];
 };
 
 export const interpretationStatusValues = ['ordered', 'running', 'completed', 'failed'] as const;

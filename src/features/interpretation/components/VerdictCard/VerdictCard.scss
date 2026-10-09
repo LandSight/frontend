@@ -1,0 +1,68 @@
+.VerdictCard {
+  --verdict-color: #{$color-text-secondary};
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-m;
+  padding: $spacing-s $spacing-m $spacing-s calc(#{$spacing-m} + 4px);
+  overflow: hidden;
+  border-radius: $border-radius-m;
+  background: color-mix(in srgb, var(--verdict-color) 7%, #{$color-bg-light});
+
+  // Bookmark-like accent strip in the verdict colour.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--verdict-color);
+  }
+
+  &[data-verdict='very_high'] {
+    --verdict-color: #1b5e20;
+  }
+
+  &[data-verdict='high'] {
+    --verdict-color: #2e7d32;
+  }
+
+  &[data-verdict='medium'] {
+    --verdict-color: #ef6c00;
+  }
+
+  &[data-verdict='low'] {
+    --verdict-color: #d84315;
+  }
+
+  &[data-verdict='very_low'] {
+    --verdict-color: #c62828;
+  }
+
+  &__Verdict {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__Label {
+    display: flex;
+    align-items: center;
+    gap: $spacing-s;
+    font-size: 1.25rem;
+    font-weight: $font-weight-bold;
+    line-height: 1.2;
+    color: var(--verdict-color);
+  }
+
+  &__Icon {
+    flex-shrink: 0;
+    font-size: 1.375rem;
+  }
+
+  &__Gauge {
+    color: var(--verdict-color);
+  }
+}

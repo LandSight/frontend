@@ -1,0 +1,70 @@
+// One grid for all rows so the columns line up regardless of label length.
+.MetricsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  column-gap: $spacing-m;
+  font-size: $font-size-s;
+
+  &__Row {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    align-items: center;
+    padding: 6px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+    // A metric without a reading has nothing to show but its name.
+    &--noData {
+      color: $color-text-secondary;
+    }
+
+    &--header {
+      padding-top: 0;
+      border-top: none;
+      font-size: $font-size-xs;
+      color: $color-text-secondary;
+    }
+  }
+
+  &__Value {
+    text-align: center;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__Position {
+    text-align: center;
+    white-space: nowrap;
+
+    &[data-position] {
+      font-size: $font-size-xs;
+      color: $color-text-secondary;
+    }
+
+    &[data-position='optimal'] {
+      color: #2e7d32;
+    }
+
+    &[data-position='partial_low'],
+    &[data-position='partial_high'] {
+      color: #ef6c00;
+    }
+
+    &[data-position='out_low'],
+    &[data-position='out_high'] {
+      color: #c62828;
+    }
+  }
+
+  &__Role {
+    justify-self: center;
+    text-align: center;
+
+    // Doubled up to win over the MUI chip styles.
+    &--chip.MuiChip-root {
+      text-transform: uppercase;
+      font-size: 0.6875rem;
+      font-weight: $font-weight-bold;
+    }
+  }
+}
