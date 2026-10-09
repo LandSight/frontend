@@ -4,7 +4,49 @@
   gap: $spacing-m;
 
   &__Muted {
+    width: 100%;
     color: $color-text-secondary;
+  }
+
+  &__Total {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $spacing-s;
+  }
+
+  &__TotalScore {
+    font-size: $font-size-l;
+    font-weight: $font-weight-bold;
+  }
+
+  &__Verdict {
+    padding: 2px $spacing-s;
+    border-radius: $border-radius-m;
+    font-size: $font-size-s;
+    font-weight: $font-weight-bold;
+    color: #fff;
+    background: $color-text-secondary;
+
+    &[data-verdict='very_high'] {
+      background: #1b5e20;
+    }
+
+    &[data-verdict='high'] {
+      background: #2e7d32;
+    }
+
+    &[data-verdict='medium'] {
+      background: #ef6c00;
+    }
+
+    &[data-verdict='low'] {
+      background: #d84315;
+    }
+
+    &[data-verdict='very_low'] {
+      background: #c62828;
+    }
   }
 
   &__Summary {
@@ -37,6 +79,23 @@
     color: $color-selected;
   }
 
+  &__AspectBar {
+    height: 6px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  &__AspectBarFill {
+    height: 100%;
+    background: $color-selected;
+  }
+
+  &__AspectLoss {
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+  }
+
   &__Explanation {
     line-height: 1.5;
   }
@@ -50,11 +109,29 @@
 
   &__Metric {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr auto auto auto;
     align-items: center;
     gap: $spacing-s;
     font-size: $font-size-s;
     color: $color-text-secondary;
+  }
+
+  &__MetricPosition {
+    font-size: $font-size-xs;
+
+    &[data-position='optimal'] {
+      color: #2e7d32;
+    }
+
+    &[data-position='partial_low'],
+    &[data-position='partial_high'] {
+      color: #ef6c00;
+    }
+
+    &[data-position='out_low'],
+    &[data-position='out_high'] {
+      color: #c62828;
+    }
   }
 
   &__MetricRole {
@@ -74,9 +151,16 @@
     }
   }
 
-  &__Generating {
+  // Stretches over the rest of the panel body so the loader sits in the
+  // middle of the space left under the message.
+  &--generating {
+    flex: 1;
+  }
+
+  &__Loader {
     display: flex;
+    flex: 1;
     align-items: center;
-    gap: $spacing-s;
+    justify-content: center;
   }
 }

@@ -13,11 +13,12 @@ export const interpretationStatusAtom = atom<InterpretationStatus | null>(
   'interpretationStatusAtom'
 );
 
-const INTERPRETATION_POLL_INTERVAL_MS = 2000;
 // Generation takes minutes because the reasoning model answers a dozen or more
-// prompts per report, so keep polling while the panel is open. If a non-terminal
-// status does not change for this long, the task was most likely lost (e.g. the
-// worker restarted mid-run) and the UI offers a manual retry.
+// prompts per report, so poll once a minute while the panel is open — every few
+// seconds is wasteful for a job that cannot possibly finish that fast. If a
+// non-terminal status does not change for this long, the task was most likely
+// lost (e.g. the worker restarted mid-run) and the UI offers a manual retry.
+const INTERPRETATION_POLL_INTERVAL_MS = 60_000;
 const INTERPRETATION_STALE_MS = 15 * 60 * 1000;
 
 // Guards against a slow poll of a previously selected analysis overwriting the
@@ -106,7 +107,7 @@ export const generateReport = action(async (analysisId: string) => {
   // Ordering returns 202 with the "ordered" status; the actual generation runs
   // in the worker, so start polling for the fresh report.
   await interpretationApi.generateReport(analysisId);
-  addNotification('Отчёт будет сгенерирован автоматически', 'success');
+  addNotification('The report will be generated automatically', 'success');
   return fetchInterpretation(analysisId);
 }, 'generateReport').extend(
   withAsyncData({

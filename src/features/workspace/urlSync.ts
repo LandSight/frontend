@@ -1,4 +1,4 @@
-import { action, atom, computed, effect } from '@reatom/core';
+import { abortVar, action, atom, computed, effect } from '@reatom/core';
 
 import { analysesAtom } from '#/features/analyses/models/analyses';
 import { isAnalysisFinished } from '#/features/analyses/types';
@@ -103,7 +103,11 @@ effect(() => {
   const analysis = analysesAtom()[id];
   if (analysis && isAnalysisFinished(analysis.status)) {
     pendingAnalysisIdAtom.set(null);
-    selectAnalysis(id);
+    // Resetting the pending id re-runs this effect, which aborts everything
+    // started from its previous run — including the evaluation request and the
+    // report polling. Detach the selection from the effect's abort context so
+    // it lives as long as a selection made by a click.
+    abortVar.spawn(() => selectAnalysis(id));
   }
 }, 'selectPendingAnalysisEffect');
 

@@ -4,6 +4,7 @@ import { reatomComponent } from '@reatom/react';
 import { evaluationAtom, fetchEvaluation } from '#/features/analyses/models/analyses';
 import type { ClusterScore, MetricContribution } from '#/features/analyses/types';
 import { cn } from '#/shared/lib/bem';
+import { formatMetricValue } from '#/shared/lib/formatMetricValue';
 
 import './EvaluationView.scss';
 
@@ -24,9 +25,7 @@ const MetricRow = ({ metric }: { metric: MetricContribution }) => (
       {metric.label || metric.key}
     </span>
     <span className={cnEvaluationView('MetricValue')}>
-      {metric.raw_value != null
-        ? `${formatNumber(metric.raw_value)}${metric.unit ? ` ${metric.unit}` : ''}`
-        : '—'}
+      {formatMetricValue(metric.raw_value, metric.unit)}
     </span>
     <span className={cnEvaluationView('MetricNorm')}>{formatPercent(metric.normalized_value)}</span>
     <span className={cnEvaluationView('MetricWeight')}>{formatNumber(metric.weight)}</span>
@@ -44,7 +43,7 @@ const ClusterBlock = ({ cluster, depth = 0 }: { cluster: ClusterScore; depth?: n
       </span>
       <span className={cnEvaluationView('ClusterScore')}>{formatNumber(cluster.score)}</span>
       <span className={cnEvaluationView('ClusterMeta')}>
-        вес {formatNumber(cluster.weight)} · вклад {formatNumber(cluster.contribution)}
+        weight {formatNumber(cluster.weight)} · contribution {formatNumber(cluster.contribution)}
       </span>
     </div>
 
@@ -59,11 +58,11 @@ const ClusterBlock = ({ cluster, depth = 0 }: { cluster: ClusterScore; depth?: n
     {cluster.metrics.length > 0 && (
       <div className={cnEvaluationView('Metrics')}>
         <div className={cnEvaluationView('MetricRow', { header: true })}>
-          <span>Метрика</span>
-          <span>Значение</span>
-          <span>Норма</span>
-          <span>Вес</span>
-          <span>Вклад</span>
+          <span>Metric</span>
+          <span>Value</span>
+          <span>Score</span>
+          <span>Weight</span>
+          <span>Contribution</span>
         </div>
         {cluster.metrics.map((metric) => (
           <MetricRow key={metric.key} metric={metric} />
@@ -84,7 +83,7 @@ export const EvaluationView = reatomComponent(() => {
   if (!evaluation) {
     return (
       <Typography variant="body2" className={cnEvaluationView('Muted')}>
-        Еvaluation unavailable.
+        Evaluation unavailable.
       </Typography>
     );
   }

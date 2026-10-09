@@ -55,7 +55,7 @@ export const ParcelListContainer = reatomFactoryComponent(() => {
       }
     };
 
-    // Если ещё не загружено и нет данных – показываем лоадер
+    // Show the loader while nothing has been loaded yet
     if (isLoading) {
       return <LinearProgress />;
     }

@@ -13,6 +13,7 @@ import type {
   MetricInfo,
 } from '#/features/interpretation/types';
 import { cn } from '#/shared/lib/bem';
+import { formatMetricValue } from '#/shared/lib/formatMetricValue';
 
 import './AnalysisReport.scss';
 
@@ -28,10 +29,19 @@ const roleLabels: Record<MetricInfo['role'], string> = {
   neutral: 'neutral',
 };
 
+const positionLabels: Record<MetricInfo['position'], string | null> = {
+  optimal: 'optimal',
+  partial_low: 'below optimal',
+  partial_high: 'above optimal',
+  out_low: 'below threshold',
+  out_high: 'above threshold',
+  unknown: null,
+};
+
 const generatingMessages: Partial<Record<InterpretationStatus, string>> = {
   ordered: 'The report has been queued for generation… This usually takes a few minutes.',
   running:
-    'The report is being generated… This usually takes a few minutes. In the meantime, you can review the assessment results on the "Assessment" tab.',
+    'The report is being generated… This usually takes a few minutes. In the meantime, you can review the assessment results on the "Evaluation" tab.',
   failed: 'Failed to generate the report. Try generating it again.',
 };
 
@@ -40,13 +50,18 @@ const noReportMessage = 'No report has been generated for this analysis yet.';
 const formatNumber = (value: number): string =>
   Number.isInteger(value) ? String(value) : value.toFixed(2);
 
+const formatPoints = (value: number): string => value.toFixed(2);
+
+const formatPercent = (share: number): string => `${Math.round(share * 100)}%`;
+
 const MetricRow = ({ metric }: { metric: MetricInfo }) => (
   <div className={cnAnalysisReport('Metric')}>
     <span className={cnAnalysisReport('MetricName')}>{metric.label || metric.key}</span>
     <span className={cnAnalysisReport('MetricValue')}>
-      {metric.raw_value != null
-        ? `${formatNumber(metric.raw_value)}${metric.unit ? ` ${metric.unit}` : ''}`
-        : '—'}
+      {formatMetricValue(metric.raw_value, metric.unit)}
+    </span>
+    <span className={cnAnalysisReport('MetricPosition')} data-position={metric.position}>
+      {positionLabels[metric.position] ?? ''}
     </span>
     <span className={cnAnalysisReport('MetricRole')} data-role={metric.role}>
       {roleLabels[metric.role]}
@@ -58,8 +73,23 @@ const AspectCard = ({ aspect }: { aspect: AspectInterpretation }) => (
   <div className={cnAnalysisReport('Aspect')}>
     <div className={cnAnalysisReport('AspectHeader')}>
       <span className={cnAnalysisReport('AspectName')}>{aspect.name || aspect.key}</span>
-      <span className={cnAnalysisReport('AspectScore')}>{aspect.score.toFixed(2)}</span>
+      <span className={cnAnalysisReport('AspectScore')}>
+        {formatPoints(aspect.points)} / {formatPoints(aspect.max_points)} pts
+      </span>
     </div>
+    <div className={cnAnalysisReport('AspectBar')}>
+      <div
+        className={cnAnalysisReport('AspectBarFill')}
+        style={{
+          width: formatPercent(aspect.max_points > 0 ? aspect.points / aspect.max_points : 0),
+        }}
+      />
+    </div>
+    {aspect.loss > 0 && (
+      <span className={cnAnalysisReport('AspectLoss')}>
+        −{formatPoints(aspect.loss)} pts ({formatPercent(aspect.loss_share)} lost)
+      </span>
+    )}
     {aspect.explanation && (
       <Typography variant="body2" className={cnAnalysisReport('Explanation')}>
         {aspect.explanation}
@@ -101,26 +131,31 @@ export const AnalysisReport = reatomComponent<AnalysisReportProps>(({ analysis }
   }
 
   if (!report) {
-    // The button stays visible but is disabled while a generation is in
-    // progress, so the user cannot order a duplicate run.
-    const isGeneratingNow = status === 'ordered' || status === 'running';
+    // While a generation is in progress the button is hidden, so the user
+    // cannot order a duplicate run.
+    const isGeneratingNow = status === 'ordered' || status === 'running' || isGenerating;
     const message = (status ? generatingMessages[status] : null) ?? noReportMessage;
 
-    return (
-      <div className={cnAnalysisReport()}>
-        <div className={cnAnalysisReport('Generating')}>
-          {isGeneratingNow && <CircularProgress size={18} />}
+    if (isGeneratingNow) {
+      return (
+        <div className={cnAnalysisReport({ generating: true })}>
           <Typography variant="body2" className={cnAnalysisReport('Muted')}>
             {message}
           </Typography>
+          <div className={cnAnalysisReport('Loader')}>
+            <CircularProgress size={64} />
+          </div>
         </div>
-        <Button
-          variant="outlined"
-          size="small"
-          disabled={isGeneratingNow || isGenerating}
-          onClick={generate}
-        >
-          {isGeneratingNow || isGenerating ? 'Generating…' : 'Generate report'}
+      );
+    }
+
+    return (
+      <div className={cnAnalysisReport()}>
+        <Typography variant="body2" className={cnAnalysisReport('Muted')}>
+          {message}
+        </Typography>
+        <Button variant="outlined" size="small" onClick={generate}>
+          Generate report
         </Button>
       </div>
     );
@@ -128,9 +163,16 @@ export const AnalysisReport = reatomComponent<AnalysisReportProps>(({ analysis }
 
   return (
     <div className={cnAnalysisReport()}>
-      <Typography variant="body2" className={cnAnalysisReport('Muted')}>
-        {report.scenario} · score {report.total_score.toFixed(2)} / {formatNumber(report.scale_max)}
-      </Typography>
+      <div className={cnAnalysisReport('Total')}>
+        <span className={cnAnalysisReport('TotalScore')}>
+          {formatPoints(report.total_score)} / {formatNumber(report.scale_max)}
+        </span>
+        {report.verdict && (
+          <span className={cnAnalysisReport('Verdict')} data-verdict={report.verdict}>
+            {report.verdict_label ?? report.verdict}
+          </span>
+        )}
+      </div>
 
       {report.top_aspects_summary && (
         <Typography variant="body1" className={cnAnalysisReport('Summary')}>

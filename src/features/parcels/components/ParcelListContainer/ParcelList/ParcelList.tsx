@@ -32,7 +32,7 @@ export const ParcelList = reatomComponent<ParcelListProps>(
                   <IconButton
                     size="small"
                     onClick={(e) => handleDelete(parcel.id, e)}
-                    title="Удалить"
+                    title="Delete"
                   >
                     <Delete className={cnParcelList('Icon')} fontSize="small" />
                   </IconButton>

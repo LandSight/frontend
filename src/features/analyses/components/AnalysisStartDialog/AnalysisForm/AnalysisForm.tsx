@@ -3,7 +3,6 @@ import {
   Button,
   CircularProgress,
   FormControl,
-  FormLabel,
   MenuItem,
   Paper,
   TextField,
@@ -64,10 +63,11 @@ export const AnalysisForm = reatomComponent(() => {
         <ProfileSelector />
         <EngineSelector />
         <FormControl component="fieldset" margin="normal" required fullWidth>
-          <FormLabel component="legend">Analysis name</FormLabel>
           <TextField
+            label="Analysis name"
             placeholder="Enter analysis name"
             variant="outlined"
+            required
             value={analysisName}
             onChange={(e) => wrap(newAnalysisNameAtom.set(e.target.value))}
             disabled={!hasSelected}
