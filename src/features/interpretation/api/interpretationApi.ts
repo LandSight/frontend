@@ -23,3 +23,14 @@ export const generateReport = action(async (id: string): Promise<InterpretationR
   );
   return response.data;
 }, 'generateReport');
+
+export const cancelReport = action(async (id: string): Promise<InterpretationReport> => {
+  const controller = new AbortController();
+  abortVar.subscribe(() => controller.abort());
+  const response = await apiClient.post<InterpretationReport>(
+    `/analysis/${id}/interpretation/cancel`,
+    {},
+    { signal: controller.signal }
+  );
+  return response.data;
+}, 'cancelReport');

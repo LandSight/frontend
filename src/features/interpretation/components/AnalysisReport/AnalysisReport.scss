@@ -31,7 +31,41 @@
   &__Loader {
     display: flex;
     flex: 1;
+    flex-direction: column;
+    gap: $spacing-m;
     align-items: center;
     justify-content: center;
+    text-align: center;
+  }
+
+  &__Progress {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-s;
+    width: min(100%, 360px);
+  }
+
+  &__ProgressHeader {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-s;
+    font-size: $font-size-s;
+    text-align: left;
+  }
+
+  &__Percent {
+    font-weight: $font-weight-bold;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__Bar {
+    height: 8px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.08);
+
+    .MuiLinearProgress-bar {
+      border-radius: 4px;
+      background-color: $color-selected;
+    }
   }
 }

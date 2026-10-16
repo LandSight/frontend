@@ -58,7 +58,33 @@ export type HierarchicalExtension = {
   clusters: ClusterScore[];
 };
 
-export type EvaluationExtension = HierarchicalExtension | Record<string, unknown>;
+export const constraintEffects = ['prohibit', 'penalty'] as const;
+export type ConstraintEffect = (typeof constraintEffects)[number];
+
+export type AppliedConstraint = {
+  kind: string;
+  effect: ConstraintEffect;
+  // Multiplier applied to the score: 0 for a prohibition.
+  factor: number;
+  // Share of the parcel inside the zone, in [0, 1].
+  overlap_share: number;
+  overlap_area_m2: number;
+  zone_names: string[];
+  legal_basis: string;
+};
+
+export type ConstraintExtension = {
+  // Score of the multi-criteria breakdown before the constraints.
+  base_score: number;
+  prohibited: boolean;
+  // Prohibitions first, then the strongest penalty first.
+  applied_constraints: AppliedConstraint[];
+};
+
+export type EvaluationExtension =
+  | HierarchicalExtension
+  | ConstraintExtension
+  | Record<string, unknown>;
 
 export type EvaluationMetadata = {
   evaluated_at: string | null;

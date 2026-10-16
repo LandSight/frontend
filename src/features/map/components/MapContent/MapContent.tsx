@@ -139,13 +139,23 @@ export const MapContent = reatomComponent(() => {
     wrap(selectParcel(selectedId === id ? null : id));
   };
 
+  // Leaflet caches the container size, so it must be told about every resize:
+  // the window, and also the sidebar animating its width when the report opens
+  // or closes. Measuring once at the start of that transition left an unloaded
+  // strip of tiles on the right. Updates are coalesced to one per frame.
   useEffect(() => {
-    const timeoutId = setTimeout(() => map.invalidateSize(), 0);
-    const handleResize = () => map.invalidateSize();
-    window.addEventListener('resize', handleResize);
+    let frameId: number | null = null;
+    const observer = new ResizeObserver(() => {
+      if (frameId !== null) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = null;
+        map.invalidateSize();
+      });
+    });
+    observer.observe(map.getContainer());
     return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener('resize', handleResize);
+      observer.disconnect();
+      if (frameId !== null) cancelAnimationFrame(frameId);
     };
   }, [map]);
 
@@ -177,10 +187,6 @@ export const MapContent = reatomComponent(() => {
       map.off('zoomend', updateViewport);
     };
   }, [map]);
-
-  useEffect(() => {
-    map.invalidateSize();
-  }, [map, isReportOpen]);
 
   useEffect(() => {
     if (focusKey === null || selectedParcel === null) {

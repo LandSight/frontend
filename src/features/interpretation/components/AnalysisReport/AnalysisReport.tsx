@@ -1,11 +1,13 @@
-import { Button, CircularProgress, Typography } from '@mui/material';
+import { Button, LinearProgress, Typography } from '@mui/material';
 import { reatomComponent } from '@reatom/react';
 
 import type { Analysis } from '#/features/analyses/types';
 import { generatingMessages, noReportMessage } from '#/features/interpretation/constants';
 import {
+  cancelReport,
   generateReport,
   interpretationAtom,
+  interpretationProgressAtom,
   interpretationStatusAtom,
 } from '#/features/interpretation/models';
 import { cn } from '#/shared/lib/bem';
@@ -26,10 +28,16 @@ export interface AnalysisReportProps {
 export const AnalysisReport = reatomComponent<AnalysisReportProps>(({ analysis }) => {
   const report = interpretationAtom();
   const status = interpretationStatusAtom();
+  const progress = interpretationProgressAtom();
   const isGenerating = generateReport.status().isPending;
+  const isCancelling = cancelReport.status().isPending;
 
   const generate = () => {
     void generateReport(analysis.id);
+  };
+
+  const cancel = () => {
+    void cancelReport(analysis.id);
   };
 
   if (analysis.status === 'failed') {
@@ -55,13 +63,36 @@ export const AnalysisReport = reatomComponent<AnalysisReportProps>(({ analysis }
     const message = (status ? generatingMessages[status] : null) ?? noReportMessage;
 
     if (isGeneratingNow) {
+      const percent = progress ? Math.round((progress.done / progress.total) * 100) : null;
+
       return (
         <div className={cnAnalysisReport({ generating: true })}>
           <Typography variant="body2" className={cnAnalysisReport('Muted')}>
             {message}
           </Typography>
           <div className={cnAnalysisReport('Loader')}>
-            <CircularProgress size={64} />
+            <div className={cnAnalysisReport('Progress')}>
+              <div className={cnAnalysisReport('ProgressHeader')}>
+                <span>
+                  {progress
+                    ? `Explaining report sections: ${progress.done} of ${progress.total}`
+                    : 'Waiting for the generation to start…'}
+                </span>
+                {percent !== null && (
+                  <span className={cnAnalysisReport('Percent')}>{percent}%</span>
+                )}
+              </div>
+              <LinearProgress
+                variant={percent === null ? 'indeterminate' : 'determinate'}
+                value={percent ?? 0}
+                className={cnAnalysisReport('Bar')}
+              />
+            </div>
+            {status !== null && (
+              <Button variant="outlined" size="small" onClick={cancel} disabled={isCancelling}>
+                Cancel generation
+              </Button>
+            )}
           </div>
         </div>
       );

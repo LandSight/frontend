@@ -2,16 +2,20 @@ import { CircularProgress, Paper, Typography } from '@mui/material';
 import { reatomComponent } from '@reatom/react';
 
 import { enginesAtom, evaluationAtom, fetchEvaluation } from '#/features/analyses/models/analyses';
-import type { ClusterScore } from '#/features/analyses/types';
+import type { ClusterScore, ConstraintExtension } from '#/features/analyses/types';
 import { cn } from '#/shared/lib/bem';
 import { ScoreGauge } from '#/shared/ui/ScoreGauge';
 import { SectionTitle } from '#/shared/ui/SectionTitle';
 
 import { ClusterCard } from '../ClusterCard';
+import { ConstraintList } from '../ConstraintList';
 
 import './EvaluationView.scss';
 
 const cnEvaluationView = cn('EvaluationView');
+
+const isConstraintExtension = (extension: unknown): extension is ConstraintExtension =>
+  extension != null && typeof extension === 'object' && 'applied_constraints' in extension;
 
 export const EvaluationView = reatomComponent(() => {
   const evaluation = evaluationAtom();
@@ -39,6 +43,8 @@ export const EvaluationView = reatomComponent(() => {
     extension != null && typeof extension === 'object' && 'clusters' in extension
       ? (extension as { clusters: ClusterScore[] }).clusters
       : [];
+  const constraintExtension: unknown = evaluation.extensions['constraint'];
+  const constraints = isConstraintExtension(constraintExtension) ? constraintExtension : null;
   const engineName = engines[evaluation.engine]?.name ?? evaluation.engine;
 
   return (
@@ -57,7 +63,7 @@ export const EvaluationView = reatomComponent(() => {
         />
       </Paper>
 
-      <SectionTitle>Aspects</SectionTitle>
+      <SectionTitle>HMCDA</SectionTitle>
       {clusters.length === 0 ? (
         <Typography variant="body2" className={cnEvaluationView('Muted')}>
           Hierarchical breakdown is not available for this engine.
@@ -68,6 +74,19 @@ export const EvaluationView = reatomComponent(() => {
             <ClusterCard key={cluster.key} cluster={cluster} />
           ))}
         </div>
+      )}
+
+      <SectionTitle>Constraints</SectionTitle>
+      {constraints ? (
+        <ConstraintList
+          extension={constraints}
+          totalScore={evaluation.total_score}
+          scaleMax={evaluation.scale_max}
+        />
+      ) : (
+        <Typography variant="body2" className={cnEvaluationView('Muted')}>
+          Restriction zones were not checked for this analysis.
+        </Typography>
       )}
     </div>
   );

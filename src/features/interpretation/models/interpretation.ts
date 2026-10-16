@@ -13,13 +13,27 @@ export const interpretationStatusAtom = atom<InterpretationStatus | null>(
   'interpretationStatusAtom'
 );
 
-// Generation takes minutes because the reasoning model answers a dozen or more
-// prompts per report, so poll once a minute while the panel is open — every few
-// seconds is wasteful for a job that cannot possibly finish that fast. If a
-// non-terminal status does not change for this long, the task was most likely
-// lost (e.g. the worker restarted mid-run) and the UI offers a manual retry.
-const INTERPRETATION_POLL_INTERVAL_MS = 60_000;
+export type InterpretationProgress = { done: number; total: number };
+
+// Texts generated so far while the report is running; null until it starts.
+export const interpretationProgressAtom = atom<InterpretationProgress | null>(
+  null,
+  'interpretationProgressAtom'
+);
+
+// Generation takes minutes, but the worker reports its progress after every
+// text, so poll often enough for the progress ring to move. If neither the
+// status nor the progress changes for this long, the task was most likely lost
+// (e.g. the worker restarted mid-run) and the UI offers a manual retry.
+const INTERPRETATION_POLL_INTERVAL_MS = 5_000;
 const INTERPRETATION_STALE_MS = 15 * 60 * 1000;
+
+// Statuses after which the report no longer changes on its own.
+const TERMINAL_STATUSES: ReadonlySet<InterpretationStatus> = new Set([
+  'completed',
+  'failed',
+  'cancelled',
+]);
 
 // Guards against a slow poll of a previously selected analysis overwriting the
 // report of the analysis the user is looking at now.
@@ -29,19 +43,22 @@ export const resetInterpretation = action(() => {
   activeInterpretationIdAtom.set(null);
   interpretationAtom.set(null);
   interpretationStatusAtom.set(null);
+  interpretationProgressAtom.set(null);
 }, 'resetInterpretation');
 
 export const fetchInterpretation = action(async (analysisId: string) => {
   activeInterpretationIdAtom.set(analysisId);
   interpretationAtom.set(null);
   interpretationStatusAtom.set(null);
+  interpretationProgressAtom.set(null);
 
   // A short run of 404s is expected right after an analysis completes while the
   // outbox is still relaying the evaluated event; after that the report was
   // never ordered and the UI offers a manual "Generate report" action.
   let notFoundCount = 0;
   const MAX_NOT_FOUND = 6;
-  let nonTerminalSince: number | null = null;
+  let lastChangeAt: number | null = null;
+  let lastState: string | null = null;
 
   const load = async (): Promise<boolean> => {
     try {
@@ -50,16 +67,27 @@ export const fetchInterpretation = action(async (analysisId: string) => {
         return true;
       }
       interpretationStatusAtom.set(report.status);
+      interpretationProgressAtom.set(
+        report.progress_total > 0
+          ? { done: report.progress_done, total: report.progress_total }
+          : null
+      );
       if (report.status === 'completed') {
         interpretationAtom.set(report);
         return true;
       }
-      if (nonTerminalSince === null) {
-        nonTerminalSince = Date.now();
-      } else if (Date.now() - nonTerminalSince > INTERPRETATION_STALE_MS) {
+      if (TERMINAL_STATUSES.has(report.status)) {
+        return true;
+      }
+      const state = `${report.status}:${report.progress_done}`;
+      if (state !== lastState) {
+        lastState = state;
+        lastChangeAt = Date.now();
+      } else if (lastChangeAt !== null && Date.now() - lastChangeAt > INTERPRETATION_STALE_MS) {
         // No progress for a long time: the generation was likely lost. Reset the
         // status so the UI offers "Generate report" again.
         interpretationStatusAtom.set(null);
+        interpretationProgressAtom.set(null);
         return true;
       }
       return false;
@@ -114,6 +142,27 @@ export const generateReport = action(async (analysisId: string) => {
     status: true,
     parseError: (error) => {
       const msg = getApiErrorMessage(error, 'Failed to order the interpretation report');
+      addNotification(msg, 'error');
+      return new Error(msg);
+    },
+  })
+);
+
+export const cancelReport = action(async (analysisId: string) => {
+  // The worker stops at its next step; the report is cancelled at once, so the
+  // UI switches to the cancelled state without waiting for the next poll, and
+  // the running poll loop stops when it reads the terminal status.
+  const report = await interpretationApi.cancelReport(analysisId);
+  if (activeInterpretationIdAtom() === analysisId) {
+    interpretationStatusAtom.set(report.status);
+    interpretationProgressAtom.set(null);
+  }
+  return report;
+}, 'cancelReport').extend(
+  withAsyncData({
+    status: true,
+    parseError: (error) => {
+      const msg = getApiErrorMessage(error, 'Failed to cancel the report generation');
       addNotification(msg, 'error');
       return new Error(msg);
     },

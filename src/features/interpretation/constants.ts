@@ -55,6 +55,7 @@ export const generatingMessages: Partial<Record<InterpretationStatus, string>> =
   running:
     'The report is being generated… This usually takes a few minutes. In the meantime, you can review the assessment results on the "Evaluation" tab.',
   failed: 'Failed to generate the report. Try generating it again.',
+  cancelled: 'The report generation was cancelled. You can generate it again.',
 };
 
 export const noReportMessage = 'No report has been generated for this analysis yet.';

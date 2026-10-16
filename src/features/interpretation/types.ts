@@ -69,7 +69,13 @@ export type ConstraintInterpretation = {
   points_lost: number;
 };
 
-export const interpretationStatusValues = ['ordered', 'running', 'completed', 'failed'] as const;
+export const interpretationStatusValues = [
+  'ordered',
+  'running',
+  'completed',
+  'failed',
+  'cancelled',
+] as const;
 export type InterpretationStatus = (typeof interpretationStatusValues)[number];
 
 export type InterpretationReport = {
@@ -77,6 +83,9 @@ export type InterpretationReport = {
   scale_max: number;
   scenario: string;
   status: InterpretationStatus;
+  // Texts generated so far / to generate while the report is running; total is 0 until it starts.
+  progress_done: number;
+  progress_total: number;
   aspects: AspectInterpretation[];
   top_aspects_summary: string;
   verdict: SuitabilityVerdict | null;
