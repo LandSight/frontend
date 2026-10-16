@@ -4,6 +4,7 @@ const unitSymbols: Record<string, string> = {
   degC: '°C',
   m2: 'm²',
   'km/km2': 'km/km²',
+  'ha/km2': 'ha/km²',
 };
 
 const formatAmount = (value: number): string =>

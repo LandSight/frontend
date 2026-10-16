@@ -40,6 +40,10 @@
     --verdict-color: #c62828;
   }
 
+  &[data-verdict='prohibited'] {
+    --verdict-color: #b71c1c;
+  }
+
   // The icon spans both the verdict and the profile lines.
   &__Verdict {
     display: flex;
@@ -71,6 +75,12 @@
   &__Profile {
     font-size: $font-size-s;
     color: $color-text-secondary;
+  }
+
+  &__Restricted {
+    font-size: $font-size-s;
+    color: $color-text-secondary;
+    font-variant-numeric: tabular-nums;
   }
 
   &__Gauge {

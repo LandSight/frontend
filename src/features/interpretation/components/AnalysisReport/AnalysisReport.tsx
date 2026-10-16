@@ -12,6 +12,7 @@ import { cn } from '#/shared/lib/bem';
 import { SectionTitle } from '#/shared/ui/SectionTitle';
 
 import { AspectCard } from '../AspectCard';
+import { ConstraintsCard } from '../ConstraintsCard';
 import { VerdictCard } from '../VerdictCard';
 
 import './AnalysisReport.scss';
@@ -82,21 +83,28 @@ export const AnalysisReport = reatomComponent<AnalysisReportProps>(({ analysis }
     <div className={cnAnalysisReport()}>
       <VerdictCard report={report} />
 
-      {report.top_aspects_summary && (
-        <>
-          <SectionTitle>Summary</SectionTitle>
-          <Typography variant="body1" className={cnAnalysisReport('Summary')}>
-            {report.top_aspects_summary}
-          </Typography>
-        </>
-      )}
-
       <SectionTitle>Aspects</SectionTitle>
       <div className={cnAnalysisReport('Aspects')}>
         {report.aspects.map((aspect) => (
           <AspectCard key={aspect.key} aspect={aspect} />
         ))}
       </div>
+
+      {report.top_aspects_summary && (
+        <>
+          <SectionTitle>Overall assessment</SectionTitle>
+          <Typography variant="body1" className={cnAnalysisReport('Summary')}>
+            {report.top_aspects_summary}
+          </Typography>
+        </>
+      )}
+
+      {report.constraints.length > 0 && (
+        <>
+          <SectionTitle>Restrictions</SectionTitle>
+          <ConstraintsCard report={report} />
+        </>
+      )}
     </div>
   );
 }, 'AnalysisReport');

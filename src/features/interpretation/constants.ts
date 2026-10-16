@@ -1,4 +1,5 @@
 import type { SvgIconComponent } from '@mui/icons-material';
+import BlockIcon from '@mui/icons-material/Block';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
@@ -6,7 +7,13 @@ import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import type { ChipProps } from '@mui/material';
 
-import type { InterpretationStatus, MetricRole, SuitabilityVerdict, ValuePosition } from './types';
+import type {
+  ConstraintEffect,
+  InterpretationStatus,
+  MetricRole,
+  SuitabilityVerdict,
+  ValuePosition,
+} from './types';
 
 export const metricRoleLabels: Record<MetricRole, string> = {
   strong: 'strong',
@@ -35,6 +42,12 @@ export const verdictIcons: Record<SuitabilityVerdict, SvgIconComponent> = {
   medium: RemoveCircleIcon,
   low: ReportProblemIcon,
   very_low: CancelIcon,
+  prohibited: BlockIcon,
+};
+
+export const constraintEffectLabels: Record<ConstraintEffect, string> = {
+  prohibit: 'prohibits building',
+  penalty: 'penalty',
 };
 
 export const generatingMessages: Partial<Record<InterpretationStatus, string>> = {
