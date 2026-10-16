@@ -20,6 +20,7 @@ import { reatomComponent } from '@reatom/react';
 
 import { AnalysisRow } from '#/features/analyses/components/AnalysisRow';
 import { openAnalysisDialog, requestDeleteAnalysis } from '#/features/analyses/models';
+import { isAnalysisFinished } from '#/features/analyses/types';
 import { ParcelDeleteDialog } from '#/features/parcels/components/ParcelDeleteDialog';
 import {
   deleteParcel,
@@ -161,6 +162,7 @@ export const ParcelsPanel = reatomComponent(() => {
                             canDelete={
                               analysis.status === 'completed' || analysis.status === 'failed'
                             }
+                            disabled={!isAnalysisFinished(analysis.status)}
                             onSelect={wrap(selectAnalysis)}
                             onDelete={wrap(requestDeleteAnalysis)}
                           />

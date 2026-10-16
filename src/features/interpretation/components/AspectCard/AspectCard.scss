@@ -1,0 +1,86 @@
+.AspectCard {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-m;
+  padding: $spacing-m;
+  border-radius: $border-radius-m;
+
+  // Columns are pinned so the bar and the score stay in place when an aspect
+  // has no loss badge.
+  &__Header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(80px, 30%) auto;
+    align-items: center;
+    column-gap: $spacing-s;
+  }
+
+  &__Name {
+    grid-column: 1;
+    font-weight: $font-weight-bold;
+  }
+
+  &__Bar {
+    grid-column: 3;
+    height: 8px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.08);
+
+    .MuiLinearProgress-bar {
+      border-radius: 4px;
+      background-color: $color-selected;
+    }
+  }
+
+  &__Score {
+    grid-column: 4;
+    font-weight: $font-weight-bold;
+    color: $color-selected;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__Max {
+    font-weight: normal;
+    color: $color-text-secondary;
+  }
+
+  &__Loss {
+    grid-column: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 1px $spacing-s;
+    border-radius: $border-radius-m;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    white-space: nowrap;
+
+    &[data-severity='moderate'] {
+      color: #e65100;
+      background: rgba(239, 108, 0, 0.1);
+    }
+
+    &[data-severity='severe'] {
+      color: #c62828;
+      background: rgba(198, 40, 40, 0.1);
+    }
+  }
+
+  // The LLM-written gist of the aspect, set apart from the numbers.
+  &__Takeaway {
+    padding: $spacing-s $spacing-m;
+    border-left: 3px solid rgba(0, 0, 0, 0.2);
+    border-radius: 0 $border-radius-m $border-radius-m 0;
+    background: rgba(0, 0, 0, 0.035);
+    line-height: 1.6;
+  }
+
+  &__Metrics {
+    margin: 0 $spacing-m;
+  }
+
+  &__Toggle {
+    align-self: center;
+    margin-top: -$spacing-s;
+  }
+}

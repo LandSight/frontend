@@ -1,11 +1,17 @@
 import { action, atom, computed } from '@reatom/core';
 
-import { analysesAtom, analysesListAtom } from '#/features/analyses/models/analyses';
+import {
+  analysesAtom,
+  analysesListAtom,
+  fetchEvaluation,
+} from '#/features/analyses/models/analyses';
+import { isAnalysisFinished } from '#/features/analyses/types';
 import {
   enableAllObjectCategories,
   fetchAnalysisMetricRefs,
   resetObjectCategories,
 } from '#/features/infrastructure/models';
+import { fetchInterpretation, resetInterpretation } from '#/features/interpretation/models';
 import { selectedParcelIdAtom } from '#/features/parcels/models';
 
 export type WorkspaceView = 'parcels' | 'analyses';
@@ -14,15 +20,27 @@ export const workspaceViewAtom = atom<WorkspaceView>('parcels', 'workspaceViewAt
 export const selectedAnalysisIdAtom = atom<string | null>(null, 'selectedAnalysisIdAtom');
 export const expandedParcelIdsAtom = atom<string[]>([], 'expandedParcelIdsAtom');
 
+export type ReportTab = 'report' | 'evaluation';
+
+export const reportTabAtom = atom<ReportTab>('report', 'reportTabAtom');
+
+export const setReportTab = action((tab: ReportTab) => {
+  reportTabAtom.set(tab);
+}, 'setReportTab');
+
 export const selectedAnalysisAtom = computed(() => {
   const id = selectedAnalysisIdAtom();
   return id ? (analysesAtom()[id] ?? null) : null;
 }, 'selectedAnalysisAtom');
 
-export const isReportOpenAtom = computed(
-  () => selectedAnalysisIdAtom() !== null,
-  'isReportOpenAtom'
-);
+export const isReportOpenAtom = computed(() => {
+  const id = selectedAnalysisIdAtom();
+  if (!id) {
+    return false;
+  }
+  const analysis = analysesAtom()[id];
+  return analysis != null && isAnalysisFinished(analysis.status);
+}, 'isReportOpenAtom');
 
 export const analysesByParcelAtom = computed(() => {
   const grouped: Record<string, ReturnType<typeof analysesListAtom>> = {};
@@ -37,6 +55,7 @@ export const closeReport = action(() => {
   if (analysisId) {
     resetObjectCategories(analysisId);
   }
+  resetInterpretation();
   selectedAnalysisIdAtom.set(null);
 }, 'closeReport');
 
@@ -53,7 +72,9 @@ export const toggleParcelExpanded = action((parcelId: string) => {
 
 export const selectAnalysis = action(async (id: string) => {
   const analysis = analysesAtom()[id];
-  if (!analysis) return;
+  if (!analysis || !isAnalysisFinished(analysis.status)) {
+    return;
+  }
 
   const previousId = selectedAnalysisIdAtom();
   if (previousId && previousId !== id) {
@@ -62,6 +83,10 @@ export const selectAnalysis = action(async (id: string) => {
 
   selectedParcelIdAtom.set(analysis.parcel_id);
   selectedAnalysisIdAtom.set(id);
+  if (analysis.status === 'completed') {
+    fetchEvaluation(id);
+    fetchInterpretation(id);
+  }
   await fetchAnalysisMetricRefs(id);
   await enableAllObjectCategories(id);
 }, 'selectAnalysis');

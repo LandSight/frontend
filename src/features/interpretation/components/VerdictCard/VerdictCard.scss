@@ -1,0 +1,89 @@
+.VerdictCard {
+  --verdict-color: #{$color-text-secondary};
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-m;
+  padding: $spacing-s $spacing-m $spacing-s calc(#{$spacing-m} + 4px);
+  overflow: hidden;
+  border-radius: $border-radius-m;
+  background: color-mix(in srgb, var(--verdict-color) 7%, #{$color-bg-light});
+
+  // Bookmark-like accent strip in the verdict colour.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--verdict-color);
+  }
+
+  &[data-verdict='very_high'] {
+    --verdict-color: #1b5e20;
+  }
+
+  &[data-verdict='high'] {
+    --verdict-color: #2e7d32;
+  }
+
+  &[data-verdict='medium'] {
+    --verdict-color: #ef6c00;
+  }
+
+  &[data-verdict='low'] {
+    --verdict-color: #d84315;
+  }
+
+  &[data-verdict='very_low'] {
+    --verdict-color: #c62828;
+  }
+
+  &[data-verdict='prohibited'] {
+    --verdict-color: #b71c1c;
+  }
+
+  // The icon spans both the verdict and the profile lines.
+  &__Verdict {
+    display: flex;
+    align-items: center;
+    gap: $spacing-s;
+    min-width: 0;
+  }
+
+  &__Icon {
+    flex-shrink: 0;
+    font-size: 2.5rem !important;
+    color: var(--verdict-color);
+  }
+
+  &__Text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__Label {
+    font-size: 1.25rem;
+    font-weight: $font-weight-bold;
+    line-height: 1.2;
+    color: var(--verdict-color);
+  }
+
+  &__Profile {
+    font-size: $font-size-s;
+    color: $color-text-secondary;
+  }
+
+  &__Restricted {
+    font-size: $font-size-s;
+    color: $color-text-secondary;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__Gauge {
+    color: var(--verdict-color);
+  }
+}

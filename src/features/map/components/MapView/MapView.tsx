@@ -4,6 +4,7 @@ import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
+import { mapInstanceAtom } from '#/features/map/models';
 import { cn } from '#/shared/lib/bem';
 
 import { MapContent } from '../MapContent';
@@ -19,10 +20,15 @@ L.Marker.prototype.options.icon = L.icon({
 
 const cnMapView = cn('MapView');
 
+const setMapInstance = (map: L.Map | null) => {
+  mapInstanceAtom.set(map);
+};
+
 export const MapView: React.FC = () => {
   return (
     <div className={cnMapView()}>
       <MapContainer
+        ref={setMapInstance}
         center={[59.93, 30.31]}
         zoom={12}
         zoomControl={false}

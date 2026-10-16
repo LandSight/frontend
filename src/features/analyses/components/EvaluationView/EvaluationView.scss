@@ -1,0 +1,64 @@
+.EvaluationView {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-m;
+
+  &--loading {
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__Muted {
+    color: $color-text-secondary;
+  }
+
+  &__Header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-m;
+    padding: $spacing-s $spacing-m $spacing-s calc(#{$spacing-m} + 4px);
+    overflow: hidden;
+    border-radius: $border-radius-m;
+    background: rgba(33, 150, 243, 0.06);
+
+    // Same accent strip as the report verdict card.
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: $color-selected;
+    }
+  }
+
+  &__Title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__Label {
+    font-size: 1.25rem;
+    font-weight: $font-weight-bold;
+    line-height: 1.2;
+  }
+
+  &__Meta {
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+  }
+
+  &__Gauge {
+    color: $color-selected;
+  }
+
+  &__Clusters {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-m;
+  }
+}

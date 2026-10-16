@@ -1,0 +1,94 @@
+.ConstraintsCard {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-m;
+  padding: $spacing-m;
+  border-radius: $border-radius-m;
+
+  &__Header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-s;
+  }
+
+  &__Title {
+    font-weight: $font-weight-bold;
+  }
+
+  &__Loss {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 1px $spacing-s;
+    border-radius: $border-radius-m;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    color: #c62828;
+    background: rgba(198, 40, 40, 0.1);
+  }
+
+  // The LLM-written explanation, styled like the aspect takeaways.
+  &__Takeaway {
+    padding: $spacing-s $spacing-m;
+    border-left: 3px solid rgba(198, 40, 40, 0.5);
+    border-radius: 0 $border-radius-m $border-radius-m 0;
+    background: rgba(198, 40, 40, 0.04);
+    line-height: 1.6;
+  }
+
+  &__List {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-s;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__Item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: $spacing-s $spacing-m;
+    border-radius: $border-radius-m;
+    background: rgba(0, 0, 0, 0.035);
+
+    &[data-effect='prohibit'] {
+      background: rgba(198, 40, 40, 0.06);
+    }
+  }
+
+  &__ItemHeader {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    column-gap: $spacing-s;
+  }
+
+  &__Label {
+    font-weight: $font-weight-bold;
+    overflow-wrap: anywhere;
+  }
+
+  &__Points {
+    font-weight: $font-weight-bold;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    color: #c62828;
+  }
+
+  &__Details,
+  &__Basis {
+    font-size: $font-size-s;
+    color: $color-text-secondary;
+    overflow-wrap: anywhere;
+  }
+
+  &__Basis {
+    font-size: $font-size-xs;
+  }
+}

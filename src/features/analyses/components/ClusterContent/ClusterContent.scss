@@ -1,0 +1,9 @@
+.ClusterContent {
+  &__Subcluster {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-s;
+    padding-left: $spacing-m;
+    border-left: 2px solid rgba(33, 150, 243, 0.35);
+  }
+}

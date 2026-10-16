@@ -3,7 +3,7 @@ import { effect, sleep, wrap } from '@reatom/core';
 import { reatomFactoryComponent } from '@reatom/react';
 
 import { AnalysisStartDialog } from '#/features/analyses/components/AnalysisStartDialog';
-import { fetchAnalyses } from '#/features/analyses/models';
+import { fetchAnalyses, fetchCatalogs } from '#/features/analyses/models';
 import { hasActiveAnalysesAtom } from '#/features/analyses/models/analyses';
 import { fetchInfrastructureCategories } from '#/features/infrastructure/models';
 import { MapView } from '#/features/map/components/MapView';
@@ -20,6 +20,7 @@ export const WorkspacePage = reatomFactoryComponent(() => {
   effect(() => {
     fetchParcels();
     fetchAnalyses();
+    fetchCatalogs();
     fetchInfrastructureCategories();
   }, 'workspaceInitEffect');
 

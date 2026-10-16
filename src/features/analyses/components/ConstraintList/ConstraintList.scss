@@ -1,0 +1,70 @@
+.ConstraintList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-m;
+  padding: $spacing-m;
+  border-radius: $border-radius-m;
+
+  &__Scores {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: $spacing-s;
+    font-size: $font-size-s;
+    color: $color-text-secondary;
+    font-variant-numeric: tabular-nums;
+
+    b {
+      color: $color-bg-dark;
+    }
+  }
+
+  &__Muted {
+    color: $color-text-secondary;
+  }
+
+  &__List {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-s;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__Item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: $spacing-s $spacing-m;
+    border-radius: $border-radius-m;
+    background: rgba(0, 0, 0, 0.035);
+
+    &[data-effect='prohibit'] {
+      background: rgba(198, 40, 40, 0.06);
+    }
+  }
+
+  &__ItemHeader {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: $spacing-s;
+  }
+
+  &__Label {
+    font-weight: $font-weight-bold;
+    overflow-wrap: anywhere;
+  }
+
+  &__Details,
+  &__Basis {
+    font-size: $font-size-s;
+    color: $color-text-secondary;
+    overflow-wrap: anywhere;
+  }
+
+  &__Basis {
+    font-size: $font-size-xs;
+  }
+}

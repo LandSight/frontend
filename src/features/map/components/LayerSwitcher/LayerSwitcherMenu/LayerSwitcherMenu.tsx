@@ -17,8 +17,8 @@ export const LayerSwitcherMenu = reatomComponent<LayerSwitcherMenuProps>(
         anchorEl={anchorEl}
         open={open}
         onClose={onClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'center', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'center', horizontal: 'right' }}
         className={cnLayerSwitcherMenu()}
       >
         {layerTypes.map((layerType) => (

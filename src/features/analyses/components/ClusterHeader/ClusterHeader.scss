@@ -1,0 +1,55 @@
+.ClusterHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(80px, 30%) 3.5em;
+  align-items: center;
+  column-gap: $spacing-s;
+
+  &__Title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  &__Name {
+    margin-right: 2px;
+    font-weight: $font-weight-bold;
+  }
+
+  // Doubled up to win over the MUI chip styles.
+  &__Chip.MuiChip-root {
+    height: 20px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+
+  &__Bar {
+    height: 8px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.08);
+
+    .MuiLinearProgress-bar {
+      border-radius: 4px;
+      background-color: $color-selected;
+    }
+  }
+
+  &__Score {
+    text-align: right;
+    font-weight: $font-weight-bold;
+    color: $color-selected;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+
+  &--nested {
+    font-size: $font-size-s;
+
+    .ClusterHeader__Bar {
+      height: 6px;
+    }
+  }
+}
